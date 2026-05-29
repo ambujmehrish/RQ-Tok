@@ -30,6 +30,10 @@ renderer:
   backbone: black-forest-labs/FLUX.1-dev
   image_size: 1024
   latent_dim: 64
+  model_dim: 3072
+  num_blocks: 19
+  num_heads: 24
+  num_image_tokens: 256
   controlnet_double_blocks: 4
   controlnet_single_blocks: 1
   downsample_factor: 2

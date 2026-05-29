@@ -30,6 +30,10 @@ renderer:
   backbone: dummy
   image_size: 64
   latent_dim: 32
+  model_dim: 64
+  num_blocks: 2
+  num_heads: 4
+  num_image_tokens: 16
   controlnet_double_blocks: 1
   controlnet_single_blocks: 1
   downsample_factor: 2

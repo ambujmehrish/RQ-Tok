@@ -78,7 +78,11 @@ class RendererConfig:
 
     backbone: str = "dummy"         # "dummy" (tiny DiT) | "black-forest-labs/FLUX.1-dev"
     image_size: int = 64            # real: 256/512/1024
-    latent_dim: int = 32            # renderer latent channel dim
+    latent_dim: int = 32            # renderer latent channel dim (image-latent I/O)
+    model_dim: int = 64             # DiT internal width (real: 3072 for FLUX)
+    num_blocks: int = 2             # frozen backbone DiT depth (real: full FLUX)
+    num_heads: int = 4              # attention heads
+    num_image_tokens: int = 16      # image-latent token count L (real: (H/patch)^2)
     controlnet_double_blocks: int = 1   # real: 4
     controlnet_single_blocks: int = 1   # real: 1
     downsample_factor: int = 2      # 2D conv downsample before ControlNet
@@ -219,6 +223,10 @@ def _base_gpu() -> BifrostFlowConfig:
             backbone="black-forest-labs/FLUX.1-dev",
             image_size=1024,
             latent_dim=64,
+            model_dim=3072,
+            num_blocks=19,
+            num_heads=24,
+            num_image_tokens=256,
             controlnet_double_blocks=4,
             controlnet_single_blocks=1,
             num_inference_steps=28,

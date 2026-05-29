@@ -222,7 +222,11 @@ encoder-agnostic and consumes *CLIP patch latents*. Only the two `build_*` facto
    context), hybrid head = per-level code classifier (CE incl. `<halt>`) + flow-matching
    residual head; MAR masked training with CFG text-dropout; MaskGIT iterative decoding
    with CFG + flow residual sampling. CPU tests in `tests/test_mllm.py`.
-3. Flow-matching latent ControlNet + FLUX renderer (`bifrost_flow/renderer`).
+3. Flow-matching latent ControlNet + FLUX renderer (`bifrost_flow/renderer`). **(done)**
+   Frozen (grad-transparent) flow DiT backbone + trainable latent ControlNet (input
+   proj, 2D downsample conv, cross-attn blocks with zero-init residual injection);
+   rectified-flow velocity loss conditioned on `ẑ+res`; ODE sampler. CPU tests in
+   `tests/test_renderer.py`.
 4. Decoupled training pipelines + data loaders.
 5. Inference pipeline.
 6. Eval harness + ablation configs.
