@@ -1,0 +1,54 @@
+name: heimdall-tiny-cpu
+tokenizer:
+  clip_dim: 32
+  num_patches: 16
+  codebook_size: 64
+  max_depth: 4
+  shared_codebook: true
+  commitment_weight: 0.25
+  entropy_weight: 0.01
+  ema_decay: 0.99
+  adaptive_depth: true
+  halt_residual_threshold: 0.05
+  rate_penalty: 0.001
+mllm:
+  backbone: dummy
+  hidden_dim: 64
+  num_layers: 2
+  num_heads: 4
+  freeze_backbone: true
+  code_head: true
+  flow_residual_head: true
+  flow_head_dim: 64
+  flow_head_layers: 2
+  cfg_text_dropout: 0.1
+  cfg_scale: 3.0
+  mask_min: 0.7
+  mask_max: 1.0
+  decode_steps: 16
+renderer:
+  backbone: dummy
+  image_size: 64
+  latent_dim: 32
+  controlnet_double_blocks: 1
+  controlnet_single_blocks: 1
+  downsample_factor: 2
+  flow_sigma_min: 0.0
+  num_inference_steps: 8
+  controlnet_conditioning_scale: 0.7
+  guidance_scale: 3.5
+  train_on_dequantized: true
+  scheduled_sampling_prob: 0.0
+train:
+  stage: tokenizer
+  batch_size: 4
+  lr: 0.0001
+  weight_decay: 0.0
+  max_steps: 100
+  grad_clip: 1.0
+  seed: 0
+  device: cpu
+  precision: fp32
+  dataset: dummy
+  log_every: 10
+  ckpt_dir: checkpoints
