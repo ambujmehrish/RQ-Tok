@@ -58,6 +58,13 @@ class Codebook(nn.Module):
         self.eps = float(eps)
         self.dead_code_threshold = float(dead_code_threshold)
 
+        # Buffer type annotations (registered below): tells type-checkers these
+        # attributes are Tensors, not the Tensor|Module union nn.Module infers.
+        self.embed: Tensor
+        self.cluster_size: Tensor
+        self.embed_avg: Tensor
+        self.initted: Tensor
+
         # Code vectors. Not an nn.Parameter: the codebook learns via EMA, not grad.
         embed = torch.randn(self.codebook_size, self.dim)
         self.register_buffer("embed", embed)

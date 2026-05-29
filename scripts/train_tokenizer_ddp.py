@@ -82,8 +82,9 @@ def main():
         idx = torch.randint(latents.shape[0], (args.batch_size,), generator=gen, device=info.device)
         out = tok(latents[idx], update_codebook=True)  # EMA all-reduces across ranks
         if is_main_process() and (step % 50 == 0 or step == args.steps - 1):
-            l = out.losses.item()
-            print(f"  step {step:5d}  recon={l['recon']:.4f}  rate={l['rate']:.2f}  "
+            stats = out.losses.item()
+            print(f"  step {step:5d}  recon={stats['recon']:.4f}  "
+                  f"rate={stats['rate']:.2f}  "
                   f"usage={float(tok.codebook_usage()):.2f}", flush=True)
 
     barrier()

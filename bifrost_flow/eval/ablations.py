@@ -10,7 +10,6 @@ from __future__ import annotations
 
 import dataclasses
 import os
-from typing import Dict
 
 from ..config import BifrostFlowConfig, get_preset
 
@@ -20,7 +19,7 @@ def _with(cfg: BifrostFlowConfig, **sub_overrides) -> BifrostFlowConfig:
 
     ``sub_overrides`` keys are ``"<block>.<field>"`` (e.g. ``"tokenizer.max_depth"``).
     """
-    blocks: Dict[str, dict] = {}
+    blocks: dict[str, dict] = {}
     for dotted, value in sub_overrides.items():
         block, field = dotted.split(".", 1)
         blocks.setdefault(block, {})[field] = value
@@ -32,10 +31,12 @@ def _with(cfg: BifrostFlowConfig, **sub_overrides) -> BifrostFlowConfig:
     return dataclasses.replace(cfg, **kwargs)
 
 
-def ablation_configs(base: str = "tiny_cpu") -> Dict[str, BifrostFlowConfig]:
+def ablation_configs(base: str = "tiny_cpu") -> dict[str, BifrostFlowConfig]:
     """Named ablation variants derived from ``base`` (named accordingly)."""
     b = get_preset(base)
-    out: Dict[str, BifrostFlowConfig] = {"baseline": dataclasses.replace(b, name=f"{base}-baseline")}
+    out: dict[str, BifrostFlowConfig] = {
+        "baseline": dataclasses.replace(b, name=f"{base}-baseline")
+    }
 
     def add(name: str, **ov):
         out[name] = _with(dataclasses.replace(b, name=f"{base}-{name}"), **ov)

@@ -18,14 +18,15 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass, field
+from typing import cast
 
 import torch
 from torch import Tensor, nn
 
 from ..config import BifrostFlowConfig
 from ..data import build_dataloader, build_dataset
-from ..mllm import build_vision_gen_model
-from ..renderer import build_renderer
+from ..mllm import VisionGenModel, build_vision_gen_model
+from ..renderer import FlowRenderer, build_renderer
 from ..tokenizer import build_tokenizer
 from ..tokenizer.encoder import DummyCLIPEncoder
 from ..utils.distributed import (
@@ -39,6 +40,7 @@ from ..utils.distributed import (
     seed_everything,
     setup_distributed,
 )
+from ..utils.logging import get_logger
 
 VALID_STAGES = ("tokenizer", "branch", "renderer")
 
@@ -58,6 +60,7 @@ class Trainer:
             raise ValueError(f"stage must be one of {VALID_STAGES}, got {cfg.train.stage!r}")
         self.cfg = cfg
         self.stage = cfg.train.stage
+        self.log = get_logger("trainer")
 
         if setup_dist:
             self.info = setup_distributed(
@@ -82,6 +85,20 @@ class Trainer:
         self.sampler = make_sampler(dataset, self.info, shuffle=True, seed=cfg.train.seed)
         self.loader = build_dataloader(cfg, dataset, sampler=self.sampler)
 
+    # Typed accessors: model/opt exist for the branch & renderer stages (built in
+    # _build_stage). These assert the invariant and narrow the Optional for callers.
+    @property
+    def _model(self) -> nn.Module:
+        if self.model is None:
+            raise RuntimeError(f"stage '{self.stage}' has no trainable model")
+        return self.model
+
+    @property
+    def _opt(self) -> torch.optim.Optimizer:
+        if self.opt is None:
+            raise RuntimeError(f"stage '{self.stage}' has no optimizer")
+        return self.opt
+
     # -- stage construction ------------------------------------------------------------
     def _build_stage(self) -> None:
         cfg = self.cfg
@@ -97,7 +114,7 @@ class Trainer:
             self.vae = DummyCLIPEncoder(
                 cfg.renderer.latent_dim, cfg.renderer.num_image_tokens).to(self.device)
 
-        params = [p for p in self.model.parameters() if p.requires_grad]
+        params = [p for p in self._model.parameters() if p.requires_grad]
         if not params:
             raise RuntimeError(f"stage '{self.stage}' has no trainable parameters")
         self.opt = torch.optim.AdamW(
@@ -120,16 +137,19 @@ class Trainer:
         return {k: torch.as_tensor(v, device=self.device) for k, v in out.losses.item().items()}
 
     def _step_branch(self, images: Tensor, text: Tensor) -> Tensor:
+        model = cast(VisionGenModel, self._model)
         _, codes, zhat, res = self._tokenize(images)
-        losses = self.model.compute_loss(text, codes, res, zhat)
+        losses = model.compute_loss(text, codes, res, zhat)
         self._last = losses.item()
         return losses.total
 
     def _step_renderer(self, images: Tensor, text: Tensor) -> Tensor:
+        model = cast(FlowRenderer, self._model)
         _, _, zhat, res = self._tokenize(images)
         control = (zhat + res)                                   # dequantized + residual
+        assert self.vae is not None                              # set for renderer stage
         image_latents = self.vae(images)                         # [B, L, C] target
-        loss = self.model.compute_loss(image_latents, control)
+        loss = model.compute_loss(image_latents, control)
         self._last = loss.item()
         return loss.flow
 
@@ -151,16 +171,16 @@ class Trainer:
                     metrics = self._step_tokenizer(images)
                     last = {k: float(v) for k, v in metrics.items()}
                 else:
-                    self.opt.zero_grad()
+                    self._opt.zero_grad()
                     loss = (self._step_branch(images, text) if self.stage == "branch"
                             else self._step_renderer(images, text))
                     loss.backward()
-                    average_gradients(self.model)
+                    average_gradients(self._model)
                     if self.cfg.train.grad_clip > 0:
                         nn.utils.clip_grad_norm_(
-                            [p for p in self.model.parameters() if p.requires_grad],
+                            [p for p in self._model.parameters() if p.requires_grad],
                             self.cfg.train.grad_clip)
-                    self.opt.step()
+                    self._opt.step()
                     last = self._last
 
                 if step % self.cfg.train.log_every == 0 or step == self.cfg.train.max_steps - 1:
@@ -177,14 +197,13 @@ class Trainer:
         reduced = reduce_dict(
             {k: torch.tensor(v, device=self.device) for k, v in last.items()})
         snap = {"step": float(step), **{k: float(v) for k, v in reduced.items()}}
-        if is_main_process():
-            msg = "  ".join(f"{k}={v:.4f}" for k, v in snap.items() if k != "step")
-            print(f"[{self.stage}] step {step:6d}  {msg}", flush=True)
+        msg = "  ".join(f"{k}={v:.4f}" for k, v in snap.items() if k != "step")
+        self.log.info("[%s] step %6d  %s", self.stage, step, msg)
         return snap
 
     # -- checkpointing -----------------------------------------------------------------
     def _trainable_module(self) -> nn.Module:
-        return self.tokenizer if self.stage == "tokenizer" else self.model
+        return self.tokenizer if self.stage == "tokenizer" else self._model
 
     def save_checkpoint(self, step: int) -> str | None:
         if not is_main_process():

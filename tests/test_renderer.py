@@ -99,7 +99,8 @@ def test_renderer_learns_control_to_latent():
     for _ in range(120):
         opt.zero_grad()
         loss = r.compute_loss(target, control, generator=g)
-        loss.flow.backward(); opt.step()
+        loss.flow.backward()
+        opt.step()
         if first is None:
             first = loss.flow.detach().item()
     last = loss.flow.detach().item()

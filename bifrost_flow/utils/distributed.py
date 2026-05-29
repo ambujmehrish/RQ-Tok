@@ -19,7 +19,7 @@ from __future__ import annotations
 import datetime as _dt
 import os
 from dataclasses import dataclass
-from typing import Any, Dict, Iterable, Optional
+from typing import Any
 
 import torch
 import torch.distributed as dist
@@ -39,7 +39,7 @@ class DistInfo:
         return self.rank == 0
 
 
-def _env_int(name: str) -> Optional[int]:
+def _env_int(name: str) -> int | None:
     v = os.environ.get(name)
     if v is None or v == "":
         return None
@@ -49,7 +49,7 @@ def _env_int(name: str) -> Optional[int]:
         raise ValueError(f"environment variable {name}={v!r} is not an int") from e
 
 
-def detect_launch_env() -> Dict[str, Optional[int | str]]:
+def detect_launch_env() -> dict[str, int | str | None]:
     """Resolve (rank, world_size, local_rank) from torchrun or SLURM.
 
     torchrun env wins if present; otherwise SLURM. Returns a dict with the resolved
@@ -98,9 +98,10 @@ def setup_distributed(backend: str = "nccl", init_timeout_min: int = 30) -> Dist
         raise ValueError(f"backend must be 'nccl' or 'gloo', got {backend!r}")
 
     env = detect_launch_env()
-    world_size = int(env["world_size"])
-    rank = int(env["rank"])
-    local_rank = int(env["local_rank"])
+    # rank/world_size/local_rank are always populated ints (see detect_launch_env).
+    world_size = int(env["world_size"])  # type: ignore[arg-type]
+    rank = int(env["rank"])  # type: ignore[arg-type]
+    local_rank = int(env["local_rank"])  # type: ignore[arg-type]
 
     if world_size == 1:
         device = _select_device(backend, local_rank, allow_cpu=True)
@@ -174,7 +175,7 @@ def all_reduce_mean(tensor: torch.Tensor) -> torch.Tensor:
     return tensor
 
 
-def reduce_dict(values: Dict[str, torch.Tensor]) -> Dict[str, torch.Tensor]:
+def reduce_dict(values: dict[str, torch.Tensor]) -> dict[str, torch.Tensor]:
     """Mean-reduce a dict of scalar tensors across ranks (for logging)."""
     if not is_dist():
         return values

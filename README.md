@@ -5,9 +5,9 @@ for unified multimodal understanding and generation. The name reflects the core 
 bridge (*Bifröst*) between a frozen multimodal LLM (MLLM) and a pretrained image renderer is
 now driven end-to-end by **flow matching** instead of diffusion + MSE.
 
-> Status: **early development.** See [`DESIGN.md`](DESIGN.md) for the full research design.
-> The codebase is being built phase-by-phase; tiny configs run on CPU, real backbones
-> (Qwen2.5-VL + FLUX.1-dev) plug in via config on GPU nodes.
+> See [`DESIGN.md`](DESIGN.md) for the full research design and [`NOVELTY.md`](NOVELTY.md)
+> for the precise weakness→fix→code mapping vs. Bifrost-1. Tiny configs run on CPU; real
+> backbones (Qwen2.5-VL + FLUX.1-dev) plug in via config on GPU nodes.
 
 ## Core idea
 
@@ -136,8 +136,20 @@ report = evaluate_tokenizer(tok, z)        # recon MSE/PSNR, mean depth, depth c
 Ablation configs (depth, adaptive on/off, codebook size, CFG, exposure-bias, flow head,
 continuous-Bifrost baseline) are in `configs/ablations/`.
 
+## Development
+
+```bash
+make install     # pip install -e ".[dev,torch]"
+make check       # ruff + mypy + pytest (mirrors CI)
+make fmt         # ruff autofix
+```
+
+CI (`.github/workflows/ci.yml`) runs ruff, mypy, and the CPU test suite (incl. the
+2-process gloo distributed test) on Python 3.10–3.12. The package ships `py.typed`.
+
 ## Build status
 
-Phases 0–6 complete and CPU-tested (`pytest -q`, tokenizer/MLLM/renderer/training/inference/eval).
-Multi-GPU (DDP/FSDP) wired. Remaining for GPU production: swap the dummy MLLM/CLIP/FLUX
-stand-ins for the real frozen models and wire the real datasets + external eval metrics.
+Phases 0–6 complete and CPU-tested (`pytest -q`, tokenizer/MLLM/renderer/training/inference/eval);
+ruff- and mypy-clean. Multi-GPU (DDP/FSDP) wired. Remaining for GPU production: swap the
+dummy MLLM/CLIP/FLUX stand-ins for the real frozen models and wire the real datasets +
+external eval metrics.

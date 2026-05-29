@@ -12,7 +12,6 @@ dummy renderer returns the image latents directly.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional
 
 import torch
 from torch import Tensor, nn
@@ -34,7 +33,7 @@ class PipelineOutput:
 class BifrostFlowPipeline(nn.Module):
     """Bundles the frozen tokenizer, the vision-generation model, and the renderer."""
 
-    def __init__(self, cfg: BifrostFlowConfig, device: Optional[torch.device] = None) -> None:
+    def __init__(self, cfg: BifrostFlowConfig, device: torch.device | None = None) -> None:
         super().__init__()
         self.cfg = cfg
         self.device = device or torch.device(cfg.train.device)
@@ -56,10 +55,10 @@ class BifrostFlowPipeline(nn.Module):
 
     # -- generation --------------------------------------------------------------------
     @torch.no_grad()
-    def generate(self, text_ids: Tensor, cfg_scale: Optional[float] = None,
-                 temperature: float = 1.0, decode_steps: Optional[int] = None,
-                 render_steps: Optional[int] = None,
-                 generator: Optional[torch.Generator] = None) -> PipelineOutput:
+    def generate(self, text_ids: Tensor, cfg_scale: float | None = None,
+                 temperature: float = 1.0, decode_steps: int | None = None,
+                 render_steps: int | None = None,
+                 generator: torch.Generator | None = None) -> PipelineOutput:
         if text_ids.dim() != 2:
             raise ValueError(f"text_ids must be [B, T], got {tuple(text_ids.shape)}")
         text_ids = text_ids.to(self.device)
@@ -76,5 +75,5 @@ class BifrostFlowPipeline(nn.Module):
 
 
 def build_pipeline(cfg: BifrostFlowConfig,
-                   device: Optional[torch.device] = None) -> BifrostFlowPipeline:
+                   device: torch.device | None = None) -> BifrostFlowPipeline:
     return BifrostFlowPipeline(cfg, device=device)

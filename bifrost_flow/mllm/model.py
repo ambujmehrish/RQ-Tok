@@ -16,8 +16,8 @@ Fail-loud throughout; no silent fallbacks.
 from __future__ import annotations
 
 import math
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Callable, Optional
 
 import torch
 import torch.nn.functional as F
@@ -52,7 +52,7 @@ class GenerateOutput:
 
 class VisionGenModel(nn.Module):
     def __init__(self, mllm_cfg: MLLMConfig, tok_cfg: TokenizerConfig,
-                 backbone: Optional[nn.Module] = None) -> None:
+                 backbone: nn.Module | None = None) -> None:
         super().__init__()
         self.mllm_cfg = mllm_cfg
         self.tok_cfg = tok_cfg
@@ -97,7 +97,7 @@ class VisionGenModel(nn.Module):
 
     # -- training ----------------------------------------------------------------------
     def compute_loss(self, text_ids: Tensor, codes: Tensor, residual: Tensor,
-                     zhat: Tensor, generator: Optional[torch.Generator] = None) -> BranchLosses:
+                     zhat: Tensor, generator: torch.Generator | None = None) -> BranchLosses:
         """MAR masked training step.
 
         Args:
@@ -136,7 +136,7 @@ class VisionGenModel(nn.Module):
         return BranchLosses(total=total, code_ce=code_ce, flow=flow)
 
     def _sample_mask(self, b: int, device: torch.device,
-                     generator: Optional[torch.Generator]) -> Tensor:
+                     generator: torch.Generator | None) -> Tensor:
         lo, hi = self.mllm_cfg.mask_min, self.mllm_cfg.mask_max
         ratio = torch.empty(b, device=device).uniform_(lo, hi, generator=generator)
         n_mask = (ratio * self.N).ceil().clamp(1, self.N).long()    # >=1 masked
@@ -148,9 +148,9 @@ class VisionGenModel(nn.Module):
     # -- decoding ----------------------------------------------------------------------
     @torch.no_grad()
     def generate(self, text_ids: Tensor, dequantize_fn: Callable[[Tensor], Tensor],
-                 steps: Optional[int] = None, cfg_scale: Optional[float] = None,
+                 steps: int | None = None, cfg_scale: float | None = None,
                  temperature: float = 1.0,
-                 generator: Optional[torch.Generator] = None) -> GenerateOutput:
+                 generator: torch.Generator | None = None) -> GenerateOutput:
         """Iterative MaskGIT decode (codes) + flow sampling (residual).
 
         Args:
@@ -211,7 +211,7 @@ class VisionGenModel(nn.Module):
         return lu + cfg_scale * (lc - lu)
 
     def _sample_codes(self, logits: Tensor, temperature: float,
-                      generator: Optional[torch.Generator]) -> tuple[Tensor, Tensor]:
+                      generator: torch.Generator | None) -> tuple[Tensor, Tensor]:
         logp = F.log_softmax(logits, dim=-1)               # [B,N,D,vocab]
         if temperature <= 0.0:
             cand = logits.argmax(dim=-1)                    # greedy
@@ -253,6 +253,6 @@ class VisionGenModel(nn.Module):
 
 
 def build_vision_gen_model(cfg: BifrostFlowConfig,
-                           backbone: Optional[nn.Module] = None) -> VisionGenModel:
+                           backbone: nn.Module | None = None) -> VisionGenModel:
     """Construct the vision-generation model from a full config."""
     return VisionGenModel(cfg.mllm, cfg.tokenizer, backbone=backbone)

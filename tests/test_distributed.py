@@ -116,7 +116,7 @@ def _codebook_worker(rank: int, world_size: int, port: int):
     )
     from bifrost_flow.config import TokenizerConfig
     from bifrost_flow.tokenizer import AdaptiveResidualQuantizer
-    from bifrost_flow.utils.distributed import setup_distributed, cleanup
+    from bifrost_flow.utils.distributed import cleanup, setup_distributed
 
     info = setup_distributed(backend="gloo")
     assert info.is_distributed and info.world_size == world_size

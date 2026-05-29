@@ -8,8 +8,8 @@ import bifrost_flow
 from bifrost_flow.config import (
     BifrostFlowConfig,
     TokenizerConfig,
-    get_preset,
     available_presets,
+    get_preset,
 )
 
 CONFIG_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "configs")

@@ -7,14 +7,14 @@ loudly if torch is missing — there are no silent fallbacks.
 """
 
 from .codebook import Codebook
+from .encoder import DummyCLIPEncoder, build_clip_encoder
+from .fit import FitReport, fit_tokenizer
 from .quantizer import (
     AdaptiveResidualQuantizer,
     QuantizeOutput,
     TokenizerLosses,
 )
-from .encoder import DummyCLIPEncoder, build_clip_encoder
 from .tokenizer import RVQCLIPTokenizer, build_tokenizer
-from .fit import FitReport, fit_tokenizer
 
 __all__ = [
     "Codebook",

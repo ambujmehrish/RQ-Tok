@@ -6,6 +6,8 @@ Self-contained metrics (MSE/PSNR/SSIM, codebook perplexity) + a tokenizer evalua
 Requires torch.
 """
 
+from .ablations import ablation_configs, dump_ablation_configs
+from .evaluator import TokenizerReport, evaluate_tokenizer, reconstruction_vs_depth
 from .metrics import (
     codebook_perplexity,
     dpg_bench_score,
@@ -19,8 +21,6 @@ from .metrics import (
     sfid,
     ssim,
 )
-from .evaluator import TokenizerReport, evaluate_tokenizer, reconstruction_vs_depth
-from .ablations import ablation_configs, dump_ablation_configs
 
 __all__ = [
     "mse", "psnr", "ssim", "codebook_perplexity",

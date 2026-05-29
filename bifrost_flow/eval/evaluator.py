@@ -29,7 +29,9 @@ class TokenizerReport:
 
 
 @torch.no_grad()
-def reconstruction_vs_depth(tokenizer: RVQCLIPTokenizer, latents: Tensor) -> list[tuple[int, float]]:
+def reconstruction_vs_depth(
+    tokenizer: RVQCLIPTokenizer, latents: Tensor
+) -> list[tuple[int, float]]:
     """MSE between ``z`` and the prefix dequantized using only the first ``d`` codes."""
     if latents.dim() == 3:
         latents = latents.reshape(-1, latents.size(-1))
@@ -52,7 +54,7 @@ def evaluate_tokenizer(tokenizer: RVQCLIPTokenizer, latents: Tensor) -> Tokenize
     q = tokenizer.quantizer
     out = q(latents, update_codebook=False)
 
-    cluster_size = q.codebooks[0].cluster_size
+    cluster_size = q._book(0).cluster_size
     return TokenizerReport(
         recon_prefix_mse=float(mse(out.zhat, latents)),
         recon_full_mse=float(mse(out.zhat + out.res, latents)),

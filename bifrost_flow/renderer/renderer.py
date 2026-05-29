@@ -8,7 +8,6 @@ code space"). Sampling integrates the probability-flow ODE from noise to image l
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional
 
 import torch
 from torch import Tensor, nn
@@ -44,7 +43,7 @@ class FlowRenderer(nn.Module):
         return self.backbone(x_t, t, control_residuals=residuals)
 
     def compute_loss(self, image_latents: Tensor, control: Tensor,
-                     generator: Optional[torch.Generator] = None) -> RendererLoss:
+                     generator: torch.Generator | None = None) -> RendererLoss:
         """Rectified-flow velocity loss.
 
         Args:
@@ -62,9 +61,9 @@ class FlowRenderer(nn.Module):
         return RendererLoss(flow=flow)
 
     @torch.no_grad()
-    def sample(self, control: Tensor, steps: Optional[int] = None,
-               generator: Optional[torch.Generator] = None,
-               x0: Optional[Tensor] = None) -> Tensor:
+    def sample(self, control: Tensor, steps: int | None = None,
+               generator: torch.Generator | None = None,
+               x0: Tensor | None = None) -> Tensor:
         """Integrate the flow ODE from noise to image latents ``[B, L, C]``."""
         self.eval()
         steps = steps if steps is not None else self.cfg.num_inference_steps

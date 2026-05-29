@@ -9,8 +9,8 @@ the branch/head/training/decoding code is backbone-agnostic and unchanged by tha
 
 from .backbone import DummyMLLMBackbone, build_backbone
 from .branch import VisionGenBranch
-from .heads import CodeClassifierHead, FlowResidualHead
 from .flow import flow_matching_loss, flow_sample, rectified_flow_target
+from .heads import CodeClassifierHead, FlowResidualHead
 from .model import (
     BranchLosses,
     GenerateOutput,

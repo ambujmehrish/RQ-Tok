@@ -63,12 +63,11 @@ class LatentControlNet(nn.Module):
         self.blocks = nn.ModuleList(BranchBlock(cfg.model_dim, cfg.num_heads)
                                     for _ in range(n_blocks))
         # Zero-init output projections: residuals start at 0 (identity init).
-        self.zero_projs = nn.ModuleList(
-            nn.Linear(cfg.model_dim, cfg.model_dim) for _ in range(n_blocks)
-        )
-        for zp in self.zero_projs:
+        zero_projs = [nn.Linear(cfg.model_dim, cfg.model_dim) for _ in range(n_blocks)]
+        for zp in zero_projs:
             nn.init.zeros_(zp.weight)
             nn.init.zeros_(zp.bias)
+        self.zero_projs = nn.ModuleList(zero_projs)
 
     def forward(self, x_t: Tensor, t: Tensor, control: Tensor) -> list[Tensor]:
         b = x_t.shape[0]
@@ -90,7 +89,7 @@ class LatentControlNet(nn.Module):
         h = self.img_in(x_t) + img_pos + self.time(t).unsqueeze(1)
 
         residuals: list[Tensor] = []
-        for blk, zp in zip(self.blocks, self.zero_projs):
+        for blk, zp in zip(self.blocks, self.zero_projs, strict=True):
             h = blk(h, ctrl)                                   # cross-attend to control
             residuals.append(self.cond_scale * zp(h))         # zero-init -> 0 at start
         return residuals

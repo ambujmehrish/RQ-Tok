@@ -17,8 +17,8 @@ Usage:
 from __future__ import annotations
 
 import dataclasses
-from dataclasses import dataclass, field, asdict
-from typing import Any, Dict, Optional
+from dataclasses import asdict, dataclass, field
+from typing import Any
 
 
 # --------------------------------------------------------------------------------------
@@ -148,11 +148,11 @@ class BifrostFlowConfig:
     dist: DistConfig = field(default_factory=DistConfig)
 
     # ---- (de)serialization -----------------------------------------------------------
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return asdict(self)
 
     @classmethod
-    def from_dict(cls, d: Dict[str, Any]) -> "BifrostFlowConfig":
+    def from_dict(cls, d: dict[str, Any]) -> BifrostFlowConfig:
         d = dict(d or {})
         sub = {
             "tokenizer": (TokenizerConfig, d.pop("tokenizer", {})),
@@ -161,7 +161,7 @@ class BifrostFlowConfig:
             "train": (TrainConfig, d.pop("train", {})),
             "dist": (DistConfig, d.pop("dist", {})),
         }
-        kwargs: Dict[str, Any] = {}
+        kwargs: dict[str, Any] = {}
         for key, (klass, raw) in sub.items():
             kwargs[key] = _build(klass, raw)
         # remaining top-level scalars (e.g. name)
@@ -170,10 +170,10 @@ class BifrostFlowConfig:
         return cls(**kwargs)
 
     @classmethod
-    def from_yaml(cls, path: str) -> "BifrostFlowConfig":
+    def from_yaml(cls, path: str) -> BifrostFlowConfig:
         import yaml  # local import keeps module import light
 
-        with open(path, "r") as f:
+        with open(path) as f:
             data = yaml.safe_load(f) or {}
         return cls.from_dict(data)
 
@@ -184,7 +184,7 @@ class BifrostFlowConfig:
             yaml.safe_dump(self.to_dict(), f, sort_keys=False)
 
 
-def _build(klass, raw: Optional[Dict[str, Any]]):
+def _build(klass, raw: dict[str, Any] | None):
     """Construct a dataclass from a dict, ignoring unknown keys (with a clear error)."""
     raw = raw or {}
     valid = {f.name for f in dataclasses.fields(klass)}

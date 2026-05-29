@@ -93,7 +93,9 @@ class AdaptiveResidualQuantizer(nn.Module):
         )
 
     def _book(self, depth: int) -> Codebook:
-        return self.codebooks[0] if self.shared else self.codebooks[depth]
+        book = self.codebooks[0] if self.shared else self.codebooks[depth]
+        assert isinstance(book, Codebook)  # ModuleList indexing widens to Module
+        return book
 
     # ----------------------------------------------------------------------------------
     def _as_flat(self, z: Tensor) -> Tensor:
@@ -178,7 +180,7 @@ class AdaptiveResidualQuantizer(nn.Module):
                 continue
             flat = torch.cat(res_list, dim=0)
             idx = torch.cat(idx_list, dim=0)
-            self.codebooks[book_i].ema_update(flat, idx)
+            self._book(book_i).ema_update(flat, idx)
 
     def _losses(self, flat, zhat, depths, collected) -> TokenizerLosses:
         device = flat.device
@@ -191,7 +193,7 @@ class AdaptiveResidualQuantizer(nn.Module):
                 continue
             r = torch.cat(res_list, dim=0)               # [Mk, d]
             idx = torch.cat(idx_list, dim=0)             # [Mk]
-            book = self.codebooks[book_i]
+            book = self._book(book_i)
             q = book.lookup(idx).detach()
             commit_terms.append((r - q).pow(2).sum(-1).mean())
             entropy_terms.append(self._entropy_loss(book, r))
@@ -249,4 +251,6 @@ class AdaptiveResidualQuantizer(nn.Module):
         return zhat
 
     def codebook_usage(self) -> Tensor:
-        return torch.stack([b.usage() for b in self.codebooks]).mean()
+        return torch.stack(
+            [self._book(i).usage() for i in range(len(self.codebooks))]
+        ).mean()

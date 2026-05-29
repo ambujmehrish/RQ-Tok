@@ -3,6 +3,6 @@
 Requires torch. See :class:`Trainer` and the ``train`` entrypoint.
 """
 
-from .trainer import Trainer, TrainReport, VALID_STAGES
+from .trainer import VALID_STAGES, Trainer, TrainReport
 
 __all__ = ["Trainer", "TrainReport", "VALID_STAGES"]

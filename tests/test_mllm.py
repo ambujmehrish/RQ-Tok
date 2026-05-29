@@ -88,7 +88,10 @@ def test_flow_sample_shape_and_determinism():
     head = FlowResidualHead(8, 16, 16, 2)
     h = torch.randn(4, 16)
     z = torch.randn(4, 8)
-    fn = lambda x_t, t: head(x_t, t, h, z)
+
+    def fn(x_t, t):
+        return head(x_t, t, h, z)
+
     g1 = torch.Generator().manual_seed(7)
     g2 = torch.Generator().manual_seed(7)
     a = flow_sample(fn, 4, 8, steps=5, device=torch.device("cpu"), generator=g1)
@@ -107,7 +110,8 @@ def test_flow_head_learns_target():
     for _ in range(150):
         opt.zero_grad()
         loss = flow_matching_loss(lambda x_t, t: head(x_t, t, h, z), target, g)
-        loss.backward(); opt.step()
+        loss.backward()
+        opt.step()
     sample = flow_sample(lambda x_t, t: head(x_t, t, h, z), 64, 4, 50,
                          torch.device("cpu"), generator=torch.Generator().manual_seed(1))
     assert (sample - target).pow(2).mean() < 0.1 * target.pow(2).mean()
@@ -145,7 +149,8 @@ def test_compute_loss_decreases():
         g = torch.Generator().manual_seed(123)   # fix mask + flow noise -> deterministic
         opt.zero_grad()
         loss = model.compute_loss(text, codes, res, zhat, generator=g)
-        loss.total.backward(); opt.step()
+        loss.total.backward()
+        opt.step()
         return loss.total.detach().item()
 
     first = step()
@@ -159,8 +164,7 @@ def test_generate_valid_outputs():
     torch.manual_seed(0)
     mllm, tok = _cfgs()
     model = VisionGenModel(mllm, tok)
-    tk = build_tokenizer(get_preset("tiny_cpu"))  # only need a dequantize of right D? no:
-    # use this model's own tokenizer config for dequantize:
+    # Dequantize must use this model's own tokenizer config (matching D_max / dim).
     from bifrost_flow.tokenizer import AdaptiveResidualQuantizer
     q = AdaptiveResidualQuantizer(tok)
     out = model.generate(_text(2), q.dequantize, steps=6, cfg_scale=2.0, temperature=0.0)
