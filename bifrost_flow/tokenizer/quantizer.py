@@ -38,11 +38,11 @@ class TokenizerLosses:
 
     def item(self) -> dict[str, float]:
         return {
-            "total": float(self.total),
-            "recon": float(self.recon),
-            "commitment": float(self.commitment),
-            "entropy": float(self.entropy),
-            "rate": float(self.rate),
+            "total": self.total.detach().item(),
+            "recon": self.recon.detach().item(),
+            "commitment": self.commitment.detach().item(),
+            "entropy": self.entropy.detach().item(),
+            "rate": self.rate.detach().item(),
         }
 
 

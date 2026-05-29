@@ -1,4 +1,9 @@
-"""Data loaders: dummy (CPU smoke tests), ImageNet, BLIP3-o. Implemented in Phase 4.
-"""
+"""Data loaders: dummy (CPU dev/tests), ImageNet, BLIP3-o. Requires torch."""
 
-__all__ = []
+from .dataset import (
+    DummyImageTextDataset,
+    build_dataloader,
+    build_dataset,
+)
+
+__all__ = ["DummyImageTextDataset", "build_dataset", "build_dataloader"]

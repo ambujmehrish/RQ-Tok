@@ -37,8 +37,8 @@ class BranchLosses:
     flow: Tensor
 
     def item(self) -> dict[str, float]:
-        return {"total": float(self.total), "code_ce": float(self.code_ce),
-                "flow": float(self.flow)}
+        return {"total": self.total.detach().item(), "code_ce": self.code_ce.detach().item(),
+                "flow": self.flow.detach().item()}
 
 
 @dataclass

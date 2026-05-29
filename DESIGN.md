@@ -227,6 +227,10 @@ encoder-agnostic and consumes *CLIP patch latents*. Only the two `build_*` facto
    proj, 2D downsample conv, cross-attn blocks with zero-init residual injection);
    rectified-flow velocity loss conditioned on `ẑ+res`; ODE sampler. CPU tests in
    `tests/test_renderer.py`.
-4. Decoupled training pipelines + data loaders.
+4. Decoupled training pipelines + data loaders. **(done)**
+   `Trainer` dispatches Stage 0/A/B; distributed-aware (gradient averaging + EMA
+   all-reduce), checkpointing; `DummyImageTextDataset` (real loaders raise). Unified
+   entrypoint `python -m bifrost_flow.training.train --stage ...`. Tests in
+   `tests/test_training.py`.
 5. Inference pipeline.
 6. Eval harness + ablation configs.

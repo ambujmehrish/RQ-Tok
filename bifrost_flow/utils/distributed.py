@@ -185,6 +185,21 @@ def reduce_dict(values: Dict[str, torch.Tensor]) -> Dict[str, torch.Tensor]:
     return {k: packed[i] for i, k in enumerate(keys)}
 
 
+def average_gradients(module: torch.nn.Module) -> None:
+    """Mean-reduce ``.grad`` of every parameter across ranks (after backward).
+
+    Used instead of a DDP wrapper because the stage models expose custom
+    ``compute_loss`` methods (not ``forward``). No-op when not distributed.
+    """
+    if not is_dist():
+        return
+    ws = get_world_size()
+    for p in module.parameters():
+        if p.grad is not None:
+            dist.all_reduce(p.grad, op=dist.ReduceOp.SUM)
+            p.grad /= ws
+
+
 def cleanup() -> None:
     if dist.is_available() and dist.is_initialized():
         dist.destroy_process_group()

@@ -1,6 +1,8 @@
 """Decoupled training pipelines: Stage 0 (tokenizer) -> A (branch) -> B (renderer).
 
-Implemented in Phase 4.
+Requires torch. See :class:`Trainer` and the ``train`` entrypoint.
 """
 
-__all__ = []
+from .trainer import Trainer, TrainReport, VALID_STAGES
+
+__all__ = ["Trainer", "TrainReport", "VALID_STAGES"]

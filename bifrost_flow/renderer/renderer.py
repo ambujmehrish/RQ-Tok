@@ -24,7 +24,7 @@ class RendererLoss:
     flow: Tensor
 
     def item(self) -> dict[str, float]:
-        return {"flow": float(self.flow)}
+        return {"flow": self.flow.detach().item()}
 
 
 class FlowRenderer(nn.Module):
