@@ -3,13 +3,13 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "heimdall"
+name = "bifrost_flow"
 version = "0.0.1"
-description = "Heimdall: a flow-matching, adaptive residual-quantized successor to Bifrost-1 for unified multimodal understanding and generation."
+description = "Bifrost-Flow: a flow-matching, adaptive residual-quantized successor to Bifrost-1 for unified multimodal understanding and generation."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "Apache-2.0" }
-authors = [{ name = "Heimdall authors" }]
+authors = [{ name = "Bifrost-Flow authors" }]
 dependencies = [
     "pyyaml>=6.0",
 ]
@@ -31,7 +31,7 @@ dev = [
 ]
 
 [tool.setuptools.packages.find]
-include = ["heimdall*"]
+include = ["bifrost_flow*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

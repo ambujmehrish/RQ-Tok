@@ -1,4 +1,4 @@
-name: heimdall-base-gpu
+name: bifrost-flow-base-gpu
 tokenizer:
   clip_dim: 1280
   num_patches: 256

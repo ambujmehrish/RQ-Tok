@@ -1,4 +1,4 @@
-name: heimdall-tiny-cpu
+name: bifrost-flow-tiny-cpu
 tokenizer:
   clip_dim: 32
   num_patches: 16

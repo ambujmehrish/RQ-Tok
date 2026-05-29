@@ -1,9 +1,9 @@
-# Heimdall
+# Bifrost-Flow
 
-**Heimdall** is the next-generation successor to [Bifrost-1](https://arxiv.org/abs/2508.05954)
-for unified multimodal understanding and generation. In Norse myth, *Heimdall* is the
-guardian of the *Bifröst* bridge — a fitting name for a model that improves the bridge
-between a frozen multimodal LLM (MLLM) and a pretrained **flow-matching** image renderer.
+**Bifrost-Flow** is the next-generation successor to [Bifrost-1](https://arxiv.org/abs/2508.05954)
+for unified multimodal understanding and generation. The name reflects the core change: the
+bridge (*Bifröst*) between a frozen multimodal LLM (MLLM) and a pretrained image renderer is
+now driven end-to-end by **flow matching** instead of diffusion + MSE.
 
 > Status: **early development.** See [`DESIGN.md`](DESIGN.md) for the full research design.
 > The codebase is being built phase-by-phase; tiny configs run on CPU, real backbones
@@ -11,10 +11,10 @@ between a frozen multimodal LLM (MLLM) and a pretrained **flow-matching** image 
 
 ## Core idea
 
-Heimdall keeps Bifrost-1's winning insight — bridging an MLLM and a renderer through
+Bifrost-Flow keeps Bifrost-1's winning insight — bridging an MLLM and a renderer through
 **MLLM-native CLIP latents** — but replaces its three biggest weaknesses:
 
-| Bifrost-1 weakness | Heimdall fix |
+| Bifrost-1 weakness | Bifrost-Flow fix |
 |---|---|
 | MSE regression on continuous latents → mode-averaging / blur | **Flow-matching** residual head (proper distributional objective) |
 | Single CLIP vector per patch → fidelity ceiling | **Adaptive-depth residual quantization** of CLIP latents (coarse→fine) |
@@ -40,7 +40,7 @@ the LLM-native interface, classifier-free guidance, and adaptive token budget.
 ## Layout
 
 ```
-heimdall/
+bifrost_flow/
   config.py        # dataclass configs + tiny/base presets
   tokenizer/       # adaptive RVQ-CLIP tokenizer
   mllm/            # frozen MLLM + vision generation branch (hybrid head)
@@ -59,5 +59,5 @@ tests/
 ```bash
 pip install -e ".[dev]"
 pytest -q                       # pure-Python scaffold tests (no torch needed yet)
-python -m heimdall.config --print tiny_cpu   # inspect a config preset
+python -m bifrost_flow.config --print tiny_cpu   # inspect a config preset
 ```

@@ -1,17 +1,17 @@
-"""Configuration system for Heimdall.
+"""Configuration system for Bifrost-Flow.
 
 Pure-Python (dataclasses only) so it imports and tests without torch/transformers.
 Every component is selectable between a *tiny* (CPU-runnable) and a *real* (GPU) variant.
 
 Usage:
-    from heimdall.config import HeimdallConfig, get_preset
+    from bifrost_flow.config import BifrostFlowConfig, get_preset
     cfg = get_preset("tiny_cpu")
 
     # or from YAML:
-    cfg = HeimdallConfig.from_yaml("configs/base_gpu.yaml")
+    cfg = BifrostFlowConfig.from_yaml("configs/base_gpu.yaml")
 
     # CLI:
-    python -m heimdall.config --print tiny_cpu
+    python -m bifrost_flow.config --print tiny_cpu
 """
 
 from __future__ import annotations
@@ -113,8 +113,8 @@ class TrainConfig:
 
 
 @dataclass
-class HeimdallConfig:
-    name: str = "heimdall-tiny"
+class BifrostFlowConfig:
+    name: str = "bifrost-flow-tiny"
     tokenizer: TokenizerConfig = field(default_factory=TokenizerConfig)
     mllm: MLLMConfig = field(default_factory=MLLMConfig)
     renderer: RendererConfig = field(default_factory=RendererConfig)
@@ -125,7 +125,7 @@ class HeimdallConfig:
         return asdict(self)
 
     @classmethod
-    def from_dict(cls, d: Dict[str, Any]) -> "HeimdallConfig":
+    def from_dict(cls, d: Dict[str, Any]) -> "BifrostFlowConfig":
         d = dict(d or {})
         sub = {
             "tokenizer": (TokenizerConfig, d.pop("tokenizer", {})),
@@ -142,7 +142,7 @@ class HeimdallConfig:
         return cls(**kwargs)
 
     @classmethod
-    def from_yaml(cls, path: str) -> "HeimdallConfig":
+    def from_yaml(cls, path: str) -> "BifrostFlowConfig":
         import yaml  # local import keeps module import light
 
         with open(path, "r") as f:
@@ -169,15 +169,15 @@ def _build(klass, raw: Optional[Dict[str, Any]]):
 # --------------------------------------------------------------------------------------
 # Presets
 # --------------------------------------------------------------------------------------
-def _tiny_cpu() -> HeimdallConfig:
+def _tiny_cpu() -> BifrostFlowConfig:
     """Smallest end-to-end-runnable config. Everything 'dummy'; CPU-friendly."""
-    return HeimdallConfig(name="heimdall-tiny-cpu")
+    return BifrostFlowConfig(name="bifrost-flow-tiny-cpu")
 
 
-def _base_gpu() -> HeimdallConfig:
+def _base_gpu() -> BifrostFlowConfig:
     """Real-backbone config (Qwen2.5-VL 7B + FLUX.1-dev). Requires GPU + HF auth."""
-    return HeimdallConfig(
-        name="heimdall-base-gpu",
+    return BifrostFlowConfig(
+        name="bifrost-flow-base-gpu",
         tokenizer=TokenizerConfig(
             clip_dim=1280,
             num_patches=256,
@@ -215,7 +215,7 @@ _PRESETS = {
 }
 
 
-def get_preset(name: str) -> HeimdallConfig:
+def get_preset(name: str) -> BifrostFlowConfig:
     if name not in _PRESETS:
         raise KeyError(f"Unknown preset '{name}'. Available: {sorted(_PRESETS)}")
     return _PRESETS[name]()
@@ -229,7 +229,7 @@ def _main(argv=None):
     import argparse
     import json
 
-    parser = argparse.ArgumentParser(description="Heimdall config inspector")
+    parser = argparse.ArgumentParser(description="Bifrost-Flow config inspector")
     parser.add_argument("--print", dest="preset", help="preset name to print")
     parser.add_argument("--yaml", help="path to a YAML config to load and print")
     parser.add_argument("--list", action="store_true", help="list presets")
@@ -239,7 +239,7 @@ def _main(argv=None):
         print("\n".join(available_presets()))
         return
     if args.yaml:
-        cfg = HeimdallConfig.from_yaml(args.yaml)
+        cfg = BifrostFlowConfig.from_yaml(args.yaml)
     elif args.preset:
         cfg = get_preset(args.preset)
     else:
