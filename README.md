@@ -103,3 +103,41 @@ out = model.generate(text, tok.dequantize, cfg_scale=3.0)
 > The dummy MLLM backbone and dummy CLIP encoder are CPU development stand-ins; they
 > are replaced by the real frozen **Qwen2.5-VL** and its CLIP visual tower after the
 > final development phase (see `DESIGN.md` §9). All other code is unchanged by that swap.
+
+## Training, inference, eval
+
+Decoupled training (Stage 0 tokenizer → A branch → B renderer), distributed-aware:
+
+```bash
+python -m bifrost_flow.training.train --preset tiny_cpu --stage tokenizer   # Stage 0
+python -m bifrost_flow.training.train --preset tiny_cpu --stage branch      # Stage A
+python -m bifrost_flow.training.train --preset tiny_cpu --stage renderer    # Stage B
+# multi-GPU (4x A100, Cineca Leonardo): sbatch scripts/cineca_leonardo_4xA100.sbatch
+```
+
+End-to-end inference and the tokenizer reconstruction-vs-depth ablation:
+
+```python
+import torch
+from bifrost_flow.config import get_preset
+from bifrost_flow.inference import build_pipeline
+from bifrost_flow.tokenizer import build_tokenizer, fit_tokenizer
+from bifrost_flow.eval import evaluate_tokenizer
+
+cfg = get_preset("tiny_cpu")
+pipe = build_pipeline(cfg)
+out = pipe.generate(torch.randint(0, 256, (2, 5)), cfg_scale=3.0)   # codes -> image latents
+
+tok = build_tokenizer(cfg); z = tok.encode(torch.randn(64, 3, 8, 8))
+fit_tokenizer(tok, z, steps=200)
+report = evaluate_tokenizer(tok, z)        # recon MSE/PSNR, mean depth, depth curve, perplexity
+```
+
+Ablation configs (depth, adaptive on/off, codebook size, CFG, exposure-bias, flow head,
+continuous-Bifrost baseline) are in `configs/ablations/`.
+
+## Build status
+
+Phases 0–6 complete and CPU-tested (`pytest -q`, tokenizer/MLLM/renderer/training/inference/eval).
+Multi-GPU (DDP/FSDP) wired. Remaining for GPU production: swap the dummy MLLM/CLIP/FLUX
+stand-ins for the real frozen models and wire the real datasets + external eval metrics.

@@ -237,4 +237,12 @@ encoder-agnostic and consumes *CLIP patch latents*. Only the two `build_*` facto
    ControlNet → flow ODE → image latents; loads per-stage Trainer checkpoints.
    Entrypoint `python -m bifrost_flow.inference.generate`. Tests in
    `tests/test_inference.py`.
-6. Eval harness + ablation configs.
+6. Eval harness + ablation configs. **(done)**
+   Self-contained metrics (MSE/PSNR/SSIM, codebook perplexity) + tokenizer evaluator
+   (reconstruction-vs-adaptive-depth curve = our Fig.-4 analog); external metrics
+   (FID/sFID/IS/rFID/LPIPS/GenEval/DPG) fail-loud until wired. 12 ablation configs in
+   `configs/ablations/`. Tests in `tests/test_eval.py`.
+
+All build phases complete on CPU/dummy stand-ins. Remaining for GPU production: swap the
+dummy MLLM/CLIP/FLUX stand-ins for the real frozen models (DESIGN.md §9) and wire the
+real datasets + external eval metrics.

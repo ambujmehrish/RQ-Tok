@@ -1,0 +1,67 @@
+name: base_gpu-depth_2
+tokenizer:
+  clip_dim: 1280
+  num_patches: 256
+  codebook_size: 8192
+  max_depth: 2
+  shared_codebook: true
+  commitment_weight: 0.25
+  entropy_weight: 0.01
+  ema_decay: 0.99
+  adaptive_depth: true
+  halt_residual_threshold: 0.05
+  rate_penalty: 0.001
+mllm:
+  backbone: Qwen/Qwen2.5-VL-7B-Instruct
+  hidden_dim: 3584
+  num_layers: 28
+  num_heads: 28
+  freeze_backbone: true
+  code_head: true
+  flow_residual_head: true
+  flow_head_dim: 1280
+  flow_head_layers: 2
+  cfg_text_dropout: 0.1
+  cfg_scale: 3.0
+  mask_min: 0.7
+  mask_max: 1.0
+  decode_steps: 16
+renderer:
+  backbone: black-forest-labs/FLUX.1-dev
+  image_size: 1024
+  latent_dim: 64
+  model_dim: 3072
+  num_blocks: 19
+  num_heads: 24
+  num_image_tokens: 256
+  controlnet_double_blocks: 4
+  controlnet_single_blocks: 1
+  downsample_factor: 2
+  flow_sigma_min: 0.0
+  num_inference_steps: 28
+  controlnet_conditioning_scale: 0.7
+  guidance_scale: 3.5
+  train_on_dequantized: true
+  scheduled_sampling_prob: 0.0
+train:
+  stage: tokenizer
+  batch_size: 48
+  lr: 0.0001
+  weight_decay: 0.0
+  max_steps: 200000
+  grad_clip: 1.0
+  seed: 0
+  device: cuda
+  precision: bf16
+  dataset: blip3o
+  log_every: 10
+  ckpt_dir: checkpoints
+dist:
+  strategy: ddp
+  backend: nccl
+  find_unused_parameters: false
+  bucket_cap_mb: 25
+  fsdp_sharding: full
+  fsdp_mixed_precision: true
+  init_timeout_min: 30
+  seed_per_rank: true
