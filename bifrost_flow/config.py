@@ -95,6 +95,28 @@ class RendererConfig:
 
 
 @dataclass
+class DistConfig:
+    """Distributed / multi-GPU execution.
+
+    World topology (rank, world_size, local_rank) is read from the launcher
+    environment (``torchrun`` or SLURM ``srun``), never hard-coded here. These
+    fields control *how* we parallelize. Defaults target a single Leonardo
+    (Cineca) Booster node = 4x A100-64GB with DDP.
+    """
+
+    strategy: str = "ddp"           # "ddp" | "fsdp" | "none"
+    backend: str = "nccl"           # "nccl" (GPU) | "gloo" (CPU)
+    find_unused_parameters: bool = False   # DDP; True only if some params get no grad
+    bucket_cap_mb: int = 25         # DDP gradient bucket size
+    # FSDP (only used when strategy == "fsdp"; for very large trainable params)
+    fsdp_sharding: str = "full"     # "full" (ZeRO-3) | "grad_op" (ZeRO-2)
+    fsdp_mixed_precision: bool = True
+    # Process-group init
+    init_timeout_min: int = 30
+    seed_per_rank: bool = True      # offset data RNG by rank (model init stays synced)
+
+
+@dataclass
 class TrainConfig:
     """Decoupled training (Stage 0 tokenizer -> A branch -> B renderer)."""
 
@@ -119,6 +141,7 @@ class BifrostFlowConfig:
     mllm: MLLMConfig = field(default_factory=MLLMConfig)
     renderer: RendererConfig = field(default_factory=RendererConfig)
     train: TrainConfig = field(default_factory=TrainConfig)
+    dist: DistConfig = field(default_factory=DistConfig)
 
     # ---- (de)serialization -----------------------------------------------------------
     def to_dict(self) -> Dict[str, Any]:
@@ -132,6 +155,7 @@ class BifrostFlowConfig:
             "mllm": (MLLMConfig, d.pop("mllm", {})),
             "renderer": (RendererConfig, d.pop("renderer", {})),
             "train": (TrainConfig, d.pop("train", {})),
+            "dist": (DistConfig, d.pop("dist", {})),
         }
         kwargs: Dict[str, Any] = {}
         for key, (klass, raw) in sub.items():
@@ -200,12 +224,13 @@ def _base_gpu() -> BifrostFlowConfig:
             num_inference_steps=28,
         ),
         train=TrainConfig(
-            batch_size=48,
+            batch_size=48,            # per-GPU; global batch = batch_size * world_size
             max_steps=200_000,
             device="cuda",
             precision="bf16",
             dataset="blip3o",
         ),
+        dist=DistConfig(strategy="ddp", backend="nccl"),  # 4x A100 (Cineca Leonardo)
     )
 
 

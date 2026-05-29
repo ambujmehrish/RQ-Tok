@@ -132,6 +132,31 @@ distribution. The finite code vocabulary makes this gap small by construction.
   with text-dropout for CFG. MLLM backbone frozen.
 - **Stage B:** flow-matching latent ControlNet — velocity loss on dequantized code space.
 
+### 5.1 Multi-GPU / distributed execution
+
+Target hardware: a single **Cineca Leonardo Booster** node = **4× A100-64GB**, SLURM.
+Topology (rank / world_size / local_rank) is read from the launcher env (`torchrun` or
+SLURM `srun`) — never hard-coded (`bifrost_flow/utils/distributed.py`). Defaults
+(`DistConfig`): **DDP**, NCCL backend.
+
+- **DDP by default.** On 4× A100-64GB everything fits per-GPU: frozen Qwen2.5-VL-7B
+  (~14 GB bf16) is replicated; only the trainable vision branch + flow head (Stage A) or
+  the ControlNet blocks (Stage B) receive gradients and are all-reduced. **FSDP**
+  (FULL_SHARD / SHARD_GRAD_OP) is available via `dist.strategy="fsdp"` if trainable params
+  ever outgrow a single card.
+- **Tokenizer (Stage 0) is EMA, not gradient.** The codebook is therefore made
+  rank-consistent explicitly: per-step cluster statistics are **SUM all-reduced**, and
+  first-batch data-init + dead-code reinit are **broadcast from rank 0**, so every replica
+  holds a bit-identical codebook. (Verified by a 2-process test and the entrypoint's
+  cross-rank consistency check.)
+- **Data sharding** via `DistributedSampler`; data RNG offset per rank, model init synced
+  (DDP/FSDP broadcast params from rank 0).
+- **Fail-loud:** a multi-rank world missing `MASTER_ADDR/PORT`, or NCCL without CUDA,
+  raises immediately — no silent single-GPU fallback.
+- **Launch:** `scripts/cineca_leonardo_4xA100.sbatch` (sbatch → `srun`, 1 task/GPU) drives
+  `scripts/train_tokenizer_ddp.py` (Stage-0 + plumbing validation today; Phase-4 stage
+  trainers use the same launch path).
+
 ## 6. Inference
 
 ```

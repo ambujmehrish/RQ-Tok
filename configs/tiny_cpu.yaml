@@ -52,3 +52,12 @@ train:
   dataset: dummy
   log_every: 10
   ckpt_dir: checkpoints
+dist:
+  strategy: ddp
+  backend: nccl
+  find_unused_parameters: false
+  bucket_cap_mb: 25
+  fsdp_sharding: full
+  fsdp_mixed_precision: true
+  init_timeout_min: 30
+  seed_per_rank: true

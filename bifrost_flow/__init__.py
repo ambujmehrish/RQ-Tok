@@ -10,6 +10,7 @@ from .config import (
     MLLMConfig,
     RendererConfig,
     TrainConfig,
+    DistConfig,
     get_preset,
     available_presets,
 )
@@ -22,6 +23,7 @@ __all__ = [
     "MLLMConfig",
     "RendererConfig",
     "TrainConfig",
+    "DistConfig",
     "get_preset",
     "available_presets",
     "__version__",

@@ -16,7 +16,12 @@ misuse raise immediately.
 from __future__ import annotations
 
 import torch
+import torch.distributed as dist
 from torch import Tensor, nn
+
+
+def _dist_active() -> bool:
+    return dist.is_available() and dist.is_initialized() and dist.get_world_size() > 1
 
 
 class Codebook(nn.Module):
@@ -115,10 +120,13 @@ class Codebook(nn.Module):
 
         # First-batch data init: seed codes from real vectors (sampled with repeat
         # if the batch is smaller than K). Deterministic given the global RNG seed.
+        # Across ranks, rank 0's seed is broadcast so every replica starts identical.
         if not bool(self.initted):
             m = flat.shape[0]
             perm = torch.randint(m, (self.codebook_size,), device=flat.device)
-            seed = flat[perm]
+            seed = flat[perm].contiguous()
+            if _dist_active():
+                dist.broadcast(seed, src=0)
             self.embed.copy_(seed)
             self.embed_avg.copy_(seed)
             self.cluster_size.fill_(1.0)
@@ -131,6 +139,12 @@ class Codebook(nn.Module):
 
         batch_count = onehot.sum(0)                 # [K]
         batch_sum = onehot.t() @ flat               # [K, d]
+
+        # Sum the sufficient statistics across all ranks so every replica applies the
+        # same EMA update and codebooks stay bit-identical across GPUs.
+        if _dist_active():
+            dist.all_reduce(batch_count, op=dist.ReduceOp.SUM)
+            dist.all_reduce(batch_sum, op=dist.ReduceOp.SUM)
 
         d = self.ema_decay
         self.cluster_size.mul_(d).add_(batch_count, alpha=1.0 - d)
@@ -147,12 +161,17 @@ class Codebook(nn.Module):
 
     @torch.no_grad()
     def _reinit_dead_codes(self, flat: Tensor) -> None:
+        # cluster_size is identical across ranks here (EMA stats were all-reduced), so
+        # the dead mask matches everywhere; broadcast the replacement vectors so the
+        # reinit is identical on every replica.
         dead = self.cluster_size < self.dead_code_threshold
         n_dead = int(dead.sum())
         if n_dead == 0:
             return
         perm = torch.randint(flat.shape[0], (n_dead,), device=flat.device)
-        resampled = flat[perm]
+        resampled = flat[perm].contiguous()
+        if _dist_active():
+            dist.broadcast(resampled, src=0)
         self.embed[dead] = resampled
         self.embed_avg[dead] = resampled
         self.cluster_size[dead] = 1.0
