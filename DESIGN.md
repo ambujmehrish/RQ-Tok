@@ -232,5 +232,9 @@ encoder-agnostic and consumes *CLIP patch latents*. Only the two `build_*` facto
    all-reduce), checkpointing; `DummyImageTextDataset` (real loaders raise). Unified
    entrypoint `python -m bifrost_flow.training.train --stage ...`. Tests in
    `tests/test_training.py`.
-5. Inference pipeline.
+5. Inference pipeline. **(done)**
+   `BifrostFlowPipeline`: text → decode codes (CFG) → dequantize + flow residual →
+   ControlNet → flow ODE → image latents; loads per-stage Trainer checkpoints.
+   Entrypoint `python -m bifrost_flow.inference.generate`. Tests in
+   `tests/test_inference.py`.
 6. Eval harness + ablation configs.

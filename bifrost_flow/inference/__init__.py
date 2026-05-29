@@ -1,5 +1,7 @@
 """Inference pipeline: text -> adaptive RVQ codes (CFG) -> dequantize + flow residual
--> latent ControlNet -> FLUX flow ODE -> image. Implemented in Phase 5.
+-> latent ControlNet -> flow ODE -> image latents. Requires torch.
 """
 
-__all__ = []
+from .pipeline import BifrostFlowPipeline, PipelineOutput, build_pipeline
+
+__all__ = ["BifrostFlowPipeline", "PipelineOutput", "build_pipeline"]
