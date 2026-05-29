@@ -57,7 +57,21 @@ tests/
 ## Quickstart (dev)
 
 ```bash
-pip install -e ".[dev]"
-pytest -q                       # pure-Python scaffold tests (no torch needed yet)
+pip install -e ".[dev]"                          # config/scaffold tests, no torch
+pip install -e ".[dev,torch]"                    # also run the tokenizer (Phase 1) tests
+pytest -q                                         # tokenizer tests auto-skip without torch
 python -m bifrost_flow.config --print tiny_cpu   # inspect a config preset
+```
+
+The adaptive RVQ-CLIP tokenizer (Phase 1) runs on CPU:
+
+```python
+import torch
+from bifrost_flow.config import get_preset
+from bifrost_flow.tokenizer import build_tokenizer, fit_tokenizer
+
+tok = build_tokenizer(get_preset("tiny_cpu"))
+z   = tok.encode(torch.randn(8, 3, 8, 8))   # frozen dummy CLIP -> patch latents
+fit_tokenizer(tok, z, steps=200)            # Stage-0 EMA codebook fit
+out = tok.tokenize(torch.randn(8, 3, 8, 8)) # adaptive RVQ codes + halt depths + residual
 ```

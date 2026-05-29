@@ -176,8 +176,11 @@ training/inference loop must run on CPU with tiny dummy backbones so each phase 
 
 ## 10. Build phases
 
-0. Repo scaffold, configs, design doc, tests. **(this phase)**
-1. Adaptive RVQ-CLIP tokenizer (`bifrost_flow/tokenizer`).
+0. Repo scaffold, configs, design doc, tests. **(done)**
+1. Adaptive RVQ-CLIP tokenizer (`bifrost_flow/tokenizer`). **(done)**
+   EMA codebook (shared/per-depth) + adaptive-depth residual quantization with a
+   residual-norm halting rule and `<halt>` sentinel; frozen dummy CLIP encoder for
+   CPU; Stage-0 EMA fit. Fail-loud, no fallbacks. CPU tests in `tests/test_tokenizer.py`.
 2. MLLM vision-gen branch with hybrid head (`bifrost_flow/mllm`).
 3. Flow-matching latent ControlNet + FLUX renderer (`bifrost_flow/renderer`).
 4. Decoupled training pipelines + data loaders.
