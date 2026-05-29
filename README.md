@@ -75,3 +75,31 @@ z   = tok.encode(torch.randn(8, 3, 8, 8))   # frozen dummy CLIP -> patch latents
 fit_tokenizer(tok, z, steps=200)            # Stage-0 EMA codebook fit
 out = tok.tokenize(torch.randn(8, 3, 8, 8)) # adaptive RVQ codes + halt depths + residual
 ```
+
+The MLLM vision-generation branch + hybrid head (Phase 2) also runs on CPU:
+
+```python
+from bifrost_flow.config import get_preset
+from bifrost_flow.tokenizer import build_tokenizer
+from bifrost_flow.mllm import build_vision_gen_model
+
+cfg = get_preset("tiny_cpu")
+tok = build_tokenizer(cfg)
+model = build_vision_gen_model(cfg)            # frozen (dummy) MLLM + trainable branch
+
+z  = tok.encode(torch.randn(2, 3, 8, 8))       # CLIP latents
+qo = tok(z, update_codebook=False)             # RVQ codes / depths / residual / prefix
+B, N, D, d = 2, cfg.tokenizer.num_patches, cfg.tokenizer.max_depth, cfg.tokenizer.clip_dim
+text = torch.randint(0, 256, (B, 5))
+
+# MAR masked training: cross-entropy (codes + <halt>) + flow-matching (residual)
+loss = model.compute_loss(text, qo.codes.reshape(B, N, D),
+                          qo.res.reshape(B, N, d), qo.zhat.reshape(B, N, d))
+
+# MaskGIT decode (CFG) + flow residual sampling -> latents for the renderer (Phase 3)
+out = model.generate(text, tok.dequantize, cfg_scale=3.0)
+```
+
+> The dummy MLLM backbone and dummy CLIP encoder are CPU development stand-ins; they
+> are replaced by the real frozen **Qwen2.5-VL** and its CLIP visual tower after the
+> final development phase (see `DESIGN.md` §9). All other code is unchanged by that swap.

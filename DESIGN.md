@@ -199,6 +199,17 @@ Every component is **config-selectable** between a *tiny* variant (CPU-runnable,
 end-to-end smoke runs here) and a *real* variant (Qwen2.5-VL + FLUX.1-dev on GPU). The full
 training/inference loop must run on CPU with tiny dummy backbones so each phase is testable.
 
+**Dummy → real swap plan (decided).** The dummy stand-ins are *development* scaffolding,
+kept for CPU testing through all build phases and **replaced by the real models only after
+the final development phase**:
+- `DummyMLLMBackbone` → frozen **Qwen2.5-VL** (load via transformers; init the trainable
+  branch from its decoder QKV/MLP/norm layers).
+- `DummyCLIPEncoder` → the real **MLLM-native CLIP visual tower**.
+
+The swap is isolated by construction: the branch/heads/training/decoding (Component B) are
+backbone-agnostic and consume *context hidden states*; the tokenizer (Component A) is
+encoder-agnostic and consumes *CLIP patch latents*. Only the two `build_*` factories change.
+
 ## 10. Build phases
 
 0. Repo scaffold, configs, design doc, tests. **(done)**
@@ -206,7 +217,11 @@ training/inference loop must run on CPU with tiny dummy backbones so each phase 
    EMA codebook (shared/per-depth) + adaptive-depth residual quantization with a
    residual-norm halting rule and `<halt>` sentinel; frozen dummy CLIP encoder for
    CPU; Stage-0 EMA fit. Fail-loud, no fallbacks. CPU tests in `tests/test_tokenizer.py`.
-2. MLLM vision-gen branch with hybrid head (`bifrost_flow/mllm`).
+2. MLLM vision-gen branch with hybrid head (`bifrost_flow/mllm`). **(done)**
+   Frozen backbone + trainable branch (Img-G bidirectional attention over read-only
+   context), hybrid head = per-level code classifier (CE incl. `<halt>`) + flow-matching
+   residual head; MAR masked training with CFG text-dropout; MaskGIT iterative decoding
+   with CFG + flow residual sampling. CPU tests in `tests/test_mllm.py`.
 3. Flow-matching latent ControlNet + FLUX renderer (`bifrost_flow/renderer`).
 4. Decoupled training pipelines + data loaders.
 5. Inference pipeline.
