@@ -1,117 +1,128 @@
-# AdaRQ-Flow vs. Bifrost-1 — What's New and Why
+# AdaRQ-Flow — Problem, Thesis, and Contribution
 
-This document states precisely how **AdaRQ-Flow** differs from its baseline
-**Bifrost-1** ([arXiv:2508.05954](https://arxiv.org/abs/2508.05954)), maps each change
-to the Bifrost-1 weakness it fixes, and points at the exact code that implements it.
-
-AdaRQ-Flow **keeps Bifrost-1's central, validated insight** — bridge a *frozen MLLM*
-and a *pretrained generative renderer* through **MLLM-native CLIP patch latents** (the
-alignment that makes the bridge cheap and effective). Everything below changes *how the
-bridge is represented and learned*, not that thesis.
+This document states what AdaRQ-Flow *is* on its own terms. It deliberately does **not**
+frame the work as a repair of any single prior system. Related work — including
+Bifrost-1, and the discrete-token bridges that predate it — appears in §5 as **baselines
+we must beat**, not as foundations we stand on.
 
 ---
 
-## 1. The one-line difference
+## 1. The problem
 
-> **Bifrost-1:** the MLLM predicts a *single continuous CLIP vector per patch* with an
-> **MSE** loss; a ControlNet feeds those (blurred) vectors to FLUX.
->
-> **AdaRQ-Flow:** the MLLM predicts an **adaptive-depth residual-quantized** code
-> sequence with **cross-entropy** *plus* a **flow-matching** head for the continuous
-> residual; the renderer is trained on the **dequantized code space** it actually sees
-> at inference.
+Two kinds of foundation model are now cheap to obtain and expensive to retrain:
 
-The novel combination — **(MLLM-native CLIP bridge) × (adaptive-depth RVQ) ×
-(flow-matching for both the latent residual head and the renderer)** — is, to our
-knowledge, not united in any prior work (see §4).
+- **reasoners** — multimodal LLMs that understand images and language;
+- **synthesizers** — flow/diffusion renderers that produce high-fidelity pixels.
 
----
+Composing them is attractive (no trillion-token retraining) and is being done, but the
+composition is almost always treated as an engineering detail: pick a latent, project
+into it, regress. We argue the composition **is** the research problem:
 
-## 2. Weakness → fix → code
+> **What is the right interface for transmitting generative intent from a frozen
+> reasoner to a frozen synthesizer?**
 
-| # | Bifrost-1 weakness | AdaRQ-Flow mechanism | Where it lives |
-|---|---|---|---|
-| 1 | **MSE on continuous latents → mode-averaging / blur** (paper §3.3 uses MSE for patch-embedding prediction; likely hurts FID) | **Flow-matching residual head** (rectified-flow / conditional-OT velocity objective) replaces MSE → a proper *distributional* target. Discrete codes carry the coarse signal so the head only models residual detail. | `mllm/flow.py` (`flow_matching_loss`, `rectified_flow_target`), `mllm/heads.py` (`FlowResidualHead`), used in `mllm/model.py:compute_loss` |
-| 2 | **Continuous bridge abandons the LLM-native interface** — no cross-entropy, no temperature/top-p, no token-level **CFG**, no likelihood | **Discrete adaptive-RVQ codes** predicted with **cross-entropy**; a learned **null context** enables **classifier-free guidance** on the code logits; sampling supports temperature. | `tokenizer/quantizer.py` (codes), `mllm/heads.py` (`CodeClassifierHead`), `mllm/model.py` (`null_context`, `_apply_cfg_dropout`, `_cfg_logits`, `_sample_codes`) |
-| 3 | **Semantic bottleneck of one CLIP vector per patch caps fidelity** — only improvable by scaling token count | **Residual quantization** stacks `D_max` codes per patch (coarse→fine); the leftover **continuous residual** is recovered by the flow head. Fidelity scales with *depth*, not just patch count. | `tokenizer/quantizer.py` (`AdaptiveResidualQuantizer`, `dequantize`), residual `res = z − ẑ` handed to the flow head |
-| 4 | **Exposure bias** — ControlNet trained on *ground-truth* CLIP latents but fed *MSE-blurred predicted* latents at inference | Renderer (Stage B) is trained on the **dequantized code space** `ẑ + res` — the *same finite-vocabulary distribution* it receives at inference. The discrete vocabulary makes the train/inference gap small by construction. | `training/trainer.py:_step_renderer` (`control = ẑ + res`), `config.RendererConfig.train_on_dequantized`, `scheduled_sampling_prob` hook |
-| 5 | **Fixed, uniform token budget** — flat and detailed patches get identical cost | **Content-adaptive depth**: a residual-norm halting rule stops early on flat patches and spends more codes on detailed ones; a `<halt>` symbol lets the MLLM predict variable depth; a rate penalty keeps budgets honest. | `tokenizer/quantizer.py` (halting loop, `<halt>` sentinel = class `K`), `config.TokenizerConfig.adaptive_depth / halt_residual_threshold / rate_penalty` |
+An interface is characterized by three properties: its **rate** (how many bits per
+image region), its **algebra** (discrete/continuous — what operations the reasoner can
+perform on it), and its **objective** (how it is fit). Existing bridges make all three
+choices implicitly, and — we claim — make all three badly.
 
----
+## 2. Why the standard answers fail
 
-## 3. Mechanism details (and how they differ from Bifrost-1)
+**Continuous-vector interfaces** (project the reasoner's hidden state into the
+synthesizer's conditioning space, fit by regression) are high-capacity but:
+- fitting by MSE targets the *conditional mean* of a multimodal distribution, so the
+  interface transmits an average of plausible images rather than one of them;
+- a continuous vector has no sampling algebra — no temperature, no top-p, no
+  classifier-free guidance, no likelihood. The reasoner cannot *reason over* it;
+- rate is fixed by construction: every region costs the same.
 
-### 3.1 Adaptive-depth RVQ-CLIP tokenizer — *new component*
-Bifrost-1 has **no tokenizer**: a patch *is* its raw CLIP vector. AdaRQ-Flow inserts a
-residual quantizer over the (frozen) CLIP latents:
+**Discrete-token interfaces** (VQ/RVQ the visual latent, predict tokens with
+cross-entropy) restore the algebra, but:
+- quantization error is a hard fidelity ceiling, escaped only by spending more tokens
+  everywhere;
+- rate is again uniform: a flat sky and a face cost identical budget.
 
-- a **shared (or per-depth) EMA codebook** with commitment + usage-entropy losses and two
-  anti-collapse mechanisms (first-batch data init, dead-code reinit) —
-  `tokenizer/codebook.py`;
-- **per-patch adaptive depth** via residual-norm halting (`adaptive_depth`) —
-  `tokenizer/quantizer.py`;
-- output = discrete `codes`, per-patch `depths`, dequantized prefix `ẑ`, and continuous
-  `res = z − ẑ`. The codes feed the cross-entropy head; `res` feeds the flow head.
+Both families inherit the same unexamined assumption: **that the interface should
+allocate the same capacity to every region of every image.**
 
-This makes the bridge a **finite-vocabulary, variable-rate** interface — the property
-that unlocks fixes #2, #4, #5 simultaneously.
+## 3. Thesis
 
-### 3.2 Hybrid head — *changed objective + interface*
-Bifrost-1's branch has a single linear *vision head* trained with **MSE**. AdaRQ-Flow's
-branch (same idea: a trainable copy of the MLLM layers, backbone frozen) carries **two**
-heads (`mllm/model.py`):
+> **The reasoner→synthesizer interface should be rate-adaptive and hybrid: a
+> variable-length discrete code that carries semantic intent in an algebra the reasoner
+> can sample and guide, plus a continuous residual generated by a distributional model
+> that restores what quantization necessarily discards.**
 
-1. **`CodeClassifierHead`** — per-residual-level softmax over `K+1` classes (the `+1` is
-   `<halt>`), trained with **cross-entropy**; CFG-capable.
-2. **`FlowResidualHead`** — a flow-matching velocity MLP for the continuous residual,
-   conditioned on the branch hidden state *and the predicted dequantized prefix*.
+Two consequences follow, and they are the contribution:
 
-Training is **MAR-style masked** (random masking, CE + flow on masked patches, CFG
-text-dropout); decoding is **MaskGIT-style** iterative unmasking with CFG, then the flow
-head fills the residual by ODE sampling.
+**(A) Allocation is a first-class object.** Bits should be spent where the *synthesizer*
+needs them. Because the code is a nested residual sequence, "spend more here" is simply
+"emit another code" — depth becomes a per-region, content-dependent decision, and the
+`<halt>` symbol makes that decision something the reasoner itself predicts.
 
-### 3.3 Flow-matching latent ControlNet — *same recipe, exposure-bias-aware, no diffusion*
-Like Bifrost-1 we adapt the FLUX ControlNet (input projection + 2D downsample + a few
-trainable DiT blocks, zero-init residual injection — `renderer/controlnet.py`). The
-differences: it conditions on **`ẑ + res`** (the dequantized code space, fix #4) and the
-whole stack is **rectified-flow / velocity** end to end — **no DDPM-style diffusion
-anywhere** (`renderer/renderer.py`, `mllm/flow.py`).
+**(B) Discreteness and fidelity stop being a trade-off.** The discrete prefix supplies
+the algebra (sampling, guidance, halting); the continuous residual supplies the
+fidelity. Neither has to be sacrificed, because they are not competing for the same
+channel.
 
----
+## 4. What this buys that is not a number
 
-## 4. Relationship to prior art (why the *combination* is novel)
+Two properties here are **structural** — no baseline achieves them at any
+hyperparameter setting, so they cannot be dismissed as a marginal win:
 
-| Prior work | What it has | What AdaRQ-Flow adds over it |
-|---|---|---|
-| **Bifrost-1** | CLIP-native bridge + ControlNet + FLUX, **MSE** branch | flow-matching residual + adaptive RVQ + discrete CFG-able interface; exposure-bias fix |
-| **NextStep-1** (2508.10711) | AR + continuous tokens + flow-matching head | we borrow the flow head but on a **CLIP-native, MLLM-bridged, residual-quantized** interface (NextStep uses VAE-style tokens, single-arch, no quantization) |
-| **ResGen** (2412.10208) | RVQ tokens, **fixed depth**, discrete-diffusion | we make depth **adaptive**, use a **CLIP-native** bridge, and **flow matching** |
-| **VRVQ / RAQ** (2405.14222) | variable-rate RVQ for audio/compression | we adapt **per-patch depth** for an **MLLM image-generation bridge** |
-| **FlowAR** (2412.15205) | scale-wise AR + flow matching, from scratch | we **bridge pretrained** MLLM + FLUX (efficiency thesis), CLIP-native |
+1. **Inference-time rate control.** A single trained model spans a rate–quality curve;
+   the token budget is a decode-time knob. Fixed-rate interfaces require training one
+   model per operating point.
+2. **A guidable, samplable interface.** Classifier-free guidance, temperature, and
+   confidence-ordered decoding exist only because part of the channel is discrete. A
+   regression bridge has no logits to guide.
 
-**Novel union:** MLLM-native CLIP bridge **×** adaptive-depth RVQ **×** flow matching for
-*both* the residual head and the renderer. No prior work combines all three.
+These are the claims we consider load-bearing. Metric deltas (§ EXPERIMENTS.md C1–C2)
+support them but are not the argument.
 
----
+## 5. Baselines (what we must beat)
 
-## 5. How each claim is checked in this repo
+| Family | Representative | Rate | Algebra | Objective |
+|---|---|---|---|---|
+| Continuous bridge, mean-fit | Bifrost-1 (2508.05954) | fixed | none | MSE |
+| Continuous bridge, distributional | NextStep-1 (2508.10711) | fixed | none | flow matching |
+| Discrete bridge, fixed depth | RVQ/token bridges; ResGen (2412.10208) | fixed | full | cross-entropy |
+| Variable-rate RQ (other domains) | VRVQ / RAQ (2405.14222) | adaptive | — | audio/compression RD |
+| Scale-wise AR + flow | FlowAR (2412.15205) | fixed | partial | flow matching |
+| **AdaRQ-Flow** | this work | **adaptive** | **full** | **CE + flow matching** |
 
-Every mechanism above is exercised by CPU tests on dummy stand-ins (the real
-Qwen2.5-VL / FLUX.1-dev swap is isolated to two `build_*` factories — see `DESIGN.md`
-§9). Direct evidence:
+The relevant prior art for *adaptive rate* lives in neural audio compression, where the
+objective is rate–distortion on the signal itself. Transplanting it is not the
+contribution; the contribution is that in a generative bridge the correct distortion is
+**not** signal reconstruction (§6).
 
-- **Distributional residual (fix #1):** `tests/test_mllm.py::test_flow_head_learns_target`,
-  `tests/test_renderer.py::test_renderer_learns_control_to_latent`.
-- **Discrete CFG-able interface (fix #2):** `tests/test_mllm.py::test_generate_*`
-  (CFG scale, greedy determinism), `test_compute_loss_*`.
-- **Residual depth recovers detail (fix #3):**
-  `tests/test_eval.py::test_reconstruction_vs_depth_monotone` — the recon-vs-depth curve
-  (our analog of Bifrost-1's token-count scaling, Fig. 4).
-- **Exposure-bias-aware renderer (fix #4):** `training/trainer.py:_step_renderer` trains on
-  `ẑ + res`; `tests/test_training.py::test_stage_renderer_decreases`.
-- **Adaptive depth (fix #5):** `tests/test_tokenizer.py::test_halting_depth_varies_by_detail`,
-  `test_non_adaptive_uses_full_depth`.
+## 6. The open scientific question (and our current weakness)
 
-The planned head-to-head ablations (incl. a **continuous + no-code "Bifrost-style"
-baseline** under matched compute) are generated by `adarq_flow/eval/ablations.py`
-(`configs/ablations/`), per `DESIGN.md` §7.
+The thesis says bits should go where the synthesizer needs them. That requires an
+allocation *criterion*, and the criterion is where the science is.
+
+**The current implementation halts on relative residual norm** — a hand-set threshold
+optimizing *reconstruction* of the CLIP latent. We flag this as the weakest part of the
+present design, for a concrete reason:
+
+> Reconstruction error is a poor proxy for generative utility. A textured region (foliage,
+> noise) has large residual norm and attracts codes, while a semantically load-bearing
+> region (a face, text, an object boundary) may have small residual norm and be starved.
+> Optimizing latent-space L2 can therefore *anti-correlate* with what the renderer needs.
+
+A threshold on the wrong quantity is exactly the kind of mechanism that produces
+marginal gains. The version of this work worth publishing replaces it with a **learned
+allocator trained against a rate–distortion objective whose distortion is measured
+downstream** (renderer output / perceptual), with the rate multiplier λ supplied as a
+conditioning input so one model spans the frontier.
+
+`EXPERIMENTS.md` **E0** is designed to answer this before any of it is built: it measures
+the headroom between uniform and oracle allocation. If that gap is small, the central
+thesis is wrong and the project should stop — not be tuned until it clears a bar.
+
+## 7. Status of the claims
+
+Nothing in §3–§4 is empirically established yet. The repository implements the
+architecture and verifies its *mechanics* on CPU stand-ins; it has not been trained on
+real data with real backbones, so no quality claim is supported. See `EXPERIMENTS.md`
+for the falsification plan and `ISSUES.md` for defects that must be closed before any
+number produced by this code is trustworthy.

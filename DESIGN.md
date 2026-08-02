@@ -1,23 +1,24 @@
 # AdaRQ-Flow — Design Document
 
-*AdaRQ-Flow: a flow-matching, adaptive residual-quantized successor to Bifrost-1 for unified
-multimodal understanding and generation.*
+*AdaRQ-Flow: a rate-adaptive, hybrid discrete-continuous interface between a frozen
+multimodal LLM and a frozen flow-matching renderer.*
 
 This document is the source of truth for the research design. It is written to outlive the
 ephemeral dev container, so it is intentionally self-contained.
 
 ---
 
-## 1. Research problem (unchanged from Bifrost-1)
+## 1. Research problem
 
 Integrate high-fidelity image generation into a **pretrained MLLM** while
 (a) preserving its reasoning / understanding ability and
 (b) avoiding single-architecture-scale training cost,
 by **bridging a frozen MLLM and a pretrained generative renderer** through a latent interface.
 
-We keep Bifrost-1's experimental protocol exactly (see §7) so results are directly comparable.
+We adopt the established evaluation protocol for this class of system (§7) so that
+results are directly comparable against published bridges.
 
-## 2. Baseline recap — Bifrost-1
+## 2. Reference baseline — continuous-vector bridges (Bifrost-1)
 
 - Bridge medium: **patch-level CLIP latents** that are *natively aligned* with the MLLM's
   own CLIP visual encoder (this alignment is the key efficiency win — beats VAE/SigLIP variants).
@@ -28,7 +29,11 @@ We keep Bifrost-1's experimental protocol exactly (see §7) so results are direc
 - **Decoupled training**: MLLM branch (MSE loss on latents) and ControlNet (flow-matching
   loss) trained separately. MLLM backbone frozen → understanding preserved.
 
-## 3. Diagnosed weaknesses of Bifrost-1
+## 3. Why existing bridges fail
+
+The critiques below are stated against continuous-vector bridges (Bifrost-1 is the
+reference instance) and, where noted, against fixed-depth discrete-token bridges. They
+motivate the design; they are not a repair list for one system.
 
 1. **MSE on continuous latents → mode-averaging.** §3.3 states "we use the MSE loss for
    image patch embedding prediction"; MAR's per-token diffusion head is dropped. MSE on a
@@ -115,7 +120,7 @@ velocity loss** (rectified flow), sampled by an ODE solver.
 scheduled-sampling on MLLM-sampled codes), so it sees its true inference-time input
 distribution. The finite code vocabulary makes this gap small by construction.
 
-### 4.4 How each weakness is addressed
+### 4.4 How each failure mode is addressed
 
 | Weakness | Fix |
 |---|---|
