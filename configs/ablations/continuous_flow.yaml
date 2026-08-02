@@ -1,4 +1,4 @@
-name: base_gpu-no_flow_head
+name: base_gpu-continuous_flow
 tokenizer:
   clip_dim: 1280
   num_patches: 256
@@ -17,10 +17,12 @@ mllm:
   num_layers: 28
   num_heads: 28
   freeze_backbone: true
-  code_head: true
-  flow_residual_head: false
+  code_head: false
+  flow_residual_head: true
+  residual_objective: flow
   flow_head_dim: 1280
   flow_head_layers: 2
+  flow_loss_weight: 1.0
   cfg_text_dropout: 0.1
   cfg_scale: 3.0
   mask_min: 0.7

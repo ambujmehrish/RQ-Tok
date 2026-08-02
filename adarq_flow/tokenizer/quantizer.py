@@ -240,8 +240,18 @@ class AdaptiveResidualQuantizer(nn.Module):
             raise ValueError(
                 f"expected codes of shape [M, {self.max_depth}], got {tuple(codes.shape)}"
             )
+        # RVQ prefixes are nested: <halt> must occupy a contiguous suffix. A code after a
+        # halt would be applied to a residual that never passed through the skipped
+        # level, silently producing a zhat outside the quantizer's reachable set.
+        halted = (codes == self.codebook_size).cummax(dim=-1).values
+        if bool((halted & (codes != self.codebook_size)).any()):
+            bad = int((halted & (codes != self.codebook_size)).any(-1).sum())
+            raise ValueError(
+                f"{bad} code row(s) have a real code after a <halt>; <halt> must be a "
+                "contiguous suffix. Sampling must be projected onto the valid set."
+            )
         m = codes.shape[0]
-        zhat = torch.zeros(m, self.dim, device=codes.device)
+        zhat = torch.zeros(m, self.dim, device=codes.device, dtype=self._book(0).embed.dtype)
         for k in range(self.max_depth):
             book = self._book(k)
             col = codes[:, k]

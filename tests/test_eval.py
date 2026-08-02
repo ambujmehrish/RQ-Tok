@@ -88,12 +88,13 @@ def test_evaluate_tokenizer_report():
 def test_ablation_configs_present_and_valid():
     cfgs = ablation_configs("tiny_cpu")
     for key in ["baseline", "fixed_depth", "depth_8", "per_depth_codebook",
-                "no_flow_head", "no_exposure_fix", "bifrost_continuous"]:
+                "discrete_only", "no_exposure_fix", "continuous_mse",
+                "continuous_flow", "hybrid_mse"]:
         assert key in cfgs
     assert cfgs["fixed_depth"].tokenizer.adaptive_depth is False
     assert cfgs["depth_8"].tokenizer.max_depth == 8
     assert cfgs["per_depth_codebook"].tokenizer.shared_codebook is False
-    assert cfgs["no_flow_head"].mllm.flow_residual_head is False
+    assert cfgs["discrete_only"].mllm.flow_residual_head is False
     # every variant round-trips through (de)serialization
     for cfg in cfgs.values():
         assert AdaRQFlowConfig.from_dict(cfg.to_dict()).to_dict() == cfg.to_dict()

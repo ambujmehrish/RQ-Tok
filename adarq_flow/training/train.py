@@ -11,19 +11,24 @@ from __future__ import annotations
 import argparse
 import dataclasses
 
-from ..config import get_preset
+from ..config import AdaRQFlowConfig, get_preset
 from .trainer import Trainer
 
 
 def main(argv=None) -> None:
     ap = argparse.ArgumentParser(description="AdaRQ-Flow trainer")
     ap.add_argument("--preset", default="tiny_cpu")
+    ap.add_argument("--config", default=None,
+                    help="path to a YAML config (e.g. configs/ablations/*.yaml). "
+                         "Takes precedence over --preset.")
     ap.add_argument("--stage", required=True, choices=["tokenizer", "branch", "renderer"])
     ap.add_argument("--max-steps", type=int, default=None)
     ap.add_argument("--dataset-length", type=int, default=256)
     args = ap.parse_args(argv)
 
-    cfg = get_preset(args.preset)
+    # Without this, generated ablation YAMLs cannot be run at all.
+    cfg = (AdaRQFlowConfig.from_yaml(args.config) if args.config
+           else get_preset(args.preset))
     overrides = {"stage": args.stage}
     if args.max_steps is not None:
         overrides["max_steps"] = args.max_steps

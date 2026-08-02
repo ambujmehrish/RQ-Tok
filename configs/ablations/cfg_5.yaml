@@ -19,8 +19,10 @@ mllm:
   freeze_backbone: true
   code_head: true
   flow_residual_head: true
+  residual_objective: flow
   flow_head_dim: 1280
   flow_head_layers: 2
+  flow_loss_weight: 1.0
   cfg_text_dropout: 0.1
   cfg_scale: 5.0
   mask_min: 0.7

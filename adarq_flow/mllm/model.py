@@ -63,15 +63,35 @@ class VisionGenModel(nn.Module):
         self.vocab = self.K + 1  # codes + <halt>
         H = mllm_cfg.hidden_dim
 
+        # Ablation switches (honored at runtime — see MLLMConfig).
+        self.use_code_head = bool(mllm_cfg.code_head)
+        self.use_residual_head = bool(mllm_cfg.flow_residual_head)
+        if not (self.use_code_head or self.use_residual_head):
+            raise ValueError(
+                "at least one of mllm.code_head / mllm.flow_residual_head must be True; "
+                "with both disabled the model predicts nothing"
+            )
+        self.residual_objective = mllm_cfg.residual_objective
+        if self.residual_objective not in ("flow", "mse"):
+            raise ValueError(
+                f"mllm.residual_objective must be 'flow' or 'mse', "
+                f"got {self.residual_objective!r}"
+            )
+
         self.backbone = backbone if backbone is not None else build_backbone(mllm_cfg)
         self.latent_in = nn.Linear(self.d, H)
         self.pos = nn.Embedding(self.N, H)
         self.mask_token = nn.Parameter(torch.randn(H) * 0.02)
         self.null_context = nn.Parameter(torch.randn(1, 1, H) * 0.02)  # CFG unconditional
         self.branch = VisionGenBranch(H, mllm_cfg.num_layers, mllm_cfg.num_heads)
-        self.code_head = CodeClassifierHead(H, self.D, self.vocab)
-        self.flow_head = FlowResidualHead(
-            self.d, H, mllm_cfg.flow_head_dim, mllm_cfg.flow_head_layers
+        self.code_head = (
+            CodeClassifierHead(H, self.D, self.vocab) if self.use_code_head else None
+        )
+        # The same module serves both objectives, so "flow" vs "mse" differs ONLY in the
+        # training objective and the sampling procedure — never in head capacity.
+        self.flow_head = (
+            FlowResidualHead(self.d, H, mllm_cfg.flow_head_dim, mllm_cfg.flow_head_layers)
+            if self.use_residual_head else None
         )
 
     # -- context / embeddings ----------------------------------------------------------
@@ -121,19 +141,50 @@ class VisionGenModel(nn.Module):
         if not bool(sel.any()):                                  # guarantee >=1 target
             sel[0] = True
 
-        logits = self.code_head(hidden).reshape(-1, self.D, self.vocab)[sel]
-        tgt = codes.reshape(-1, self.D)[sel]
-        code_ce = F.cross_entropy(logits.reshape(-1, self.vocab), tgt.reshape(-1))
-
+        zero = torch.zeros((), device=device)
         h_sel = hidden.reshape(-1, hidden.shape[-1])[sel]
-        zhat_sel = zhat.reshape(-1, self.d)[sel]
-        res_sel = residual.reshape(-1, self.d)[sel]
-        flow = flow_matching_loss(
-            lambda x_t, t: self.flow_head(x_t, t, h_sel, zhat_sel), res_sel, generator
-        )
 
-        total = code_ce + flow
-        return BranchLosses(total=total, code_ce=code_ce, flow=flow)
+        if self.use_code_head:
+            assert self.code_head is not None
+            logits = self.code_head(hidden).reshape(-1, self.D, self.vocab)[sel]
+            tgt = codes.reshape(-1, self.D)[sel]
+            code_ce = F.cross_entropy(logits.reshape(-1, self.vocab), tgt.reshape(-1))
+            # With codes, the continuous head models only the leftover residual,
+            # conditioned on the dequantized prefix.
+            cont_target = residual.reshape(-1, self.d)[sel]
+            cont_cond = zhat.reshape(-1, self.d)[sel]
+        else:
+            # Purely continuous bridge: no codes, so the head must model the full latent
+            # and has no prefix to condition on.
+            code_ce = zero
+            cont_target = (zhat + residual).reshape(-1, self.d)[sel]
+            cont_cond = torch.zeros_like(cont_target)
+
+        cont = self._residual_loss(h_sel, cont_cond, cont_target, generator)
+        total = code_ce + self.mllm_cfg.flow_loss_weight * cont
+        return BranchLosses(total=total, code_ce=code_ce, flow=cont)
+
+    def _residual_loss(self, h: Tensor, cond: Tensor, target: Tensor,
+                       generator: torch.Generator | None) -> Tensor:
+        """Continuous-head loss under the configured objective (or 0 if head disabled)."""
+        if not self.use_residual_head:
+            return torch.zeros((), device=h.device)
+        head = self.flow_head
+        assert head is not None
+        if self.residual_objective == "flow":
+            return flow_matching_loss(
+                lambda x_t, t: head(x_t, t, h, cond), target, generator
+            )
+        # "mse": deterministic conditional-mean regression through the same module.
+        pred = self._mse_predict(h, cond)
+        return (pred - target).pow(2).sum(-1).mean()
+
+    def _mse_predict(self, h: Tensor, cond: Tensor) -> Tensor:
+        """Deterministic prediction from the shared head (used by the 'mse' objective)."""
+        assert self.flow_head is not None
+        x0 = torch.zeros(h.shape[0], self.d, device=h.device, dtype=h.dtype)
+        t0 = torch.zeros(h.shape[0], device=h.device, dtype=h.dtype)
+        return self.flow_head(x0, t0, h, cond)
 
     def _sample_mask(self, b: int, device: torch.device,
                      generator: torch.Generator | None) -> Tensor:
@@ -166,6 +217,7 @@ class VisionGenModel(nn.Module):
 
         cond = self.encode_context(text_ids)
         uncond = self.null_context.expand_as(cond)
+        H = self.mllm_cfg.hidden_dim
 
         codes = torch.full((b, self.N, self.D), self.K, dtype=torch.long, device=device)
         revealed = torch.zeros(b, self.N, dtype=torch.bool, device=device)
@@ -173,37 +225,72 @@ class VisionGenModel(nn.Module):
         def deq(c: Tensor) -> Tensor:
             return dequantize_fn(c.reshape(-1, self.D)).reshape(b, self.N, self.d)
 
-        for i in range(steps):
+        if self.use_code_head:
+            assert self.code_head is not None
+            for i in range(steps):
+                zhat = deq(codes)
+                emb = self._patch_embed(zhat, ~revealed)
+                logits = self._cfg_logits(emb, cond, uncond, cfg_scale)   # [B,N,D,vocab]
+
+                cand, conf = self._sample_codes(logits, temperature, generator)
+                conf = conf.masked_fill(revealed, float("inf"))           # keep revealed
+
+                n_keep_masked = self._schedule_masked(i, steps)
+                n_reveal = self.N - n_keep_masked
+                if i == steps - 1:
+                    n_reveal = self.N
+                self._reveal(codes, revealed, cand, conf, n_reveal)
+
             zhat = deq(codes)
             emb = self._patch_embed(zhat, ~revealed)
-            logits = self._cfg_logits(emb, cond, uncond, cfg_scale)   # [B,N,D,vocab]
-
-            cand, conf = self._sample_codes(logits, temperature, generator)
-            conf = conf.masked_fill(revealed, float("inf"))           # keep revealed
-
-            n_keep_masked = self._schedule_masked(i, steps)
-            n_reveal = self.N - n_keep_masked
-            if i == steps - 1:
-                n_reveal = self.N
-            self._reveal(codes, revealed, cand, conf, n_reveal)
-
-        # All patches revealed: final residual via flow sampling.
-        zhat = deq(codes)
-        emb = self._patch_embed(zhat, ~revealed)
-        hidden = self.branch(emb, cond).reshape(-1, self.mllm_cfg.hidden_dim)
-        zhat_flat = zhat.reshape(-1, self.d)
-        res = flow_sample(
-            lambda x_t, t: self.flow_head(x_t, t, hidden, zhat_flat),
-            num=b * self.N, dim=self.d, steps=self.mllm_cfg.decode_steps,
-            device=device, generator=generator,
-        ).reshape(b, self.N, self.d)
+            hidden = self.branch(emb, cond).reshape(-1, H)
+            res = self._predict_continuous(
+                hidden, zhat.reshape(-1, self.d), generator).reshape(b, self.N, self.d)
+        else:
+            # Purely continuous bridge: there are no logits, hence no confidence signal
+            # to order the unmasking — patches are revealed in random order. (That the
+            # discrete interface *provides* a confidence signal is itself a difference,
+            # not an implementation detail.)
+            zhat = torch.zeros(b, self.N, self.d, device=device)
+            latent = torch.zeros(b, self.N, self.d, device=device)
+            ranks = torch.rand(b, self.N, device=device,
+                               generator=generator).argsort(dim=1).argsort(dim=1)
+            for i in range(steps):
+                emb = self._patch_embed(latent, ~revealed)
+                hidden = self.branch(emb, cond).reshape(-1, H)
+                pred = self._predict_continuous(
+                    hidden, torch.zeros(b * self.N, self.d, device=device), generator
+                ).reshape(b, self.N, self.d)
+                n_reveal = self.N - self._schedule_masked(i, steps)
+                if i == steps - 1:
+                    n_reveal = self.N
+                newly = (ranks < n_reveal) & (~revealed)
+                latent = torch.where(newly.unsqueeze(-1), pred, latent)
+                revealed = revealed | newly
+            res = latent
 
         depths = (codes != self.K).sum(-1)
         return GenerateOutput(codes=codes, depths=depths, residual=res, zhat=zhat,
                               latents=zhat + res)
 
+    def _predict_continuous(self, hidden: Tensor, cond: Tensor,
+                            generator: torch.Generator | None) -> Tensor:
+        """Sample/predict the continuous part (zeros if the head is disabled)."""
+        if not self.use_residual_head:
+            return torch.zeros(hidden.shape[0], self.d, device=hidden.device)
+        head = self.flow_head
+        assert head is not None
+        if self.residual_objective == "mse":
+            return self._mse_predict(hidden, cond)
+        return flow_sample(
+            lambda x_t, t: head(x_t, t, hidden, cond),
+            num=hidden.shape[0], dim=self.d, steps=self.mllm_cfg.decode_steps,
+            device=hidden.device, generator=generator,
+        )
+
     def _cfg_logits(self, emb: Tensor, cond: Tensor, uncond: Tensor,
                     cfg_scale: float) -> Tensor:
+        assert self.code_head is not None
         lc = self.code_head(self.branch(emb, cond))
         if cfg_scale == 1.0:
             return lc
@@ -212,6 +299,12 @@ class VisionGenModel(nn.Module):
 
     def _sample_codes(self, logits: Tensor, temperature: float,
                       generator: torch.Generator | None) -> tuple[Tensor, Tensor]:
+        # The tokenizer guarantees depth >= 1 (every patch spends at least one code),
+        # so <halt> is not a legal prediction at level 0. Forbid it there, otherwise the
+        # model can emit an all-halt patch that no encoder pass could ever produce.
+        logits = logits.clone()
+        logits[..., 0, self.K] = float("-inf")
+
         logp = F.log_softmax(logits, dim=-1)               # [B,N,D,vocab]
         if temperature <= 0.0:
             cand = logits.argmax(dim=-1)                    # greedy
@@ -219,8 +312,22 @@ class VisionGenModel(nn.Module):
             probs = F.softmax(logits / temperature, dim=-1).reshape(-1, self.vocab)
             cand = torch.multinomial(probs, 1, generator=generator).reshape(
                 logits.shape[:-1])
+        # RVQ semantics: <halt> must be a contiguous SUFFIX. The head scores every
+        # depth level independently, so an unconstrained sample can emit
+        # (code, halt, code) — which dequantizes level k against a residual that never
+        # passed through level k-1. Project onto the valid set: once halted, stay halted.
+        halted = (cand == self.K).cummax(dim=-1).values
+        cand = cand.masked_fill(halted, self.K)
+
         chosen = logp.gather(-1, cand.unsqueeze(-1)).squeeze(-1)   # [B,N,D]
-        conf = chosen.mean(dim=-1)                                  # [B,N]
+        # Score only the levels that are actually predicted (pre-halt prefix, plus the
+        # terminating <halt> itself). Averaging over post-halt levels would make the
+        # score track predicted DEPTH rather than confidence, so MaskGIT would reveal
+        # flat/shallow patches first regardless of certainty.
+        valid = ~halted
+        valid[..., 0] = True                       # depth >= 1; level 0 always counts
+        n_valid = valid.sum(-1).clamp_min(1)
+        conf = (chosen * valid).sum(-1) / n_valid  # [B,N]
         return cand, conf
 
     def _schedule_masked(self, step: int, steps: int) -> int:

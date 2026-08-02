@@ -186,6 +186,25 @@ def reduce_dict(values: dict[str, torch.Tensor]) -> dict[str, torch.Tensor]:
     return {k: packed[i] for i, k in enumerate(keys)}
 
 
+def broadcast_module(module: torch.nn.Module, src: int = 0) -> None:
+    """Make every rank's copy of ``module`` bit-identical to ``src``'s.
+
+    REQUIRED when using :func:`average_gradients` instead of a DDP wrapper. DDP
+    broadcasts parameters at construction; manual gradient averaging does not, so
+    without this call each rank keeps its own random initialization and averaging
+    gradients across differently-parameterized replicas trains N divergent models.
+    Buffers are included (EMA codebook state, running statistics).
+    """
+    if not is_dist():
+        return
+    with torch.no_grad():
+        for p in module.parameters():
+            dist.broadcast(p.data, src=src)
+        for b in module.buffers():
+            if b.is_floating_point() or b.dtype in (torch.int64, torch.int32, torch.bool):
+                dist.broadcast(b.data, src=src)
+
+
 def average_gradients(module: torch.nn.Module) -> None:
     """Mean-reduce ``.grad`` of every parameter across ranks (after backward).
 

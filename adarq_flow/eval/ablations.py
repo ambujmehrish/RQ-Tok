@@ -41,25 +41,35 @@ def ablation_configs(base: str = "tiny_cpu") -> dict[str, AdaRQFlowConfig]:
     def add(name: str, **ov):
         out[name] = _with(dataclasses.replace(b, name=f"{base}-{name}"), **ov)
 
-    # Adaptive vs. fixed depth.
+    # --- Interface factorial: {discrete codes on/off} x {distributional/mean objective}
+    # This 2x2 is what separates "codes help" from "the distributional objective helps".
+    # Head capacity is identical in all four cells (same module, same parameter count),
+    # so a difference cannot be attributed to model size.
+    add("continuous_mse",                       # conditional-mean continuous bridge
+        **{"mllm.code_head": False, "mllm.residual_objective": "mse"})
+    add("continuous_flow",                      # continuous bridge, distributional
+        **{"mllm.code_head": False, "mllm.residual_objective": "flow"})
+    add("hybrid_mse",                           # codes, but mean-regressed residual
+        **{"mllm.residual_objective": "mse"})
+    # (the 4th cell, codes + flow, IS `baseline`)
+
+    # --- Rate allocation: the central claim.
     add("fixed_depth", **{"tokenizer.adaptive_depth": False})
-    # Residual depth D_max.
     add("depth_2", **{"tokenizer.max_depth": 2})
     add("depth_8", **{"tokenizer.max_depth": 8})
-    # Codebook size K.
+
+    # --- Bridge capacity controls.
     add("codebook_16", **{"tokenizer.codebook_size": 16})
     add("codebook_256", **{"tokenizer.codebook_size": 256})
-    # Shared vs. per-depth codebooks.
     add("per_depth_codebook", **{"tokenizer.shared_codebook": False})
-    # CFG scale.
+    add("discrete_only", **{"mllm.flow_residual_head": False})
+
+    # --- Guidance (only meaningful with a discrete interface).
     add("cfg_1", **{"mllm.cfg_scale": 1.0})
     add("cfg_5", **{"mllm.cfg_scale": 5.0})
-    # Flow-residual head on/off.
-    add("no_flow_head", **{"mllm.flow_residual_head": False})
-    # Exposure-bias training on/off.
+
+    # --- Renderer conditioning distribution.
     add("no_exposure_fix", **{"renderer.train_on_dequantized": False})
-    # Continuous + no discrete codes (Bifrost-1-style baseline).
-    add("bifrost_continuous", **{"mllm.code_head": False, "tokenizer.max_depth": 1})
     return out
 
 

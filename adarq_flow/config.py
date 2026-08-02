@@ -56,11 +56,27 @@ class MLLMConfig:
     num_heads: int = 4
     freeze_backbone: bool = True    # core invariant: understanding preserved
 
-    # Hybrid head
+    # Hybrid head. Both flags are honored at runtime (ablations depend on it):
+    #   code_head=False          -> no discrete codes; the continuous head predicts the
+    #                               FULL latent z (a purely continuous bridge baseline).
+    #   flow_residual_head=False -> no continuous part; latents are the dequantized
+    #                               prefix z_hat only (a purely discrete bridge).
+    # At least one must be True.
     code_head: bool = True          # discrete RVQ code classifier (cross-entropy)
-    flow_residual_head: bool = True # continuous residual via flow matching
+    flow_residual_head: bool = True # continuous residual head
+    # Objective for the continuous head. "flow" = rectified-flow velocity matching
+    # (distributional); "mse" = direct regression (the conditional-mean objective used
+    # by continuous-bridge baselines). Both use the SAME head module and parameter
+    # count, so this isolates the objective from head capacity.
+    residual_objective: str = "flow"   # "flow" | "mse"
     flow_head_dim: int = 64
     flow_head_layers: int = 2
+    # Weight on the continuous-head loss in `total = code_ce + w * continuous`.
+    # These two terms are NOT naturally commensurate: the continuous loss sums over the
+    # `clip_dim` latent dimensions while the cross-entropy is a mean over scalars, so at
+    # base_gpu scale (clip_dim=1280, K=8192) the raw magnitudes differ by ~100x and the
+    # code head is effectively untrained at w=1. Tune per scale; see EXPERIMENTS.md.
+    flow_loss_weight: float = 1.0
 
     # Classifier-free guidance (text dropout during training)
     cfg_text_dropout: float = 0.1

@@ -33,6 +33,7 @@ from ..utils.distributed import (
     DistInfo,
     average_gradients,
     barrier,
+    broadcast_module,
     cleanup,
     is_main_process,
     make_sampler,
@@ -68,7 +69,9 @@ class Trainer:
         else:
             self.info = DistInfo(0, 1, 0, "gloo", torch.device(cfg.train.device), False)
         self.device = self.info.device
-        seed_everything(cfg.train.seed, self.info.rank, cfg.dist.seed_per_rank)
+        # Model construction must be seeded IDENTICALLY on every rank; only the data
+        # stream is decorrelated per rank (done after the modules are built).
+        seed_everything(cfg.train.seed, rank=0, seed_per_rank=False)
 
         # Frozen tokenizer is needed by every stage (produces latents / targets).
         self.tokenizer = build_tokenizer(cfg).to(self.device)
@@ -80,6 +83,19 @@ class Trainer:
         self.vae: nn.Module | None = None
         self.opt: torch.optim.Optimizer | None = None
         self._build_stage()
+
+        # Guarantee bit-identical replicas across ranks. We average gradients manually
+        # (the stage models expose compute_loss, not forward), so nothing else would
+        # synchronize the initial weights — including the frozen tokenizer, whose
+        # codebook otherwise produces DIFFERENT training targets on every rank.
+        broadcast_module(self.tokenizer)
+        if self.model is not None:
+            broadcast_module(self.model)
+        if self.vae is not None:
+            broadcast_module(self.vae)
+
+        # Only now decorrelate the per-rank data stream.
+        seed_everything(cfg.train.seed, self.info.rank, cfg.dist.seed_per_rank)
 
         dataset = build_dataset(cfg, length=dataset_length)
         self.sampler = make_sampler(dataset, self.info, shuffle=True, seed=cfg.train.seed)
@@ -106,6 +122,12 @@ class Trainer:
             self.tokenizer.train()
             return
         self.tokenizer.eval()  # frozen: produces targets only
+        if self.stage == "renderer" and cfg.renderer.scheduled_sampling_prob > 0.0:
+            raise NotImplementedError(
+                "renderer.scheduled_sampling_prob > 0 requires feeding branch-sampled\n"
+                "residuals into Stage B, which is not implemented. Silently ignoring it\n"
+                "would misreport the exposure-bias experiment; set it to 0.0."
+            )
 
         if self.stage == "branch":
             self.model = build_vision_gen_model(cfg).to(self.device)
@@ -146,7 +168,13 @@ class Trainer:
     def _step_renderer(self, images: Tensor, text: Tensor) -> Tensor:
         model = cast(FlowRenderer, self._model)
         _, _, zhat, res = self._tokenize(images)
-        control = (zhat + res)                                   # dequantized + residual
+        # NOTE: res is defined as z - zhat, so `zhat + res` is EXACTLY the raw continuous
+        # latent z. Conditioning on it would silently reproduce the very train/inference
+        # mismatch this stage exists to remove, and would make the flag below inert.
+        if self.cfg.renderer.train_on_dequantized:
+            control = zhat            # finite-vocabulary code space (inference-side)
+        else:
+            control = zhat + res      # == z, ground-truth continuous latent (baseline)
         assert self.vae is not None                              # set for renderer stage
         image_latents = self.vae(images)                         # [B, L, C] target
         loss = model.compute_loss(image_latents, control)
@@ -221,7 +249,7 @@ class Trainer:
         return path
 
     def load_checkpoint(self, path: str) -> int:
-        payload = torch.load(path, map_location=self.device, weights_only=False)
+        payload = torch.load(path, map_location=self.device, weights_only=True)
         if payload["stage"] != self.stage:
             raise ValueError(
                 f"checkpoint stage {payload['stage']!r} != trainer stage {self.stage!r}")

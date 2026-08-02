@@ -1,4 +1,4 @@
-name: base_gpu-no_exposure_fix
+name: base_gpu-hybrid_mse
 tokenizer:
   clip_dim: 1280
   num_patches: 256
@@ -19,7 +19,7 @@ mllm:
   freeze_backbone: true
   code_head: true
   flow_residual_head: true
-  residual_objective: flow
+  residual_objective: mse
   flow_head_dim: 1280
   flow_head_layers: 2
   flow_loss_weight: 1.0
@@ -43,7 +43,7 @@ renderer:
   num_inference_steps: 28
   controlnet_conditioning_scale: 0.7
   guidance_scale: 3.5
-  train_on_dequantized: false
+  train_on_dequantized: true
   scheduled_sampling_prob: 0.0
 train:
   stage: tokenizer
