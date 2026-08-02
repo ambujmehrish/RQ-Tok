@@ -4,8 +4,8 @@ import pytest
 
 torch = pytest.importorskip("torch")
 
-from bifrost_flow.config import RendererConfig, get_preset
-from bifrost_flow.renderer import (
+from adarq_flow.config import RendererConfig, get_preset
+from adarq_flow.renderer import (
     DummyFluxBackbone,
     FlowRenderer,
     LatentControlNet,

@@ -8,8 +8,8 @@ import pytest
 
 torch = pytest.importorskip("torch")
 
-from bifrost_flow.config import TokenizerConfig, get_preset
-from bifrost_flow.tokenizer import (
+from adarq_flow.config import TokenizerConfig, get_preset
+from adarq_flow.tokenizer import (
     AdaptiveResidualQuantizer,
     Codebook,
     DummyCLIPEncoder,

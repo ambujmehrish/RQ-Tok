@@ -23,7 +23,7 @@ from typing import cast
 import torch
 from torch import Tensor, nn
 
-from ..config import BifrostFlowConfig
+from ..config import AdaRQFlowConfig
 from ..data import build_dataloader, build_dataset
 from ..mllm import VisionGenModel, build_vision_gen_model
 from ..renderer import FlowRenderer, build_renderer
@@ -54,7 +54,7 @@ class TrainReport:
 
 
 class Trainer:
-    def __init__(self, cfg: BifrostFlowConfig, dataset_length: int = 256,
+    def __init__(self, cfg: AdaRQFlowConfig, dataset_length: int = 256,
                  setup_dist: bool = True) -> None:
         if cfg.train.stage not in VALID_STAGES:
             raise ValueError(f"stage must be one of {VALID_STAGES}, got {cfg.train.stage!r}")

@@ -10,8 +10,8 @@ Topology is read from the environment — never hard-coded:
 Fail-loud, no silent fallbacks: a multi-rank world with a missing rendezvous address,
 or an NCCL backend without CUDA, raises immediately rather than degrading.
 
-This module imports torch; the ``bifrost_flow.utils`` package stays torch-free, so
-import it explicitly: ``from bifrost_flow.utils.distributed import setup_distributed``.
+This module imports torch; the ``adarq_flow.utils`` package stays torch-free, so
+import it explicitly: ``from adarq_flow.utils.distributed import setup_distributed``.
 """
 
 from __future__ import annotations

@@ -26,9 +26,9 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
 import torch
 
-from bifrost_flow.config import get_preset
-from bifrost_flow.tokenizer import build_tokenizer
-from bifrost_flow.utils.distributed import (
+from adarq_flow.config import get_preset
+from adarq_flow.tokenizer import build_tokenizer
+from adarq_flow.utils.distributed import (
     all_reduce_mean,
     barrier,
     cleanup,
@@ -67,7 +67,7 @@ def main():
     seed_everything(args.seed, rank=info.rank, seed_per_rank=cfg.dist.seed_per_rank)
 
     if is_main_process():
-        print(f"[bifrost-flow] world_size={info.world_size} backend={backend} "
+        print(f"[adarq-flow] world_size={info.world_size} backend={backend} "
               f"device={info.device} preset={args.preset}", flush=True)
 
     tok = build_tokenizer(cfg).to(info.device)
@@ -96,7 +96,7 @@ def main():
     max_dev = (book - ref).abs().max().item()
     if is_main_process():
         ok = "OK" if max_dev < 1e-5 else f"DIVERGED (max_dev={max_dev:.2e})"
-        print(f"[bifrost-flow] cross-rank codebook consistency: {ok}", flush=True)
+        print(f"[adarq-flow] cross-rank codebook consistency: {ok}", flush=True)
     if get_world_size() > 1 and max_dev >= 1e-5:
         raise RuntimeError(f"codebooks diverged across ranks (max_dev={max_dev:.2e})")
 

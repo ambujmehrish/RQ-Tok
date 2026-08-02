@@ -11,8 +11,8 @@ import pytest
 
 torch = pytest.importorskip("torch")
 
-from bifrost_flow.config import DistConfig, get_preset
-from bifrost_flow.utils.distributed import (
+from adarq_flow.config import DistConfig, get_preset
+from adarq_flow.utils.distributed import (
     DistInfo,
     detect_launch_env,
     setup_distributed,
@@ -100,9 +100,9 @@ def test_config_has_dist_block():
     cfg = get_preset("base_gpu")
     assert cfg.dist.strategy == "ddp" and cfg.dist.backend == "nccl"
     # round-trips through (de)serialization
-    from bifrost_flow.config import BifrostFlowConfig
+    from adarq_flow.config import AdaRQFlowConfig
 
-    assert BifrostFlowConfig.from_dict(cfg.to_dict()).dist.strategy == "ddp"
+    assert AdaRQFlowConfig.from_dict(cfg.to_dict()).dist.strategy == "ddp"
 
 
 # -- real 2-process gloo run: codebook stays identical across ranks --------------------
@@ -114,9 +114,9 @@ def _codebook_worker(rank: int, world_size: int, port: int):
         RANK=str(rank), WORLD_SIZE=str(world_size), LOCAL_RANK=str(rank),
         MASTER_ADDR="127.0.0.1", MASTER_PORT=str(port),
     )
-    from bifrost_flow.config import TokenizerConfig
-    from bifrost_flow.tokenizer import AdaptiveResidualQuantizer
-    from bifrost_flow.utils.distributed import cleanup, setup_distributed
+    from adarq_flow.config import TokenizerConfig
+    from adarq_flow.tokenizer import AdaptiveResidualQuantizer
+    from adarq_flow.utils.distributed import cleanup, setup_distributed
 
     info = setup_distributed(backend="gloo")
     assert info.is_distributed and info.world_size == world_size

@@ -12,7 +12,7 @@ from dataclasses import dataclass
 import torch
 from torch import Tensor, nn
 
-from ..config import BifrostFlowConfig, RendererConfig
+from ..config import AdaRQFlowConfig, RendererConfig
 from ..mllm.flow import flow_matching_loss
 from .backbone import build_renderer_backbone
 from .controlnet import LatentControlNet
@@ -85,7 +85,7 @@ class FlowRenderer(nn.Module):
         return x
 
 
-def build_renderer(cfg: BifrostFlowConfig) -> FlowRenderer:
+def build_renderer(cfg: AdaRQFlowConfig) -> FlowRenderer:
     """Construct the renderer; conditioning geometry comes from the tokenizer config."""
     return FlowRenderer(
         cfg.renderer,

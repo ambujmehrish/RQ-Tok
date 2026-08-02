@@ -1,11 +1,11 @@
 #!/bin/bash
 # ======================================================================================
-# Bifrost-Flow — Cineca Leonardo (Booster) — 1 node x 4x A100-64GB, DDP.
+# AdaRQ-Flow — Cineca Leonardo (Booster) — 1 node x 4x A100-64GB, DDP.
 #
 # Submit with:  sbatch scripts/cineca_leonardo_4xA100.sbatch
 # Fill in the <PLACEHOLDERS> (account, venv path, module names) before submitting.
 # ======================================================================================
-#SBATCH --job-name=bifrost-flow
+#SBATCH --job-name=adarq-flow
 #SBATCH --account=<YOUR_PROJECT_ACCOUNT>      # e.g. saturday/your Cineca project
 #SBATCH --partition=boost_usr_prod            # Leonardo Booster GPU partition
 #SBATCH --qos=normal                          # or boost_qos_dbg for short debug jobs
@@ -44,4 +44,4 @@ srun python scripts/train_tokenizer_ddp.py \
     --batch-size 256
 
 # For real Phase-4 training, swap the entrypoint for the stage trainer (same launch),
-# e.g.:  srun python -m bifrost_flow.training.train --preset base_gpu --stage tokenizer
+# e.g.:  srun python -m adarq_flow.training.train --preset base_gpu --stage tokenizer

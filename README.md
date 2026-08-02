@@ -1,6 +1,6 @@
-# Bifrost-Flow
+# AdaRQ-Flow
 
-**Bifrost-Flow** is the next-generation successor to [Bifrost-1](https://arxiv.org/abs/2508.05954)
+**AdaRQ-Flow** is the next-generation successor to [Bifrost-1](https://arxiv.org/abs/2508.05954)
 for unified multimodal understanding and generation. The name reflects the core change: the
 bridge (*Bifröst*) between a frozen multimodal LLM (MLLM) and a pretrained image renderer is
 now driven end-to-end by **flow matching** instead of diffusion + MSE.
@@ -11,10 +11,10 @@ now driven end-to-end by **flow matching** instead of diffusion + MSE.
 
 ## Core idea
 
-Bifrost-Flow keeps Bifrost-1's winning insight — bridging an MLLM and a renderer through
+AdaRQ-Flow keeps Bifrost-1's winning insight — bridging an MLLM and a renderer through
 **MLLM-native CLIP latents** — but replaces its three biggest weaknesses:
 
-| Bifrost-1 weakness | Bifrost-Flow fix |
+| Bifrost-1 weakness | AdaRQ-Flow fix |
 |---|---|
 | MSE regression on continuous latents → mode-averaging / blur | **Flow-matching** residual head (proper distributional objective) |
 | Single CLIP vector per patch → fidelity ceiling | **Adaptive-depth residual quantization** of CLIP latents (coarse→fine) |
@@ -40,7 +40,7 @@ the LLM-native interface, classifier-free guidance, and adaptive token budget.
 ## Layout
 
 ```
-bifrost_flow/
+adarq_flow/
   config.py        # dataclass configs + tiny/base presets
   tokenizer/       # adaptive RVQ-CLIP tokenizer
   mllm/            # frozen MLLM + vision generation branch (hybrid head)
@@ -60,15 +60,15 @@ tests/
 pip install -e ".[dev]"                          # config/scaffold tests, no torch
 pip install -e ".[dev,torch]"                    # also run the tokenizer (Phase 1) tests
 pytest -q                                         # tokenizer tests auto-skip without torch
-python -m bifrost_flow.config --print tiny_cpu   # inspect a config preset
+python -m adarq_flow.config --print tiny_cpu   # inspect a config preset
 ```
 
 The adaptive RVQ-CLIP tokenizer (Phase 1) runs on CPU:
 
 ```python
 import torch
-from bifrost_flow.config import get_preset
-from bifrost_flow.tokenizer import build_tokenizer, fit_tokenizer
+from adarq_flow.config import get_preset
+from adarq_flow.tokenizer import build_tokenizer, fit_tokenizer
 
 tok = build_tokenizer(get_preset("tiny_cpu"))
 z   = tok.encode(torch.randn(8, 3, 8, 8))   # frozen dummy CLIP -> patch latents
@@ -79,9 +79,9 @@ out = tok.tokenize(torch.randn(8, 3, 8, 8)) # adaptive RVQ codes + halt depths +
 The MLLM vision-generation branch + hybrid head (Phase 2) also runs on CPU:
 
 ```python
-from bifrost_flow.config import get_preset
-from bifrost_flow.tokenizer import build_tokenizer
-from bifrost_flow.mllm import build_vision_gen_model
+from adarq_flow.config import get_preset
+from adarq_flow.tokenizer import build_tokenizer
+from adarq_flow.mllm import build_vision_gen_model
 
 cfg = get_preset("tiny_cpu")
 tok = build_tokenizer(cfg)
@@ -109,9 +109,9 @@ out = model.generate(text, tok.dequantize, cfg_scale=3.0)
 Decoupled training (Stage 0 tokenizer → A branch → B renderer), distributed-aware:
 
 ```bash
-python -m bifrost_flow.training.train --preset tiny_cpu --stage tokenizer   # Stage 0
-python -m bifrost_flow.training.train --preset tiny_cpu --stage branch      # Stage A
-python -m bifrost_flow.training.train --preset tiny_cpu --stage renderer    # Stage B
+python -m adarq_flow.training.train --preset tiny_cpu --stage tokenizer   # Stage 0
+python -m adarq_flow.training.train --preset tiny_cpu --stage branch      # Stage A
+python -m adarq_flow.training.train --preset tiny_cpu --stage renderer    # Stage B
 # multi-GPU (4x A100, Cineca Leonardo): sbatch scripts/cineca_leonardo_4xA100.sbatch
 ```
 
@@ -119,10 +119,10 @@ End-to-end inference and the tokenizer reconstruction-vs-depth ablation:
 
 ```python
 import torch
-from bifrost_flow.config import get_preset
-from bifrost_flow.inference import build_pipeline
-from bifrost_flow.tokenizer import build_tokenizer, fit_tokenizer
-from bifrost_flow.eval import evaluate_tokenizer
+from adarq_flow.config import get_preset
+from adarq_flow.inference import build_pipeline
+from adarq_flow.tokenizer import build_tokenizer, fit_tokenizer
+from adarq_flow.eval import evaluate_tokenizer
 
 cfg = get_preset("tiny_cpu")
 pipe = build_pipeline(cfg)

@@ -23,7 +23,7 @@ import torch
 import torch.nn.functional as F
 from torch import Tensor, nn
 
-from ..config import BifrostFlowConfig, MLLMConfig, TokenizerConfig
+from ..config import AdaRQFlowConfig, MLLMConfig, TokenizerConfig
 from .backbone import build_backbone
 from .branch import VisionGenBranch
 from .flow import flow_matching_loss, flow_sample
@@ -252,7 +252,7 @@ class VisionGenModel(nn.Module):
             raise ValueError(f"codes out of range [0, {self.K}]")
 
 
-def build_vision_gen_model(cfg: BifrostFlowConfig,
+def build_vision_gen_model(cfg: AdaRQFlowConfig,
                            backbone: nn.Module | None = None) -> VisionGenModel:
     """Construct the vision-generation model from a full config."""
     return VisionGenModel(cfg.mllm, cfg.tokenizer, backbone=backbone)

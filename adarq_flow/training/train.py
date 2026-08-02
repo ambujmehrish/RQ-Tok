@@ -1,7 +1,7 @@
 """Unified training entrypoint for all decoupled stages.
 
-    python -m bifrost_flow.training.train --preset tiny_cpu --stage tokenizer
-    srun python -m bifrost_flow.training.train --preset base_gpu --stage branch
+    python -m adarq_flow.training.train --preset tiny_cpu --stage tokenizer
+    srun python -m adarq_flow.training.train --preset base_gpu --stage branch
 
 Launch under SLURM/torchrun for multi-GPU (see scripts/cineca_leonardo_4xA100.sbatch).
 """
@@ -16,7 +16,7 @@ from .trainer import Trainer
 
 
 def main(argv=None) -> None:
-    ap = argparse.ArgumentParser(description="Bifrost-Flow trainer")
+    ap = argparse.ArgumentParser(description="AdaRQ-Flow trainer")
     ap.add_argument("--preset", default="tiny_cpu")
     ap.add_argument("--stage", required=True, choices=["tokenizer", "branch", "renderer"])
     ap.add_argument("--max-steps", type=int, default=None)

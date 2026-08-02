@@ -31,7 +31,7 @@ jobs:
         run: ruff check .
 
       - name: Mypy (type check)
-        run: mypy bifrost_flow/
+        run: mypy adarq_flow/
 
       - name: Pytest (CPU, incl. distributed gloo)
         run: pytest -q

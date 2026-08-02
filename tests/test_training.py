@@ -6,9 +6,9 @@ import pytest
 
 torch = pytest.importorskip("torch")
 
-from bifrost_flow.config import get_preset
-from bifrost_flow.data import DummyImageTextDataset, build_dataset
-from bifrost_flow.training import VALID_STAGES, Trainer
+from adarq_flow.config import get_preset
+from adarq_flow.data import DummyImageTextDataset, build_dataset
+from adarq_flow.training import VALID_STAGES, Trainer
 
 
 def _cfg(stage, max_steps=20, batch=4):

@@ -15,7 +15,7 @@ from __future__ import annotations
 
 from torch import Tensor, nn
 
-from ..config import BifrostFlowConfig, TokenizerConfig
+from ..config import AdaRQFlowConfig, TokenizerConfig
 from .encoder import build_clip_encoder
 from .quantizer import AdaptiveResidualQuantizer, QuantizeOutput
 
@@ -55,8 +55,8 @@ class RVQCLIPTokenizer(nn.Module):
         return self.quantizer.codebook_usage()
 
 
-def build_tokenizer(cfg: BifrostFlowConfig) -> RVQCLIPTokenizer:
-    """Construct a tokenizer from a full :class:`BifrostFlowConfig`.
+def build_tokenizer(cfg: AdaRQFlowConfig) -> RVQCLIPTokenizer:
+    """Construct a tokenizer from a full :class:`AdaRQFlowConfig`.
 
     The CLIP encoder follows ``cfg.mllm.backbone`` (the tokenizer's latents are the
     MLLM's native CLIP latents); the quantizer follows ``cfg.tokenizer``.

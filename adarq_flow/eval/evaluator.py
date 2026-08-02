@@ -1,7 +1,7 @@
 """Tokenizer evaluation: reconstruction quality, adaptive depth, codebook usage.
 
 The headline ablation we *can* run end-to-end (CPU + dummy) is **reconstruction vs.
-adaptive depth** — the Bifrost-Flow analog of Bifrost-1's token-count scaling curve
+adaptive depth** — the AdaRQ-Flow analog of Bifrost-1's token-count scaling curve
 (Fig. 4): how reconstruction error falls as more residual codes are spent per patch.
 """
 

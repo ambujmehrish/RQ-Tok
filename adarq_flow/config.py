@@ -1,17 +1,17 @@
-"""Configuration system for Bifrost-Flow.
+"""Configuration system for AdaRQ-Flow.
 
 Pure-Python (dataclasses only) so it imports and tests without torch/transformers.
 Every component is selectable between a *tiny* (CPU-runnable) and a *real* (GPU) variant.
 
 Usage:
-    from bifrost_flow.config import BifrostFlowConfig, get_preset
+    from adarq_flow.config import AdaRQFlowConfig, get_preset
     cfg = get_preset("tiny_cpu")
 
     # or from YAML:
-    cfg = BifrostFlowConfig.from_yaml("configs/base_gpu.yaml")
+    cfg = AdaRQFlowConfig.from_yaml("configs/base_gpu.yaml")
 
     # CLI:
-    python -m bifrost_flow.config --print tiny_cpu
+    python -m adarq_flow.config --print tiny_cpu
 """
 
 from __future__ import annotations
@@ -139,8 +139,8 @@ class TrainConfig:
 
 
 @dataclass
-class BifrostFlowConfig:
-    name: str = "bifrost-flow-tiny"
+class AdaRQFlowConfig:
+    name: str = "adarq-flow-tiny"
     tokenizer: TokenizerConfig = field(default_factory=TokenizerConfig)
     mllm: MLLMConfig = field(default_factory=MLLMConfig)
     renderer: RendererConfig = field(default_factory=RendererConfig)
@@ -152,7 +152,7 @@ class BifrostFlowConfig:
         return asdict(self)
 
     @classmethod
-    def from_dict(cls, d: dict[str, Any]) -> BifrostFlowConfig:
+    def from_dict(cls, d: dict[str, Any]) -> AdaRQFlowConfig:
         d = dict(d or {})
         sub = {
             "tokenizer": (TokenizerConfig, d.pop("tokenizer", {})),
@@ -170,7 +170,7 @@ class BifrostFlowConfig:
         return cls(**kwargs)
 
     @classmethod
-    def from_yaml(cls, path: str) -> BifrostFlowConfig:
+    def from_yaml(cls, path: str) -> AdaRQFlowConfig:
         import yaml  # local import keeps module import light
 
         with open(path) as f:
@@ -197,15 +197,15 @@ def _build(klass, raw: dict[str, Any] | None):
 # --------------------------------------------------------------------------------------
 # Presets
 # --------------------------------------------------------------------------------------
-def _tiny_cpu() -> BifrostFlowConfig:
+def _tiny_cpu() -> AdaRQFlowConfig:
     """Smallest end-to-end-runnable config. Everything 'dummy'; CPU-friendly."""
-    return BifrostFlowConfig(name="bifrost-flow-tiny-cpu")
+    return AdaRQFlowConfig(name="adarq-flow-tiny-cpu")
 
 
-def _base_gpu() -> BifrostFlowConfig:
+def _base_gpu() -> AdaRQFlowConfig:
     """Real-backbone config (Qwen2.5-VL 7B + FLUX.1-dev). Requires GPU + HF auth."""
-    return BifrostFlowConfig(
-        name="bifrost-flow-base-gpu",
+    return AdaRQFlowConfig(
+        name="adarq-flow-base-gpu",
         tokenizer=TokenizerConfig(
             clip_dim=1280,
             num_patches=256,
@@ -248,7 +248,7 @@ _PRESETS = {
 }
 
 
-def get_preset(name: str) -> BifrostFlowConfig:
+def get_preset(name: str) -> AdaRQFlowConfig:
     if name not in _PRESETS:
         raise KeyError(f"Unknown preset '{name}'. Available: {sorted(_PRESETS)}")
     return _PRESETS[name]()
@@ -262,7 +262,7 @@ def _main(argv=None):
     import argparse
     import json
 
-    parser = argparse.ArgumentParser(description="Bifrost-Flow config inspector")
+    parser = argparse.ArgumentParser(description="AdaRQ-Flow config inspector")
     parser.add_argument("--print", dest="preset", help="preset name to print")
     parser.add_argument("--yaml", help="path to a YAML config to load and print")
     parser.add_argument("--list", action="store_true", help="list presets")
@@ -272,7 +272,7 @@ def _main(argv=None):
         print("\n".join(available_presets()))
         return
     if args.yaml:
-        cfg = BifrostFlowConfig.from_yaml(args.yaml)
+        cfg = AdaRQFlowConfig.from_yaml(args.yaml)
     elif args.preset:
         cfg = get_preset(args.preset)
     else:

@@ -4,8 +4,8 @@ import pytest
 
 torch = pytest.importorskip("torch")
 
-from bifrost_flow.config import BifrostFlowConfig, get_preset
-from bifrost_flow.eval import (
+from adarq_flow.config import AdaRQFlowConfig, get_preset
+from adarq_flow.eval import (
     ablation_configs,
     codebook_perplexity,
     dump_ablation_configs,
@@ -17,7 +17,7 @@ from bifrost_flow.eval import (
     reconstruction_vs_depth,
     ssim,
 )
-from bifrost_flow.tokenizer import build_tokenizer, fit_tokenizer
+from adarq_flow.tokenizer import build_tokenizer, fit_tokenizer
 
 
 # -- self-contained metrics ------------------------------------------------------------
@@ -96,11 +96,11 @@ def test_ablation_configs_present_and_valid():
     assert cfgs["no_flow_head"].mllm.flow_residual_head is False
     # every variant round-trips through (de)serialization
     for cfg in cfgs.values():
-        assert BifrostFlowConfig.from_dict(cfg.to_dict()).to_dict() == cfg.to_dict()
+        assert AdaRQFlowConfig.from_dict(cfg.to_dict()).to_dict() == cfg.to_dict()
 
 
 def test_dump_ablation_configs(tmp_path):
     paths = dump_ablation_configs(str(tmp_path), base="tiny_cpu")
     assert len(paths) == len(ablation_configs("tiny_cpu"))
-    loaded = BifrostFlowConfig.from_yaml(paths[0])
-    assert isinstance(loaded, BifrostFlowConfig)
+    loaded = AdaRQFlowConfig.from_yaml(paths[0])
+    assert isinstance(loaded, AdaRQFlowConfig)

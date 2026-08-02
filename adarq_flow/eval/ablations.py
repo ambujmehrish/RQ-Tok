@@ -1,6 +1,6 @@
 """Ablation config generation (DESIGN.md §7 'new ablations').
 
-Programmatically derives Bifrost-Flow config variants from a base preset for the
+Programmatically derives AdaRQ-Flow config variants from a base preset for the
 planned ablations: residual depth ``D_max``, adaptive vs. fixed depth, codebook size
 ``K``, shared vs. per-depth codebooks, CFG scale, exposure-bias training on/off,
 flow-residual head on/off, and a continuous+MSE-style "Bifrost" baseline.
@@ -11,10 +11,10 @@ from __future__ import annotations
 import dataclasses
 import os
 
-from ..config import BifrostFlowConfig, get_preset
+from ..config import AdaRQFlowConfig, get_preset
 
 
-def _with(cfg: BifrostFlowConfig, **sub_overrides) -> BifrostFlowConfig:
+def _with(cfg: AdaRQFlowConfig, **sub_overrides) -> AdaRQFlowConfig:
     """Return a copy of ``cfg`` with nested dataclass field overrides.
 
     ``sub_overrides`` keys are ``"<block>.<field>"`` (e.g. ``"tokenizer.max_depth"``).
@@ -31,10 +31,10 @@ def _with(cfg: BifrostFlowConfig, **sub_overrides) -> BifrostFlowConfig:
     return dataclasses.replace(cfg, **kwargs)
 
 
-def ablation_configs(base: str = "tiny_cpu") -> dict[str, BifrostFlowConfig]:
+def ablation_configs(base: str = "tiny_cpu") -> dict[str, AdaRQFlowConfig]:
     """Named ablation variants derived from ``base`` (named accordingly)."""
     b = get_preset(base)
-    out: dict[str, BifrostFlowConfig] = {
+    out: dict[str, AdaRQFlowConfig] = {
         "baseline": dataclasses.replace(b, name=f"{base}-baseline")
     }
 

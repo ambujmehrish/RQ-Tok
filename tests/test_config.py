@@ -4,9 +4,9 @@ import os
 
 import pytest
 
-import bifrost_flow
-from bifrost_flow.config import (
-    BifrostFlowConfig,
+import adarq_flow
+from adarq_flow.config import (
+    AdaRQFlowConfig,
     TokenizerConfig,
     available_presets,
     get_preset,
@@ -18,7 +18,7 @@ CONFIG_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "configs")
 def test_package_imports():
     import importlib
 
-    assert bifrost_flow.__version__
+    assert adarq_flow.__version__
     # Submodules import without torch installed.
     for sub in [
         "tokenizer",
@@ -30,7 +30,7 @@ def test_package_imports():
         "data",
         "utils",
     ]:
-        importlib.import_module(f"bifrost_flow.{sub}")
+        importlib.import_module(f"adarq_flow.{sub}")
 
 
 def test_presets_exist():
@@ -40,8 +40,8 @@ def test_presets_exist():
 @pytest.mark.parametrize("name", ["tiny_cpu", "base_gpu"])
 def test_preset_roundtrip(name):
     cfg = get_preset(name)
-    assert isinstance(cfg, BifrostFlowConfig)
-    back = BifrostFlowConfig.from_dict(cfg.to_dict())
+    assert isinstance(cfg, AdaRQFlowConfig)
+    back = AdaRQFlowConfig.from_dict(cfg.to_dict())
     assert back.to_dict() == cfg.to_dict()
 
 
@@ -70,14 +70,14 @@ def test_adaptive_depth_enabled_by_default():
 
 def test_unknown_key_rejected():
     with pytest.raises(ValueError):
-        BifrostFlowConfig.from_dict({"tokenizer": {"not_a_field": 1}})
+        AdaRQFlowConfig.from_dict({"tokenizer": {"not_a_field": 1}})
 
 
 @pytest.mark.parametrize("fname", ["tiny_cpu.yaml", "base_gpu.yaml"])
 def test_yaml_configs_load(fname):
     path = os.path.join(CONFIG_DIR, fname)
-    cfg = BifrostFlowConfig.from_yaml(path)
-    assert isinstance(cfg, BifrostFlowConfig)
+    cfg = AdaRQFlowConfig.from_yaml(path)
+    assert isinstance(cfg, AdaRQFlowConfig)
     # YAML matches the corresponding preset.
     preset_name = "tiny_cpu" if "tiny" in fname else "base_gpu"
     assert cfg.to_dict() == get_preset(preset_name).to_dict()

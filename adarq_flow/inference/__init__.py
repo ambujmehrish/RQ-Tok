@@ -2,6 +2,6 @@
 -> latent ControlNet -> flow ODE -> image latents. Requires torch.
 """
 
-from .pipeline import BifrostFlowPipeline, PipelineOutput, build_pipeline
+from .pipeline import AdaRQFlowPipeline, PipelineOutput, build_pipeline
 
-__all__ = ["BifrostFlowPipeline", "PipelineOutput", "build_pipeline"]
+__all__ = ["AdaRQFlowPipeline", "PipelineOutput", "build_pipeline"]

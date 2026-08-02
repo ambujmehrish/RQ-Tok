@@ -1,6 +1,6 @@
 """Inference entrypoint (smoke / demo).
 
-    python -m bifrost_flow.inference.generate --preset tiny_cpu
+    python -m adarq_flow.inference.generate --preset tiny_cpu
 
 Builds the full pipeline and runs one generation. With real backbones, pass text token
 ids from the MLLM tokenizer and decode ``image_latents`` through the FLUX VAE.
@@ -17,7 +17,7 @@ from .pipeline import build_pipeline
 
 
 def main(argv=None) -> None:
-    ap = argparse.ArgumentParser(description="Bifrost-Flow inference")
+    ap = argparse.ArgumentParser(description="AdaRQ-Flow inference")
     ap.add_argument("--preset", default="tiny_cpu")
     ap.add_argument("--batch", type=int, default=2)
     ap.add_argument("--text-len", type=int, default=5)

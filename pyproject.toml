@@ -3,13 +3,13 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "bifrost_flow"
+name = "adarq_flow"
 version = "0.0.1"
-description = "Bifrost-Flow: a flow-matching, adaptive residual-quantized successor to Bifrost-1 for unified multimodal understanding and generation."
+description = "AdaRQ-Flow: a flow-matching, adaptive residual-quantized successor to Bifrost-1 for unified multimodal understanding and generation."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "Apache-2.0" }
-authors = [{ name = "Bifrost-Flow authors" }]
+authors = [{ name = "AdaRQ-Flow authors" }]
 dependencies = [
     "pyyaml>=6.0",
 ]
@@ -33,10 +33,10 @@ dev = [
 ]
 
 [tool.setuptools.packages.find]
-include = ["bifrost_flow*"]
+include = ["adarq_flow*"]
 
 [tool.setuptools.package-data]
-bifrost_flow = ["py.typed"]
+adarq_flow = ["py.typed"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

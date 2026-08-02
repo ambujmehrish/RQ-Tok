@@ -6,9 +6,9 @@ import pytest
 
 torch = pytest.importorskip("torch")
 
-from bifrost_flow.config import get_preset
-from bifrost_flow.inference import BifrostFlowPipeline, build_pipeline
-from bifrost_flow.training import Trainer
+from adarq_flow.config import get_preset
+from adarq_flow.inference import AdaRQFlowPipeline, build_pipeline
+from adarq_flow.training import Trainer
 
 
 def _text(b=2, t=5):
@@ -58,7 +58,7 @@ def test_pipeline_loads_trainer_checkpoints(tmp_path):
     t.train()
     path = t.save_checkpoint(6)
 
-    pipe = BifrostFlowPipeline(cfg)
+    pipe = AdaRQFlowPipeline(cfg)
     stage = pipe.load_stage(path)
     assert stage == "branch"
     out = pipe.generate(_text(2), temperature=0.0, decode_steps=4, render_steps=4)

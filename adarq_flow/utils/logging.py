@@ -41,10 +41,10 @@ class _RankFilter(logging.Filter):
 
 def configure_logging(level: int | str = logging.INFO, main_only: bool = True,
                       fmt: str = _DEFAULT_FMT) -> None:
-    """Configure the ``bifrost_flow`` root logger once (idempotent)."""
+    """Configure the ``adarq_flow`` root logger once (idempotent)."""
     global _CONFIGURED
     rank = _current_rank()
-    root = logging.getLogger("bifrost_flow")
+    root = logging.getLogger("adarq_flow")
     root.setLevel(level)
     root.handlers.clear()
     handler = logging.StreamHandler(sys.stderr)
@@ -60,4 +60,4 @@ def get_logger(name: str, level: int | str = logging.INFO,
     """Return a namespaced logger, configuring logging on first use."""
     if not _CONFIGURED:
         configure_logging(level=level, main_only=main_only)
-    return logging.getLogger(f"bifrost_flow.{name}")
+    return logging.getLogger(f"adarq_flow.{name}")

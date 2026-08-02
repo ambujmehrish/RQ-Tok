@@ -11,7 +11,7 @@ import torch
 from torch import Tensor
 from torch.utils.data import DataLoader, Dataset
 
-from ..config import BifrostFlowConfig
+from ..config import AdaRQFlowConfig
 
 
 class DummyImageTextDataset(Dataset):
@@ -40,7 +40,7 @@ class DummyImageTextDataset(Dataset):
         return img, text
 
 
-def build_dataset(cfg: BifrostFlowConfig, length: int = 256) -> Dataset:
+def build_dataset(cfg: AdaRQFlowConfig, length: int = 256) -> Dataset:
     """Construct the dataset named by ``cfg.train.dataset``."""
     name = cfg.train.dataset
     if name == "dummy":
@@ -54,7 +54,7 @@ def build_dataset(cfg: BifrostFlowConfig, length: int = 256) -> Dataset:
     )
 
 
-def build_dataloader(cfg: BifrostFlowConfig, dataset: Dataset, sampler=None) -> DataLoader:
+def build_dataloader(cfg: AdaRQFlowConfig, dataset: Dataset, sampler=None) -> DataLoader:
     """A DataLoader; pass a ``DistributedSampler`` for multi-GPU (shuffle off then)."""
     return DataLoader(
         dataset,

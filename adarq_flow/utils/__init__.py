@@ -3,7 +3,7 @@
 Kept torch-free at package import. The multi-GPU primitives live in the
 ``distributed`` submodule (which imports torch) — import it explicitly:
 
-    from bifrost_flow.utils.distributed import setup_distributed, wrap_model
+    from adarq_flow.utils.distributed import setup_distributed, wrap_model
 """
 
 __all__ = []

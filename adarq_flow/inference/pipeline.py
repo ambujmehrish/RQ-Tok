@@ -16,7 +16,7 @@ from dataclasses import dataclass
 import torch
 from torch import Tensor, nn
 
-from ..config import BifrostFlowConfig
+from ..config import AdaRQFlowConfig
 from ..mllm import build_vision_gen_model
 from ..renderer import build_renderer
 from ..tokenizer import build_tokenizer
@@ -30,10 +30,10 @@ class PipelineOutput:
     image_latents: Tensor  # [B, L, C] renderer output (real: FLUX VAE latents)
 
 
-class BifrostFlowPipeline(nn.Module):
+class AdaRQFlowPipeline(nn.Module):
     """Bundles the frozen tokenizer, the vision-generation model, and the renderer."""
 
-    def __init__(self, cfg: BifrostFlowConfig, device: torch.device | None = None) -> None:
+    def __init__(self, cfg: AdaRQFlowConfig, device: torch.device | None = None) -> None:
         super().__init__()
         self.cfg = cfg
         self.device = device or torch.device(cfg.train.device)
@@ -74,6 +74,6 @@ class BifrostFlowPipeline(nn.Module):
                               image_latents=image_latents)
 
 
-def build_pipeline(cfg: BifrostFlowConfig,
-                   device: torch.device | None = None) -> BifrostFlowPipeline:
-    return BifrostFlowPipeline(cfg, device=device)
+def build_pipeline(cfg: AdaRQFlowConfig,
+                   device: torch.device | None = None) -> AdaRQFlowPipeline:
+    return AdaRQFlowPipeline(cfg, device=device)

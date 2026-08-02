@@ -10,8 +10,8 @@ import pytest
 
 torch = pytest.importorskip("torch")
 
-from bifrost_flow.config import MLLMConfig, TokenizerConfig, get_preset
-from bifrost_flow.mllm import (
+from adarq_flow.config import MLLMConfig, TokenizerConfig, get_preset
+from adarq_flow.mllm import (
     DummyMLLMBackbone,
     VisionGenBranch,
     VisionGenModel,
@@ -21,8 +21,8 @@ from bifrost_flow.mllm import (
     flow_sample,
     rectified_flow_target,
 )
-from bifrost_flow.mllm.heads import CodeClassifierHead, FlowResidualHead
-from bifrost_flow.tokenizer import build_tokenizer
+from adarq_flow.mllm.heads import CodeClassifierHead, FlowResidualHead
+from adarq_flow.tokenizer import build_tokenizer
 
 
 def _cfgs():
@@ -165,7 +165,7 @@ def test_generate_valid_outputs():
     mllm, tok = _cfgs()
     model = VisionGenModel(mllm, tok)
     # Dequantize must use this model's own tokenizer config (matching D_max / dim).
-    from bifrost_flow.tokenizer import AdaptiveResidualQuantizer
+    from adarq_flow.tokenizer import AdaptiveResidualQuantizer
     q = AdaptiveResidualQuantizer(tok)
     out = model.generate(_text(2), q.dequantize, steps=6, cfg_scale=2.0, temperature=0.0)
     assert out.codes.shape == (2, model.N, model.D)
@@ -180,7 +180,7 @@ def test_generate_greedy_codes_deterministic():
     torch.manual_seed(0)
     mllm, tok = _cfgs()
     model = VisionGenModel(mllm, tok)
-    from bifrost_flow.tokenizer import AdaptiveResidualQuantizer
+    from adarq_flow.tokenizer import AdaptiveResidualQuantizer
     q = AdaptiveResidualQuantizer(tok)
     text = _text(1)
     a = model.generate(text, q.dequantize, steps=6, cfg_scale=2.0, temperature=0.0)
