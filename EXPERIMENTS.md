@@ -54,6 +54,18 @@ amount of allocator engineering will help.
 premise — that allocation matters — is false. **Stop. Do not proceed to C3.** Report the
 negative result; it is a genuine finding about generative bridges.
 
+**Configuration prerequisites (learned from the first run of E0).** Both are required or
+the measurement is confounded:
+- `tokenizer.include_zero_code = True` — otherwise extra codes can *increase* error
+  (27.5% of patches) and adaptive depth is rewarded for avoiding that, not for allocating.
+- `tokenizer.shared_codebook = False` — with a shared codebook, depth 1→4 buys only 1.7%
+  (vs 26.1% per-depth), so no allocator can show a gain regardless of the thesis.
+
+**Headroom is measured against the i.i.d. null, not against zero.** Even latents with no
+semantic structure show non-zero oracle gain (measured +6.8%) from per-sample
+quantization luck. Only gain *in excess of* the i.i.d. baseline is evidence for
+content-aware allocation.
+
 **Interpretation guard.** `random` is the load-bearing control. If `random ≈ oracle`,
 the gain comes from *rate variance*, not from *content-aware* allocation, and the
 "adaptive" claim collapses even if the oracle beats uniform.

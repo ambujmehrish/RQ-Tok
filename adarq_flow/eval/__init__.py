@@ -7,6 +7,17 @@ Requires torch.
 """
 
 from .ablations import ablation_configs, dump_ablation_configs
+from .allocation import (
+    HeadroomReport,
+    PolicyResult,
+    allocate_oracle,
+    allocate_random,
+    allocate_threshold,
+    allocate_uniform,
+    headroom_pilot,
+    marginal_returns_are_monotone,
+    prefix_errors,
+)
 from .evaluator import TokenizerReport, evaluate_tokenizer, reconstruction_vs_depth
 from .metrics import (
     codebook_perplexity,
@@ -27,4 +38,7 @@ __all__ = [
     "fid", "sfid", "inception_score", "rfid", "lpips", "geneval_score", "dpg_bench_score",
     "TokenizerReport", "evaluate_tokenizer", "reconstruction_vs_depth",
     "ablation_configs", "dump_ablation_configs",
+    "HeadroomReport", "PolicyResult", "headroom_pilot", "prefix_errors",
+    "allocate_uniform", "allocate_random", "allocate_oracle", "allocate_threshold",
+    "marginal_returns_are_monotone",
 ]

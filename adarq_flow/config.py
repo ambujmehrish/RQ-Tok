@@ -36,6 +36,14 @@ class TokenizerConfig:
     codebook_size: int = 64         # K
     max_depth: int = 4              # D_max residual levels
     shared_codebook: bool = True    # share C across depths vs. per-depth codebooks
+    # Reserve code 0 as a fixed ZERO vector ("spend a code, change nothing").
+    # Without it, RVQ is NOT monotone in depth: once the residual is smaller than the
+    # nearest codeword can help, an extra code overshoots and INCREASES error (measured:
+    # 27.5% of patches harmed, 21.7% at depth 3->4). Adaptive depth would then be
+    # partly rewarded for avoiding that self-harm rather than for content-aware
+    # allocation -- a confound that makes the C3 experiment uninterpretable.
+    # Enable for rate-allocation experiments (E0 / C3).
+    include_zero_code: bool = False
     commitment_weight: float = 0.25
     entropy_weight: float = 0.01    # anti-collapse codebook entropy reg
     ema_decay: float = 0.99         # codebook EMA

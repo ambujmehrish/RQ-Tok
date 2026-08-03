@@ -34,6 +34,14 @@ experiment is more dangerous than one that crashes.
 | B5 | major | **Flow head is trained only on masked positions but sampled at 0% masked.** Training masks ≥ 70% and takes the loss only at masked positions; at inference every patch is revealed. | The velocity field is evaluated on a conditioning distribution it never saw. Distinct from ordinary exposure bias, and it feeds the renderer. |
 | B6 | major | **CFG guides only the code logits.** The continuous residual — which carries all sub-codebook detail — is generated unconditionally. | `cfg_scale` cannot affect fine detail; C1/C4 interpretation is limited. |
 
+## Findings from the E0 pilot (design-level, not bugs)
+
+| # | Severity | Finding |
+|---|---|---|
+| D1 | **critical** | **A shared codebook makes residual depth nearly useless.** With `shared_codebook=True` (the shipped default), fitted mean error by depth is `35.03 → 34.46 → 34.43 → 34.43`: depth 1→4 buys **1.7%**. With per-depth codebooks it buys **26.1%**. Cause: EMA pools residuals from all levels, so codewords are tuned to the large level-1 residual scale and cannot refine the much smaller deeper residuals. **Consequence: under the default config there is nothing for an allocator to allocate, and C3 is untestable.** `per_depth_codebook` is a prerequisite, not a variant. |
+| D2 | **critical** | **RVQ is not monotone in depth without a zero codeword.** Measured: an extra code *increased* error for **27.5%** of patches (21.7% at depth 3→4), because the nearest codeword overshoots a residual smaller than itself (min codeword norm 0.712). Adaptive depth would then be partly rewarded for avoiding the quantizer's own self-harm rather than for content-aware allocation. Fixed by the new `include_zero_code` option (27.5% → **0.0%**); enable it for any allocation experiment. |
+| D3 | major | **Measured headroom is below the 10% floor, and the structured regime is no better than the unstructured one.** With per-depth codebooks + zero code, at matched mean depth 2.5: i.i.d. latents **+6.8%** oracle-over-uniform; deliberately heterogeneous latents **+4.9%**. Since the i.i.d. case is the null (per-sample quantization luck, no semantics), structure added *nothing*. **Not a refutation** — synthetic latents and latent-L2 distortion (the criterion `NOVELTY.md` §6 argues is wrong) — but it is a strong prior against the thesis that must be resolved on real CLIP latents with downstream distortion before C3 is worth running. |
+
 ## Open — correctness, non-blocking
 
 | # | Severity | Issue |

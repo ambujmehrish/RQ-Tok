@@ -43,6 +43,7 @@ class Codebook(nn.Module):
         ema_decay: float = 0.99,
         eps: float = 1e-5,
         dead_code_threshold: float = 1e-2,
+        include_zero_code: bool = False,
     ) -> None:
         super().__init__()
         if codebook_size < 1:
@@ -57,6 +58,9 @@ class Codebook(nn.Module):
         self.ema_decay = float(ema_decay)
         self.eps = float(eps)
         self.dead_code_threshold = float(dead_code_threshold)
+        # Index 0 held at exactly zero and excluded from EMA/reinit, so selecting it is a
+        # no-op and reconstruction error is non-increasing in depth by construction.
+        self.include_zero_code = bool(include_zero_code)
 
         # Buffer type annotations (registered below): tells type-checkers these
         # attributes are Tensors, not the Tensor|Module union nn.Module infers.
@@ -67,6 +71,8 @@ class Codebook(nn.Module):
 
         # Code vectors. Not an nn.Parameter: the codebook learns via EMA, not grad.
         embed = torch.randn(self.codebook_size, self.dim)
+        if self.include_zero_code:
+            embed[0].zero_()
         self.register_buffer("embed", embed)
         # EMA accumulators.
         self.register_buffer("cluster_size", torch.zeros(self.codebook_size))
@@ -138,6 +144,7 @@ class Codebook(nn.Module):
             self.embed_avg.copy_(seed)
             self.cluster_size.fill_(1.0)
             self.initted.fill_(True)
+            self._pin_zero_code()
 
         onehot = torch.zeros(
             flat.shape[0], self.codebook_size, device=flat.device, dtype=flat.dtype
@@ -163,8 +170,17 @@ class Codebook(nn.Module):
             (self.cluster_size + self.eps) / (n + self.codebook_size * self.eps) * n
         )
         self.embed.copy_(self.embed_avg / smoothed.unsqueeze(1))
+        self._pin_zero_code()
 
         self._reinit_dead_codes(flat)
+        self._pin_zero_code()
+
+    @torch.no_grad()
+    def _pin_zero_code(self) -> None:
+        if self.include_zero_code:
+            self.embed[0].zero_()
+            self.embed_avg[0].zero_()
+            self.cluster_size[0] = 1.0     # never considered dead
 
     @torch.no_grad()
     def _reinit_dead_codes(self, flat: Tensor) -> None:
