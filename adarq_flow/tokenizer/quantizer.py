@@ -89,7 +89,8 @@ class AdaptiveResidualQuantizer(nn.Module):
         n_books = 1 if self.shared else self.max_depth
         self.codebooks = nn.ModuleList(
             Codebook(cfg.codebook_size, cfg.clip_dim, ema_decay=cfg.ema_decay,
-                     include_zero_code=cfg.include_zero_code)
+                     include_zero_code=cfg.include_zero_code,
+                     dead_code_threshold=cfg.dead_code_threshold)
             for _ in range(n_books)
         )
 

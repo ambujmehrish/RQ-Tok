@@ -31,7 +31,11 @@ import torch
 
 from adarq_flow.config import get_preset
 from adarq_flow.eval import headroom_pilot, marginal_returns_are_monotone, prefix_errors
-from adarq_flow.tokenizer import build_tokenizer, fit_tokenizer
+from adarq_flow.tokenizer import (
+    AdaptiveResidualQuantizer,
+    build_tokenizer,
+    fit_tokenizer,
+)
 
 
 def synth_homogeneous(m: int, d: int, g: torch.Generator) -> torch.Tensor:
@@ -63,10 +67,21 @@ def run(name: str, latents: torch.Tensor, preset: str, fit_steps: int,
     cfg = dataclasses.replace(cfg, tokenizer=dataclasses.replace(
         cfg.tokenizer, include_zero_code=zero_code))
     torch.manual_seed(seed)
-    tok = build_tokenizer(cfg)
-    fit_tokenizer(tok, latents, steps=fit_steps, batch_size=128, seed=seed)
-
-    q = tok.quantizer
+    if real_data:
+        # Build ONLY the quantizer: real latents are supplied directly, so no image
+        # encoder is needed and no development stand-in is constructed at all.
+        q = AdaptiveResidualQuantizer(cfg.tokenizer)
+        gen = torch.Generator(device=latents.device).manual_seed(seed)
+        q.train()
+        for _ in range(fit_steps):
+            idx = torch.randint(latents.shape[0], (min(128, latents.shape[0]),),
+                                generator=gen, device=latents.device)
+            q(latents[idx], update_codebook=True)
+        q.eval()
+    else:
+        tok = build_tokenizer(cfg)
+        fit_tokenizer(tok, latents, steps=fit_steps, batch_size=128, seed=seed)
+        q = tok.quantizer
     errs = prefix_errors(q, latents)
     monotone = marginal_returns_are_monotone(errs)
 

@@ -37,7 +37,19 @@ experiment is more dangerous than one that crashes.
 | B5 | major | **Flow head is trained only on masked positions but sampled at 0% masked.** Training masks ≥ 70% and takes the loss only at masked positions; at inference every patch is revealed. | The velocity field is evaluated on a conditioning distribution it never saw. Distinct from ordinary exposure bias, and it feeds the renderer. |
 | B6 | major | **CFG guides only the code logits.** The continuous residual — which carries all sub-codebook detail — is generated unconditionally. | `cfg_scale` cannot affect fine detail; C1/C4 interpretation is limited. |
 
-## Findings from the E0 pilot (design-level, not bugs)
+## E0 on REAL data — the results that supersede the synthetic pilot
+
+Run: 64 real COCO val2017 photographs -> `openai/clip-vit-base-patch32` -> 3136 real
+patch latents (`scripts/smoke_test.sh`).
+
+| # | Severity | Finding |
+|---|---|---|
+| R1 | **critical (fixed)** | **`dead_code_threshold=1e-2` collapsed every codebook past level 0.** With `ema_decay=0.99` a code needs ~458 consecutive unused steps to be declared dead, so rescue never fired. Measured on real latents: distinct codes per level `[212, 1, 1, 1]` and depth 1→4 gain **−0.0%**. At `0.5`: `[447, 239, 115, 89]` and **+55.1%**. Default raised to 0.5 and made configurable. **This silently made the entire adaptive-depth premise untestable.** |
+| R2 | — | **D1 was a misattribution.** The "shared codebook makes depth useless" finding was a *symptom* of R1, not the cause. With the collapse fixed, real data gives depth 1→4 = **+69.6%** and **502/512** codes in use. Per-depth codebooks still help, but they are not the mechanism. |
+| R3 | **result** | **E0 verdict on real latents: PROCEED.** At matched mean depth 2.5 — oracle vs uniform **+34.2%**, oracle vs **random +34.1%**. Comfortably above the 10% floor, and the random control confirms the gain is *content-aware*, not rate variance. The earlier synthetic verdict (+4.9% structured vs +6.8% i.i.d.) was an artifact of R1 plus unrepresentative synthetic latents — **D3 below is superseded.** |
+| R4 | caveat | **The shipped threshold rule already captures ~100% of the available headroom** (34.2% of 34.2%) *on latent-L2 distortion*. So a learned allocator has nothing to gain against this criterion — the remaining opportunity is exactly the downstream/perceptual distortion argued for in `NOVELTY.md` §6, not a better rule on latent L2. |
+
+## Findings from the E0 pilot (design-level, not bugs) — SYNTHETIC, superseded by R1–R4
 
 | # | Severity | Finding |
 |---|---|---|

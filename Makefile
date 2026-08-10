@@ -1,4 +1,4 @@
-.PHONY: install lint type test check fmt clean ablations
+.PHONY: install lint type test check fmt clean ablations smoke prefetch
 
 install:
 	pip install -e ".[dev,torch]"
@@ -25,3 +25,11 @@ ablations:
 clean:
 	rm -rf checkpoints/ .pytest_cache .mypy_cache .ruff_cache
 	find . -type d -name __pycache__ -prune -exec rm -rf {} +
+
+# End-to-end smoke test on REAL data (real COCO images -> real CLIP -> tokenizer -> E0).
+smoke:
+	bash scripts/smoke_test.sh
+
+# Prefetch models/images to $ADARQ_CACHE (outside $HOME). RUN ON A LOGIN NODE.
+prefetch:
+	bash scripts/prefetch_assets.sh

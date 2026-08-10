@@ -44,6 +44,15 @@ class TokenizerConfig:
     # allocation -- a confound that makes the C3 experiment uninterpretable.
     # Enable for rate-allocation experiments (E0 / C3).
     include_zero_code: bool = False
+    # EMA cluster-size below which a code is considered dead and resampled from the
+    # current batch. This is NOT a cosmetic knob: at the old default of 1e-2, with
+    # ema_decay=0.99 a code needs ~458 consecutive unused steps to be declared dead, so
+    # rescue never fires. Measured on REAL CLIP latents (2352 COCO patches, 400 steps):
+    #   1e-2 -> distinct codes per level [212, 1, 1, 1], depth 1->4 gain  -0.0%
+    #   0.5  -> distinct codes per level [447, 239, 115, 89], depth gain +55.1%
+    # i.e. every codebook past level 0 collapsed to a single code and residual depth was
+    # worthless. Do not lower this without re-checking per-level code usage on real data.
+    dead_code_threshold: float = 0.5
     commitment_weight: float = 0.25
     entropy_weight: float = 0.01    # anti-collapse codebook entropy reg
     ema_decay: float = 0.99         # codebook EMA
@@ -333,9 +342,31 @@ def _base_gpu() -> AdaRQFlowConfig:
     )
 
 
+def _clip_b32() -> AdaRQFlowConfig:
+    """Tokenizer geometry matched to REAL openai/clip-vit-base-patch32 patch latents
+    (768-dim, 7x7=49 patches at 224px). Used by scripts/smoke_test.sh, which runs the
+    tokenizer and the E0 pilot on real CLIP latents extracted from real photographs.
+
+    Allocation prerequisites are ON by default here (ISSUES.md D1/D2): a shared codebook
+    makes depth nearly useless, and without a zero codeword RVQ is not monotone in depth.
+    """
+    return AdaRQFlowConfig(
+        name="adarq-flow-clip-b32",
+        tokenizer=TokenizerConfig(
+            clip_dim=768,
+            num_patches=49,
+            codebook_size=512,
+            max_depth=4,
+            shared_codebook=False,
+            include_zero_code=True,
+        ),
+    )
+
+
 _PRESETS = {
     "tiny_cpu": _tiny_cpu,
     "base_gpu": _base_gpu,
+    "clip_b32": _clip_b32,
 }
 
 

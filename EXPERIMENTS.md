@@ -66,6 +66,13 @@ semantic structure show non-zero oracle gain (measured +6.8%) from per-sample
 quantization luck. Only gain *in excess of* the i.i.d. baseline is evidence for
 content-aware allocation.
 
+**Result on real data (2026-08, `scripts/smoke_test.sh`).** 64 real COCO val2017 images
+→ real CLIP-B/32 → 3136 patch latents, matched mean depth 2.5:
+`oracle vs uniform +34.2%`, `oracle vs random +34.1%` → **PROCEED** (well clear of the
+10% floor; the random control confirms the gain is content-aware). Note the shipped
+threshold rule already captures ~100% of that headroom on latent-L2, so C3's learned
+allocator must be judged on **downstream** distortion, not latent L2.
+
 **Interpretation guard.** `random` is the load-bearing control. If `random ≈ oracle`,
 the gain comes from *rate variance*, not from *content-aware* allocation, and the
 "adaptive" claim collapses even if the oracle beats uniform.
