@@ -23,8 +23,10 @@ def _current_rank() -> int:
         if val is not None and val != "":
             try:
                 return int(val)
-            except ValueError:
-                return 0
+            except ValueError as e:
+                # Silently returning 0 would make every rank log as rank 0 and hide a
+                # broken launcher environment.
+                raise ValueError(f"environment variable {key}={val!r} is not an int") from e
     return 0
 
 

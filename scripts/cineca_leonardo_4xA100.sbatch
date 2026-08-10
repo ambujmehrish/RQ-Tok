@@ -38,10 +38,15 @@ export NCCL_DEBUG=WARN
 # export NCCL_SOCKET_IFNAME=ib0
 
 # Each srun task becomes one rank; setup_distributed() reads SLURM_PROCID/LOCALID.
-srun python scripts/train_tokenizer_ddp.py \
-    --preset base_gpu \
-    --steps 1000 \
-    --batch-size 256
+#
+# REAL training. run_mode must be "experiment" in the config, which forbids every dummy
+# component (see AdaRQFlowConfig.validate_run_mode); the run raises rather than silently
+# training against stand-ins.
+srun python -m adarq_flow.training.train \
+    --config configs/experiment.yaml \
+    --stage tokenizer
 
-# For real Phase-4 training, swap the entrypoint for the stage trainer (same launch),
-# e.g.:  srun python -m adarq_flow.training.train --preset base_gpu --stage tokenizer
+# Distributed-plumbing check ONLY (synthetic latents, no checkpoint, not a result).
+# Requires the explicit acknowledgement flag:
+# srun python scripts/train_tokenizer_ddp.py --preset base_gpu --steps 1000 \
+#     --batch-size 256 --synthetic-plumbing-check

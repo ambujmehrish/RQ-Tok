@@ -1,11 +1,23 @@
-name: base_gpu-hybrid_mse
+# AdaRQ-Flow — REAL EXPERIMENT config (run_mode: experiment).
+#
+# Every component points at a real model/dataset. run_mode=experiment makes
+# AdaRQFlowConfig.validate_run_mode() REJECT any development stand-in, so this file
+# cannot silently fall back to dummy components.
+#
+# Running it today FAILS LOUDLY with NotImplementedError, because the real Qwen2.5-VL /
+# FLUX.1-dev / BLIP3-o adapters are not wired yet. That is the intended behaviour: a
+# hard error is correct, silently training against stand-ins is not.
+#
+# tokenizer.shared_codebook=false and include_zero_code=true are REQUIRED for any
+# rate-allocation experiment (ISSUES.md D1, D2).
+name: adarq-flow-experiment
 tokenizer:
   clip_dim: 1280
   num_patches: 256
   codebook_size: 8192
   max_depth: 8
-  shared_codebook: true
-  include_zero_code: false
+  shared_codebook: false
+  include_zero_code: true
   commitment_weight: 0.25
   entropy_weight: 0.01
   ema_decay: 0.99
@@ -20,7 +32,7 @@ mllm:
   freeze_backbone: true
   code_head: true
   flow_residual_head: true
-  residual_objective: mse
+  residual_objective: flow
   flow_head_dim: 1280
   flow_head_layers: 2
   flow_loss_weight: 1.0
@@ -31,7 +43,7 @@ mllm:
   decode_steps: 16
 renderer:
   backbone: black-forest-labs/FLUX.1-dev
-  vae: dummy
+  vae: black-forest-labs/FLUX.1-dev
   image_size: 1024
   latent_dim: 64
   model_dim: 3072
@@ -48,7 +60,7 @@ renderer:
   train_on_dequantized: true
   scheduled_sampling_prob: 0.0
 train:
-  run_mode: smoke
+  run_mode: experiment
   stage: tokenizer
   batch_size: 48
   lr: 0.0001

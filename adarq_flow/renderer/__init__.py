@@ -10,6 +10,7 @@ transformer; it is replaced after the final development phase (DESIGN.md §9).
 from .backbone import DummyFluxBackbone, build_renderer_backbone
 from .controlnet import LatentControlNet
 from .renderer import FlowRenderer, RendererLoss, build_renderer
+from .vae import build_image_latent_encoder
 
 __all__ = [
     "DummyFluxBackbone",
@@ -18,4 +19,5 @@ __all__ = [
     "FlowRenderer",
     "RendererLoss",
     "build_renderer",
+    "build_image_latent_encoder",
 ]

@@ -5,6 +5,7 @@ tokenizer:
   codebook_size: 8192
   max_depth: 8
   shared_codebook: false
+  include_zero_code: false
   commitment_weight: 0.25
   entropy_weight: 0.01
   ema_decay: 0.99
@@ -30,6 +31,7 @@ mllm:
   decode_steps: 16
 renderer:
   backbone: black-forest-labs/FLUX.1-dev
+  vae: dummy
   image_size: 1024
   latent_dim: 64
   model_dim: 3072
@@ -46,6 +48,7 @@ renderer:
   train_on_dequantized: true
   scheduled_sampling_prob: 0.0
 train:
+  run_mode: smoke
   stage: tokenizer
   batch_size: 48
   lr: 0.0001

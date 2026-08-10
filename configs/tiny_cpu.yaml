@@ -5,6 +5,7 @@ tokenizer:
   codebook_size: 64
   max_depth: 4
   shared_codebook: true
+  include_zero_code: false
   commitment_weight: 0.25
   entropy_weight: 0.01
   ema_decay: 0.99
@@ -19,8 +20,10 @@ mllm:
   freeze_backbone: true
   code_head: true
   flow_residual_head: true
+  residual_objective: flow
   flow_head_dim: 64
   flow_head_layers: 2
+  flow_loss_weight: 1.0
   cfg_text_dropout: 0.1
   cfg_scale: 3.0
   mask_min: 0.7
@@ -28,6 +31,7 @@ mllm:
   decode_steps: 16
 renderer:
   backbone: dummy
+  vae: dummy
   image_size: 64
   latent_dim: 32
   model_dim: 64
@@ -44,6 +48,7 @@ renderer:
   train_on_dequantized: true
   scheduled_sampling_prob: 0.0
 train:
+  run_mode: smoke
   stage: tokenizer
   batch_size: 4
   lr: 0.0001

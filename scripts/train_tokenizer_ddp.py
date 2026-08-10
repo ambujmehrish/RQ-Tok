@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
-"""Multi-GPU Stage-0 tokenizer training / plumbing validation.
+"""Multi-GPU DISTRIBUTED-PLUMBING CHECK (not a training run).
 
 Validates the full distributed path on real hardware: NCCL init from the launcher
 env, per-rank data sharding, EMA codebook updates with cross-rank all-reduce, and a
 post-training check that every rank holds an identical codebook.
 
-Until Phase 4 wires real datasets, this trains on synthetic *clustered* CLIP latents
-(shared cluster centers, per-rank samples) — enough to exercise and verify the
-multi-GPU machinery end to end on your 4x A100 node.
+This validates NCCL init, per-rank sharding, EMA all-reduce and cross-rank codebook
+consistency. By default it operates on SYNTHETIC latents, which makes it a plumbing
+check and NOT a scientific result — so synthetic mode must be requested explicitly with
+--synthetic-plumbing-check. Pass --latents PATH to run the same checks on real CLIP
+latents. It never writes a checkpoint, so its output cannot be mistaken for a trained
+tokenizer.
 
 Launch (Cineca Leonardo, 4 GPUs, 1 task/GPU):
     srun python scripts/train_tokenizer_ddp.py --preset base_gpu --steps 500
@@ -59,7 +62,21 @@ def main():
     ap.add_argument("--clusters", type=int, default=256)
     ap.add_argument("--backend", default=None, help="override cfg.dist.backend")
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--latents", default=None,
+                    help="path to a .pt tensor of REAL CLIP patch latents [M, d]")
+    ap.add_argument("--synthetic-plumbing-check", action="store_true",
+                    help="acknowledge that synthetic latents are used and that the run "
+                         "validates distributed plumbing only, producing no result")
     args = ap.parse_args()
+
+    if not args.latents and not args.synthetic_plumbing_check:
+        raise SystemExit(
+            "refusing to run on synthetic latents implicitly.\n"
+            "  --latents PATH                 run the checks on real CLIP latents, or\n"
+            "  --synthetic-plumbing-check     acknowledge a plumbing-only run.\n"
+            "This guard exists so a synthetic run on the cluster cannot be mistaken for "
+            "a Stage-0 training result."
+        )
 
     cfg = get_preset(args.preset)
     backend = args.backend or cfg.dist.backend
@@ -72,9 +89,20 @@ def main():
 
     tok = build_tokenizer(cfg).to(info.device)
     dim = cfg.tokenizer.clip_dim
-    latents = _synthetic_latents(
-        args.samples_per_rank, dim, args.clusters, info.device, info, args.seed
-    )
+    if args.latents:
+        latents = torch.load(args.latents, map_location=info.device, weights_only=True)
+        if latents.dim() == 3:
+            latents = latents.reshape(-1, latents.size(-1))
+        if latents.size(-1) != dim:
+            raise ValueError(f"latents dim {latents.size(-1)} != preset clip_dim {dim}")
+        source = f"real latents from {args.latents}"
+    else:
+        latents = _synthetic_latents(
+            args.samples_per_rank, dim, args.clusters, info.device, info, args.seed
+        )
+        source = "SYNTHETIC latents - PLUMBING CHECK ONLY, not a result"
+    if is_main_process():
+        print(f"[adarq-flow] data source: {source}", flush=True)
 
     tok.train()
     gen = torch.Generator(device=info.device).manual_seed(args.seed + info.rank)

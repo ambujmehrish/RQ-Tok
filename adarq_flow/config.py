@@ -101,6 +101,10 @@ class RendererConfig:
     """Flow-matching latent ControlNet + FLUX renderer (Component C)."""
 
     backbone: str = "dummy"         # "dummy" (tiny DiT) | "black-forest-labs/FLUX.1-dev"
+    # Encoder producing the image-latent TARGETS for Stage B. Previously the trainer
+    # hard-wired a DummyCLIPEncoder here with no config field, so a real run could not
+    # avoid regressing toward a randomly-initialized projection.
+    vae: str = "dummy"              # "dummy" | "black-forest-labs/FLUX.1-dev"
     image_size: int = 64            # real: 256/512/1024
     latent_dim: int = 32            # renderer latent channel dim (image-latent I/O)
     model_dim: int = 64             # DiT internal width (real: 3072 for FLUX)
@@ -148,6 +152,11 @@ class DistConfig:
 class TrainConfig:
     """Decoupled training (Stage 0 tokenizer -> A branch -> B renderer)."""
 
+    # Declares intent. "smoke" permits dummy stand-ins (CPU development). "experiment"
+    # forbids EVERY dummy component and every synthetic dataset -- a run that would
+    # silently mix real and stand-in parts raises instead. Results are only citable from
+    # run_mode="experiment".
+    run_mode: str = "smoke"         # "smoke" | "experiment"
     stage: str = "tokenizer"        # "tokenizer" | "branch" | "renderer"
     batch_size: int = 4
     lr: float = 1e-4
@@ -193,12 +202,70 @@ class AdaRQFlowConfig:
             kwargs[k] = v
         return cls(**kwargs)
 
+    # ---- run-mode gate ---------------------------------------------------------------
+    DUMMY = "dummy"
+
+    def dummy_components(self) -> dict[str, str]:
+        """Every component currently backed by a development stand-in."""
+        found = {}
+        if self.mllm.backbone == self.DUMMY:
+            found["mllm.backbone"] = "DummyMLLMBackbone (and the dummy CLIP encoder)"
+        if self.renderer.backbone == self.DUMMY:
+            found["renderer.backbone"] = "DummyFluxBackbone"
+        if self.renderer.vae == self.DUMMY:
+            found["renderer.vae"] = "DummyCLIPEncoder -- random projection as targets"
+        if self.train.dataset == self.DUMMY:
+            found["train.dataset"] = "DummyImageTextDataset -- zero image/text mutual info"
+        return found
+
+    def validate_run_mode(self) -> None:
+        """Raise unless the configuration is internally consistent with its run_mode."""
+        if self.train.run_mode not in ("smoke", "experiment"):
+            raise ValueError(
+                f"train.run_mode must be 'smoke' or 'experiment', "
+                f"got {self.train.run_mode!r}"
+            )
+        dummies = self.dummy_components()
+        if self.train.run_mode == "experiment" and dummies:
+            listing = "\n".join(f"  - {k}: {v}" for k, v in sorted(dummies.items()))
+            raise ValueError(
+                "run_mode='experiment' forbids development stand-ins, but this config "
+                f"still uses:\n{listing}\n"
+                "Point every field at a real model/dataset, or set run_mode='smoke' and "
+                "do not cite the numbers."
+            )
+        # A partially-real configuration is never intentional: it silently mixes a real
+        # component with a random one and the result is uninterpretable either way.
+        if self.train.run_mode == "smoke" and dummies:
+            real_side = {
+                "mllm.backbone": self.mllm.backbone,
+                "renderer.backbone": self.renderer.backbone,
+                "renderer.vae": self.renderer.vae,
+                "train.dataset": self.train.dataset,
+            }
+            reals = {k: v for k, v in real_side.items() if v != self.DUMMY}
+            if reals:
+                raise ValueError(
+                    "mixed real/stand-in configuration: "
+                    f"real={sorted(reals)} dummy={sorted(dummies)}. "
+                    "Real components trained against stand-in data (or vice versa) "
+                    "produce uninterpretable results. Make it all-real "
+                    "(run_mode='experiment') or all-dummy."
+                )
+
     @classmethod
     def from_yaml(cls, path: str) -> AdaRQFlowConfig:
         import yaml  # local import keeps module import light
 
         with open(path) as f:
-            data = yaml.safe_load(f) or {}
+            data = yaml.safe_load(f)
+        if not isinstance(data, dict) or not data:
+            # Silently returning defaults here would make a typo'd or truncated ablation
+            # file run as the baseline -- exactly the no-op-ablation failure class.
+            raise ValueError(
+                f"{path} is empty or is not a YAML mapping; refusing to fall back to "
+                "default config"
+            )
         return cls.from_dict(data)
 
     def to_yaml(self, path: str) -> None:

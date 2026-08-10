@@ -44,10 +44,11 @@ def build_dataset(cfg: AdaRQFlowConfig, length: int = 256) -> Dataset:
     """Construct the dataset named by ``cfg.train.dataset``."""
     name = cfg.train.dataset
     if name == "dummy":
+        if cfg.renderer.image_size < 8:
+            raise ValueError(
+                f"renderer.image_size must be >= 8, got {cfg.renderer.image_size}")
         return DummyImageTextDataset(
-            length=length,
-            image_size=max(cfg.renderer.image_size // 8, 8) if cfg.renderer.image_size else 8,
-        )
+            length=length, image_size=max(cfg.renderer.image_size // 8, 8))
     raise NotImplementedError(
         f"dataset '{name}' is not yet wired. Implement an ImageNet/BLIP3-o loader that "
         "yields (image, text_ids); for CPU runs set train.dataset='dummy'."

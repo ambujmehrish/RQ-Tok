@@ -26,9 +26,8 @@ from torch import Tensor, nn
 from ..config import AdaRQFlowConfig
 from ..data import build_dataloader, build_dataset
 from ..mllm import VisionGenModel, build_vision_gen_model
-from ..renderer import FlowRenderer, build_renderer
+from ..renderer import FlowRenderer, build_image_latent_encoder, build_renderer
 from ..tokenizer import build_tokenizer
-from ..tokenizer.encoder import DummyCLIPEncoder
 from ..utils.distributed import (
     DistInfo,
     average_gradients,
@@ -59,6 +58,8 @@ class Trainer:
                  setup_dist: bool = True) -> None:
         if cfg.train.stage not in VALID_STAGES:
             raise ValueError(f"stage must be one of {VALID_STAGES}, got {cfg.train.stage!r}")
+        # Refuse to start a run whose components contradict its declared intent.
+        cfg.validate_run_mode()
         self.cfg = cfg
         self.stage = cfg.train.stage
         self.log = get_logger("trainer")
@@ -133,8 +134,7 @@ class Trainer:
             self.model = build_vision_gen_model(cfg).to(self.device)
         elif self.stage == "renderer":
             self.model = build_renderer(cfg).to(self.device)
-            self.vae = DummyCLIPEncoder(
-                cfg.renderer.latent_dim, cfg.renderer.num_image_tokens).to(self.device)
+            self.vae = build_image_latent_encoder(cfg.renderer).to(self.device)
 
         params = [p for p in self._model.parameters() if p.requires_grad]
         if not params:
@@ -217,7 +217,16 @@ class Trainer:
                         report.loss_history.append(snap)
                 step += 1
 
-        report.final_loss = last.get("total", last.get("flow", float("nan")))
+        if not last:
+            raise RuntimeError(
+                "training loop completed without a single step; check max_steps and that "
+                "the dataloader is non-empty (drop_last can empty it)")
+        if "total" in last:
+            report.final_loss = last["total"]
+        elif "flow" in last:
+            report.final_loss = last["flow"]
+        else:
+            raise RuntimeError(f"no recognised loss key in {sorted(last)}")
         barrier()
         return report
 

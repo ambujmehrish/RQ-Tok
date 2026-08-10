@@ -47,10 +47,14 @@ def ssim(pred: Tensor, target: Tensor, data_range: float | None = None,
     if pred.dim() != 4 or pred.shape != target.shape:
         raise ValueError("ssim expects matching [B, C, H, W] tensors")
     b, c, h, w = pred.shape
-    ws = min(window_size, h, w)
-    if ws % 2 == 0:
-        ws -= 1
-    ws = max(ws, 1)
+    if window_size % 2 == 0:
+        raise ValueError(f"window_size must be odd, got {window_size}")
+    if window_size > min(h, w):
+        # Silently shrinking the window changes the metric definition between arms.
+        raise ValueError(
+            f"ssim window_size={window_size} exceeds image size {h}x{w}; pass a smaller "
+            "odd window explicitly rather than having it adjusted silently")
+    ws = window_size
     if data_range is None:
         data_range = float((target.max() - target.min()).clamp_min(1e-8))
     window = _gaussian_window(ws, sigma, c, pred.device)
