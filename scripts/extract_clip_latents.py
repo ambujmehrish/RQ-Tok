@@ -38,6 +38,21 @@ COCO_VAL2017_IDS = [
 ]
 COCO_URL = "http://images.cocodataset.org/val2017/{}.jpg"
 
+def _vision_tower(model):
+    """Return the CLIP vision tower regardless of wrapper class / transformers version.
+
+    `CLIPModel` nests it under `.vision_model`; `CLIPVisionModel` (transformers>=5) IS
+    the tower. Raises if neither shape matches rather than guessing.
+    """
+    tower = getattr(model, "vision_model", model)
+    if not hasattr(tower, "encoder") or not hasattr(tower, "post_layernorm"):
+        raise RuntimeError(
+            f"{type(model).__name__} does not expose a CLIP vision tower "
+            "(encoder + post_layernorm); cannot resume the tower suffix."
+        )
+    return tower
+
+
 
 def _require(module: str):
     try:
@@ -98,8 +113,14 @@ def fetch_images(n: int, timeout: int = 30, save_dir: str | None = None):
     return images[:n]
 
 
-def extract(images, model_id: str, device: str):
-    """Real CLIP vision tower -> per-patch hidden states [B, N, d] (CLS dropped)."""
+def extract(images, model_id: str, device: str, layer: int | None = None):
+    """Real CLIP vision tower -> per-patch hidden states [B, N, d] (CLS dropped).
+
+    With ``layer=L`` the latents are taken from the INPUT of encoder layer ``L`` and the
+    CLS token is returned too, so the remaining layers can be replayed downstream
+    (:mod:`adarq_flow.eval.downstream`). ``layer=None`` returns the final layer, where
+    no suffix remains and only latent-space distortion is measurable.
+    """
     _require("transformers")
     from transformers import CLIPImageProcessor, CLIPVisionModel
 
@@ -110,10 +131,22 @@ def extract(images, model_id: str, device: str):
 
     batch = proc(images=images, return_tensors="pt").to(device)
     with torch.no_grad():
-        out = model(**batch).last_hidden_state          # [B, 1 + N, d]
-    if out.shape[1] < 2:
-        raise RuntimeError(f"unexpected CLIP output shape {tuple(out.shape)}")
-    return out[:, 1:, :].contiguous().float().cpu()      # drop CLS -> patch latents
+        out = model(**batch, output_hidden_states=True)
+    if layer is None:
+        hs = out.last_hidden_state
+    else:
+        n_layers = len(_vision_tower(model).encoder.layers)
+        if not 0 <= layer < n_layers:
+            raise SystemExit(
+                f"--layer must be in [0, {n_layers}) for {model_id}; got {layer}. "
+                "It selects the tower depth at which latents are quantized; the layers "
+                "above it become the downstream decoder."
+            )
+        hs = out.hidden_states[layer]                    # input to encoder layer `layer`
+    if hs.shape[1] < 2:
+        raise RuntimeError(f"unexpected CLIP output shape {tuple(hs.shape)}")
+    hs = hs.float().cpu()
+    return hs[:, 1:, :].contiguous(), hs[:, :1, :].contiguous()
 
 
 def main() -> None:
@@ -128,6 +161,10 @@ def main() -> None:
                          "(required on compute nodes without internet)")
     ap.add_argument("--save-images", default=None,
                     help="also write the downloaded images here, for later offline use")
+    ap.add_argument("--layer", type=int, default=None,
+                    help="quantize at this encoder-layer input; the layers ABOVE it form "
+                         "the frozen downstream decoder used by E0's downstream "
+                         "distortion. Omit for final-layer (latent-L2 only) latents.")
     args = ap.parse_args()
 
     if args.image_dir:
@@ -138,8 +175,10 @@ def main() -> None:
         print(f"[extract] fetching {args.num_images} real COCO val2017 images ...",
               flush=True)
         images = fetch_images(args.num_images, save_dir=args.save_images)
-    print(f"[extract] running real CLIP: {args.model}", flush=True)
-    z = extract(images, args.model, args.device)         # [B, N, d]
+    print(f"[extract] running real CLIP: {args.model}"
+          + (f" (quantize at layer {args.layer})" if args.layer is not None else ""),
+          flush=True)
+    z, cls_tokens = extract(images, args.model, args.device, args.layer)   # [B, N, d]
     b, n, d = z.shape
     flat = z.reshape(-1, d)
 
@@ -155,7 +194,14 @@ def main() -> None:
         "clip_dim": d,
         "num_patch_latents": int(flat.shape[0]),
         "synthetic": False,
+        "layer": args.layer,
     }
+    if args.layer is not None:
+        ctx_path = out.with_suffix(out.suffix + ".ctx.pt")
+        torch.save({"cls_tokens": cls_tokens, "layer": args.layer,
+                    "num_images": b, "patches_per_image": n}, ctx_path)
+        meta["tower_context"] = str(ctx_path)
+        print(f"[extract] wrote tower context -> {ctx_path}", flush=True)
     out.with_suffix(out.suffix + ".meta.json").write_text(json.dumps(meta, indent=2))
     print(f"[extract] wrote {tuple(flat.shape)} real patch latents -> {out}", flush=True)
     print(f"[extract] {b} images x {n} patches, clip_dim={d}", flush=True)

@@ -73,6 +73,21 @@ content-aware allocation.
 threshold rule already captures ~100% of that headroom on latent-L2, so C3's learned
 allocator must be judged on **downstream** distortion, not latent L2.
 
+**Downstream distortion is now wired** (`--downstream`). The decoder is the *real
+frozen CLIP tower suffix*: quantize at layer `L`, replay layers `L..end`, compare the
+final CLIP embedding. Verified bit-exact against the true embedding (max|diff| = 0.0).
+Because self-attention mixes patches, distortion is **non-separable** and the Lagrangian
+oracle does not apply — `allocate_greedy_downstream` performs the honest greedy search
+over actual decoder output (`O(budget x N)` decoder passes, so it is the expensive path).
+
+**Status: UNDERPOWERED, not an outcome.** Two small runs disagreed sharply — headroom
++15.7% with latent-L2 capturing 66% (8 images), versus +45.4% with latent-L2 capturing
+98% (6 images); the `random` control itself moved from -0.3% to +12.9%. At this sample
+size the estimate is dominated by which images are drawn. The report now prints the
+per-image spread and refuses to issue a verdict below 32 images. Per R2 this needs
+>= 32 images and >= 3 seeds before any conclusion — including any claim that latent-L2
+is or is not the wrong criterion.
+
 **Interpretation guard.** `random` is the load-bearing control. If `random ≈ oracle`,
 the gain comes from *rate variance*, not from *content-aware* allocation, and the
 "adaptive" claim collapses even if the oracle beats uniform.

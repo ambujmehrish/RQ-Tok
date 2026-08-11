@@ -258,6 +258,159 @@ def allocate_threshold(quantizer: AdaptiveResidualQuantizer, latents: Tensor) ->
     return out.depths
 
 
+@torch.no_grad()
+def prefix_zhat(quantizer: AdaptiveResidualQuantizer, latents: Tensor) -> Tensor:
+    """Cumulative RVQ reconstruction at every prefix depth: ``[M, D_max + 1, d]``.
+
+    ``table[p, k]`` is the dequantized latent for patch ``p`` given depth ``k`` (``k=0``
+    means "transmit nothing"). Any allocation is then a gather, which is what makes the
+    non-separable greedy search below affordable.
+    """
+    if latents.dim() == 3:
+        latents = latents.reshape(-1, latents.size(-1))
+    m, d = latents.shape
+    table = torch.zeros(m, quantizer.max_depth + 1, d, device=latents.device)
+    zhat = torch.zeros_like(latents)
+    r = latents.clone()
+    for k in range(quantizer.max_depth):
+        _, q = quantizer._book(k).quantize(r)
+        zhat = zhat + q
+        r = r - q
+        table[:, k + 1] = zhat
+    return table
+
+
+@torch.no_grad()
+def allocate_greedy_downstream(table: Tensor, budget: int, d_max: int,
+                               score_fn, chunk: int = 64) -> Tensor:
+    """Greedy allocation against a **non-separable** downstream distortion.
+
+    When distortion is measured after a decoder whose attention mixes all patches
+    together, total distortion is not a sum of per-patch terms, so the Lagrangian
+    decoupling used by :func:`allocate_oracle` is invalid. This performs the honest
+    search instead: at each step, try giving one more code to every patch that still has
+    headroom, score all those candidates, and keep the single best.
+
+    Cost is ``O(budget x N)`` decoder evaluations, batched ``chunk`` candidates at a time.
+
+    Args:
+        table: ``[N, D_max + 1, d]`` from :func:`prefix_zhat` for ONE image.
+        budget: total codes to spend across the image (``>= N``).
+        score_fn: ``[C, N, d] -> [C]`` distortion for C candidate allocations.
+    """
+    n = table.shape[0]
+    _validate_budget(budget, n, d_max)
+    depths = torch.ones(n, dtype=torch.long, device=table.device)
+    idx = torch.arange(n, device=table.device)
+
+    for _ in range(budget - n):
+        cand = (depths < d_max).nonzero(as_tuple=True)[0]
+        if cand.numel() == 0:
+            raise RuntimeError("budget exceeds capacity; rate would not be matched")
+        scores = []
+        for start in range(0, cand.numel(), chunk):
+            block = cand[start:start + chunk]
+            trial = depths.unsqueeze(0).repeat(block.numel(), 1)
+            trial[torch.arange(block.numel(), device=table.device), block] += 1
+            latents = table[idx.unsqueeze(0), trial]          # [C, N, d]
+            scores.append(score_fn(latents))
+        best = cand[int(torch.cat(scores).argmin())]
+        depths[best] += 1
+    return depths
+
+
+@dataclass
+class DownstreamReport:
+    """E0 measured on a real decoder's output rather than on latent L2."""
+
+    num_images: int
+    mean_depth_budget: float
+    layer: int
+    uniform: float
+    random: float
+    oracle_latent_l2: float
+    oracle_downstream: float
+    effect_floor: float = 0.10
+    # Per-image gains (oracle_downstream vs uniform) so the spread is visible. A point
+    # estimate from a handful of images is not an outcome (EXPERIMENTS.md R2).
+    per_image_gain: list[float] = field(default_factory=list)
+    min_images: int = 32
+
+    @property
+    def headroom(self) -> float:
+        """Oracle gain on the objective that actually matters."""
+        return (self.uniform - self.oracle_downstream) / self.uniform
+
+    @property
+    def random_gain(self) -> float:
+        return (self.uniform - self.random) / self.uniform
+
+    @property
+    def latent_l2_gain(self) -> float:
+        return (self.uniform - self.oracle_latent_l2) / self.uniform
+
+    @property
+    def criterion_gap(self) -> float:
+        """Fraction of the real headroom a latent-L2 allocator FAILS to capture."""
+        return 0.0 if self.headroom <= 0 else 1.0 - self.latent_l2_gain / self.headroom
+
+    @property
+    def gain_std(self) -> float:
+        if len(self.per_image_gain) < 2:
+            return float("nan")
+        mu = sum(self.per_image_gain) / len(self.per_image_gain)
+        var = sum((g - mu) ** 2 for g in self.per_image_gain)
+        return (var / (len(self.per_image_gain) - 1)) ** 0.5
+
+    def underpowered(self) -> bool:
+        """True when too few images back the estimate to report an outcome."""
+        return self.num_images < self.min_images
+
+    def summary(self) -> str:
+        rows = [("uniform", self.uniform), ("random", self.random),
+                ("oracle_latent_l2", self.oracle_latent_l2),
+                ("oracle_downstream", self.oracle_downstream)]
+        lines = [f"E0 DOWNSTREAM distortion — {self.num_images} images @ mean depth "
+                 f"{self.mean_depth_budget:.2f}, quantized at layer {self.layer}", ""]
+        lines.append(f"{'policy':<20}{'distortion':>14}{'vs uniform':>12}")
+        for name, v in rows:
+            lines.append(f"{name:<20}{v:>14.6f}"
+                         f"{(self.uniform - v) / self.uniform:>11.1%}")
+        lines += ["",
+                  f"headroom on the RIGHT objective : {self.headroom:+.1%}",
+                  f"latent-L2 allocation captures   : {self.latent_l2_gain:+.1%}",
+                  f"criterion gap (L2 misses)       : {self.criterion_gap:.0%}",
+                  f"random control                  : {self.random_gain:+.1%}",
+                  f"per-image gain spread           : +-{self.gain_std:.1%} "
+                  f"(n={self.num_images})",
+                  "", f"VERDICT: {self.verdict()}"]
+        return "\n".join(lines)
+
+    def verdict(self) -> str:
+        if self.underpowered():
+            return (
+                f"UNDERPOWERED — {self.num_images} images (< {self.min_images}) and one "
+                f"seed. Per-image gain spread is +-{self.gain_std:.1%}; point estimates "
+                "at this sample size swing wildly (observed +15.7% and +45.4% on "
+                "different subsets). NOT an outcome: re-run with more images and >=3 "
+                "seeds per EXPERIMENTS.md R2 before drawing any conclusion."
+            )
+        if self.headroom < self.effect_floor:
+            return (f"REFUTED on the correct objective — headroom {self.headroom:.1%} "
+                    f"< {self.effect_floor:.0%} floor. Allocation does not matter "
+                    "downstream; do not proceed to C3.")
+        if self.random_gain >= self.headroom - 1e-9:
+            return ("CONTENT-AWARENESS REFUTED — random allocation matches the oracle, "
+                    "so only rate variance matters.")
+        if self.criterion_gap < 0.10:
+            return (f"PROCEED, but latent-L2 already captures "
+                    f"{1 - self.criterion_gap:.0%} of the headroom — a downstream-aware "
+                    "allocator has little left to win. The C3 contribution would be thin.")
+        return (f"PROCEED — headroom {self.headroom:.1%} on the correct objective, and a "
+                f"latent-L2 allocator misses {self.criterion_gap:.0%} of it. Optimizing "
+                "reconstruction is measurably the wrong criterion (NOVELTY.md 6).")
+
+
 def marginal_returns_are_monotone(errs: Tensor) -> bool:
     """Whether per-patch marginal gain is non-increasing in depth (greedy optimality)."""
     gains = errs[:, :-1] - errs[:, 1:]
