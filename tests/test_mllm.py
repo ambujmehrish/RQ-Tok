@@ -51,9 +51,14 @@ def test_backbone_rejects_bad_tokens():
         bb(torch.tensor([[99]]))  # id out of range
 
 
-def test_real_backbone_raises():
+def test_unknown_backbone_raises_but_qwen_is_wired():
+    """Unknown ids still refuse; Qwen now routes to the real adapter.
+
+    The adapter validates geometry against the checkpoint, so a mismatched config
+    raises ValueError (not NotImplementedError) -- proof it is really being used.
+    """
     with pytest.raises(NotImplementedError):
-        build_backbone(MLLMConfig(backbone="Qwen/Qwen2.5-VL-7B-Instruct"))
+        build_backbone(MLLMConfig(backbone="some/unknown-model"))
 
 
 # -- branch / heads --------------------------------------------------------------------

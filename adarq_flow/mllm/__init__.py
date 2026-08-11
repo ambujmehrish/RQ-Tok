@@ -17,10 +17,12 @@ from .model import (
     VisionGenModel,
     build_vision_gen_model,
 )
+from .qwen import QwenBackbone, QwenVisionEncoder, is_qwen_vl, qwen_dims
 
 __all__ = [
     "DummyMLLMBackbone",
     "build_backbone",
+    "QwenBackbone", "QwenVisionEncoder", "is_qwen_vl", "qwen_dims",
     "VisionGenBranch",
     "CodeClassifierHead",
     "FlowResidualHead",

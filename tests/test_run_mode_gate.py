@@ -81,8 +81,13 @@ def test_experiment_config_has_no_dummy_components():
 
 
 def test_experiment_config_fails_loud_rather_than_substituting():
-    """Real adapters are unwired; the run must raise, not fall back to stand-ins."""
+    """The renderer half is still unwired; the run must raise, not substitute.
+
+    Device is forced to cpu so the failure is the FLUX adapter (the thing under test)
+    rather than 'no CUDA' on a CPU machine.
+    """
     cfg = AdaRQFlowConfig.from_yaml("configs/experiment.yaml")
+    cfg = dataclasses.replace(cfg, train=dataclasses.replace(cfg.train, device="cpu"))
     with pytest.raises(NotImplementedError):
         Trainer(cfg, dataset_length=8, setup_dist=False)
 

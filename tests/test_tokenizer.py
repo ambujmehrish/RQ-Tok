@@ -189,9 +189,10 @@ def test_build_tokenizer_from_preset():
     assert tok.codebook_vocab == cfg.codebook_size + 1
 
 
-def test_real_backbone_raises_not_implemented():
+def test_unknown_backbone_raises_not_implemented():
+    """Unknown encoders refuse. Qwen is wired and covered by tests/test_qwen_backbone.py."""
     with pytest.raises(NotImplementedError):
-        build_clip_encoder("Qwen/Qwen2.5-VL-7B-Instruct", _cfg())
+        build_clip_encoder("some/unknown-model", _cfg())
 
 
 def test_bad_threshold_raises():

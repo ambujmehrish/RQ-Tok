@@ -70,8 +70,14 @@ def build_clip_encoder(backbone: str, tok_cfg: TokenizerConfig) -> nn.Module:
     """
     if backbone == "dummy":
         return DummyCLIPEncoder(tok_cfg.clip_dim, tok_cfg.num_patches)
+
+    from ..mllm.qwen import QwenVisionEncoder, is_qwen_vl
+
+    if is_qwen_vl(backbone):
+        # The MLLM's OWN visual tower: patch latents in the space the LLM consumes.
+        return QwenVisionEncoder(backbone, tok_cfg)
     raise NotImplementedError(
-        f"real CLIP encoder for backbone '{backbone}' is wired in Phase 2 "
-        "(loaded from the frozen MLLM visual tower). For CPU runs set "
-        "mllm.backbone='dummy'."
+        f"no image encoder for backbone '{backbone}'. Supported: 'dummy' (CPU "
+        "development) or a Qwen-VL checkpoint, whose visual tower supplies the "
+        "MLLM-native patch latents. Refusing to substitute a stand-in."
     )

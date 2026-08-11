@@ -363,8 +363,35 @@ def _clip_b32() -> AdaRQFlowConfig:
     )
 
 
+def _qwen2_5_vl_3b() -> AdaRQFlowConfig:
+    """REAL frozen Qwen2.5-VL-3B. Every dimension below was read off the checkpoint and
+    verified end to end against the actual weights:
+
+        text hidden      2048   -> mllm.hidden_dim (the branch is a copy of these layers)
+        vision hidden    1280          (tower-internal, NOT what the LLM consumes)
+        visual out       2048   -> tokenizer.clip_dim (POST patch-merger)
+        visual tokens      64   -> tokenizer.num_patches at a 16x16 grid (2x2 merged)
+
+    The bridge latents are the post-merger features, i.e. literally the vectors the
+    language model receives. Allocation prerequisites (ISSUES.md D1/D2) are on.
+    """
+    return AdaRQFlowConfig(
+        name="adarq-flow-qwen2.5-vl-3b",
+        tokenizer=TokenizerConfig(
+            clip_dim=2048, num_patches=64, codebook_size=8192, max_depth=4,
+            shared_codebook=False, include_zero_code=True,
+        ),
+        mllm=MLLMConfig(
+            backbone="Qwen/Qwen2.5-VL-3B-Instruct",
+            hidden_dim=2048, num_layers=4, num_heads=16, flow_head_dim=1024,
+        ),
+        train=TrainConfig(device="cuda", precision="bf16", batch_size=8),
+    )
+
+
 _PRESETS = {
     "tiny_cpu": _tiny_cpu,
+    "qwen2_5_vl_3b": _qwen2_5_vl_3b,
     "base_gpu": _base_gpu,
     "clip_b32": _clip_b32,
 }

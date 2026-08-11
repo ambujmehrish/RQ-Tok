@@ -15,6 +15,8 @@ from torch import Tensor, nn
 from ..config import MLLMConfig
 from .layers import SelfBlock, causal_mask
 
+QWEN_HINT = "(Qwen/Qwen2.5-VL-*, Qwen/Qwen2-VL-*)"
+
 
 class DummyMLLMBackbone(nn.Module):
     """Tiny frozen causal transformer over text token ids -> context hidden states."""
@@ -58,9 +60,13 @@ def build_backbone(cfg: MLLMConfig) -> nn.Module:
     """Construct the (frozen) MLLM backbone for ``cfg.backbone``."""
     if cfg.backbone == "dummy":
         return DummyMLLMBackbone(cfg.hidden_dim, cfg.num_layers, cfg.num_heads)
+
+    from .qwen import QwenBackbone, is_qwen_vl
+
+    if is_qwen_vl(cfg.backbone):
+        return QwenBackbone(cfg)
     raise NotImplementedError(
-        f"real MLLM backbone '{cfg.backbone}' is not yet wired. The frozen "
-        "Qwen2.5-VL adapter (load via transformers, freeze, expose hidden states + "
-        "init the branch from its decoder layers) is GPU-only and lands as a focused "
-        "follow-up. For CPU runs set mllm.backbone='dummy'."
+        f"no adapter for MLLM backbone '{cfg.backbone}'. Supported: 'dummy' (CPU "
+        f"development) or a Qwen-VL checkpoint {QWEN_HINT}. Refusing to substitute a "
+        "stand-in."
     )

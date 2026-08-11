@@ -207,8 +207,11 @@ training/inference loop must run on CPU with tiny dummy backbones so each phase 
 **Dummy → real swap plan (decided).** The dummy stand-ins are *development* scaffolding,
 kept for CPU testing through all build phases and **replaced by the real models only after
 the final development phase**:
-- `DummyMLLMBackbone` → frozen **Qwen2.5-VL** (load via transformers; init the trainable
-  branch from its decoder QKV/MLP/norm layers).
+- `DummyMLLMBackbone` → frozen **Qwen2.5-VL**. **DONE and verified** against real
+  Qwen2.5-VL-3B weights (`adarq_flow/mllm/qwen.py`). The bridge latent is the
+  **post-merger** visual feature (2048-d), i.e. exactly what the LLM consumes — not the
+  1280-d tower-internal state. Geometry is read off the checkpoint
+  (`python -m adarq_flow.mllm.qwen <id>`), never hardcoded.
 - `DummyCLIPEncoder` → the real **MLLM-native CLIP visual tower**.
 
 The swap is isolated by construction: the branch/heads/training/decoding (Component B) are
