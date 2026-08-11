@@ -88,6 +88,12 @@ per-image spread and refuses to issue a verdict below 32 images. Per R2 this nee
 >= 32 images and >= 3 seeds before any conclusion — including any claim that latent-L2
 is or is not the wrong criterion.
 
+**The powered run is `scripts/e0_downstream_64.sbatch`** — 64 real images x 3 seeds,
+one seed per GPU on a Leonardo node, fully offline from the prefetched cache. It
+aggregates across seeds and applies R1/R2 automatically: it refuses below 3 seeds,
+reports UNDERPOWERED below 32 images, and returns INCONCLUSIVE when the 2-sigma lower
+bound on headroom falls under the 10% floor. All six verdict branches are exercised.
+
 **Interpretation guard.** `random` is the load-bearing control. If `random ≈ oracle`,
 the gain comes from *rate variance*, not from *content-aware* allocation, and the
 "adaptive" claim collapses even if the oracle beats uniform.

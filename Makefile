@@ -1,4 +1,4 @@
-.PHONY: install lint type test check fmt clean ablations smoke prefetch
+.PHONY: install lint type test check fmt clean ablations smoke prefetch e0
 
 install:
 	pip install -e ".[dev,torch]"
@@ -33,3 +33,7 @@ smoke:
 # Prefetch models/images to $ADARQ_CACHE (outside $HOME). RUN ON A LOGIN NODE.
 prefetch:
 	bash scripts/prefetch_assets.sh
+
+# Submit the powered E0 downstream run (64 images x 3 seeds) on Leonardo.
+e0:
+	sbatch scripts/e0_downstream_64.sbatch

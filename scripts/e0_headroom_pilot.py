@@ -110,7 +110,8 @@ def run(name: str, latents: torch.Tensor, preset: str, fit_steps: int,
 
 
 def run_downstream(latents_path: str, ctx_path: str, preset: str, fit_steps: int,
-                   mean_depth: float, model_id: str, max_images: int, seed: int) -> None:
+                   mean_depth: float, model_id: str, max_images: int, seed: int,
+                   device: str = "cpu", json_out: str | None = None) -> None:
     """E0 measured through a REAL frozen decoder (the CLIP tower suffix).
 
     Distortion here is non-separable across patches, so the Lagrangian oracle does not
@@ -119,28 +120,29 @@ def run_downstream(latents_path: str, ctx_path: str, preset: str, fit_steps: int
     import dataclasses
     import statistics as st
 
-    z = torch.load(latents_path, map_location="cpu", weights_only=True)
-    ctx = load_tower_context(ctx_path)
+    dev = torch.device(device)
+    z = torch.load(latents_path, map_location=dev, weights_only=True)
+    ctx = load_tower_context(ctx_path, device=device)
     n, d = ctx.patches_per_image, z.shape[-1]
     b_all = ctx.num_images
     n_img = min(max_images, b_all)
     cfg = dataclasses.replace(get_preset(preset).tokenizer, clip_dim=d)
 
     torch.manual_seed(seed)
-    q = AdaptiveResidualQuantizer(cfg)
+    q = AdaptiveResidualQuantizer(cfg).to(dev)
     q.train()
-    g = torch.Generator().manual_seed(seed)
+    g = torch.Generator(device=dev).manual_seed(seed)
     for _ in range(fit_steps):
-        q(z[torch.randint(z.shape[0], (min(128, z.shape[0]),), generator=g)],
+        q(z[torch.randint(z.shape[0], (min(128, z.shape[0]),), generator=g, device=dev)],
           update_codebook=True)
     q.eval()
 
-    dist = ClipTowerDistortion(model_id, ctx, metric="cosine")
+    dist = ClipTowerDistortion(model_id, ctx, device=device, metric="cosine")
     table = prefix_zhat(q, z).reshape(b_all, n, cfg.max_depth + 1, d)
     errs = prefix_errors(q, z).reshape(b_all, n, cfg.max_depth + 1)
     ref = z.reshape(b_all, n, d)
     budget = int(round(mean_depth * n))
-    idx = torch.arange(n)
+    idx = torch.arange(n, device=dev)
 
     acc: dict[str, list[float]] = {k: [] for k in
                                    ("uniform", "random", "oracle_l2", "oracle_down")}
@@ -154,8 +156,9 @@ def run_downstream(latents_path: str, ctx_path: str, preset: str, fit_steps: int
 
         pol = {
             "uniform": allocate_uniform(n, budget, cfg.max_depth, z.device),
-            "random": allocate_random(n, budget, cfg.max_depth, z.device,
-                                      generator=torch.Generator().manual_seed(seed + i)),
+            "random": allocate_random(
+                n, budget, cfg.max_depth, z.device,
+                generator=torch.Generator(device=dev).manual_seed(seed + i)),
             "oracle_l2": allocate_oracle(errs[i], budget, cfg.max_depth),
             "oracle_down": allocate_greedy_downstream(table[i], budget, cfg.max_depth,
                                                       score),
@@ -178,6 +181,21 @@ def run_downstream(latents_path: str, ctx_path: str, preset: str, fit_steps: int
     print(rep.summary())
     print("\n  NOTE: greedy search on a non-separable objective is not provably optimal, "
           "\n  so the reported headroom is a LOWER bound on the true optimum.")
+    if json_out:
+        import json
+        pathlib.Path(json_out).parent.mkdir(parents=True, exist_ok=True)
+        pathlib.Path(json_out).write_text(json.dumps({
+            "seed": seed, "num_images": rep.num_images, "layer": rep.layer,
+            "mean_depth_budget": rep.mean_depth_budget,
+            "uniform": rep.uniform, "random": rep.random,
+            "oracle_latent_l2": rep.oracle_latent_l2,
+            "oracle_downstream": rep.oracle_downstream,
+            "headroom": rep.headroom, "latent_l2_gain": rep.latent_l2_gain,
+            "random_gain": rep.random_gain, "criterion_gap": rep.criterion_gap,
+            "per_image_gain": rep.per_image_gain,
+            "underpowered": rep.underpowered(),
+        }, indent=2))
+        print(f"  wrote {json_out}", flush=True)
 
 
 def main() -> None:
@@ -200,6 +218,9 @@ def main() -> None:
     ap.add_argument("--ctx", default=None,
                     help="tower-context sidecar; defaults to <latents>.ctx.pt")
     ap.add_argument("--model", default="openai/clip-vit-base-patch32")
+    ap.add_argument("--device", default="cpu", help="cpu | cuda")
+    ap.add_argument("--json-out", default=None,
+                    help="write the downstream result as JSON (for multi-seed aggregation)")
     ap.add_argument("--max-images", type=int, default=8,
                     help="greedy downstream search is O(budget x N) decoder passes")
     ap.add_argument("--no-zero-code", action="store_true",
@@ -223,7 +244,8 @@ def main() -> None:
                 "latent L2, which measures a different objective.")
         run_downstream(args.latents, ctx_path, args.preset, args.fit_steps,
                        args.mean_depth if args.mean_depth else 2.5,
-                       args.model, args.max_images, args.seed)
+                       args.model, args.max_images, args.seed,
+                       device=args.device, json_out=args.json_out)
         return
 
     if args.latents:
