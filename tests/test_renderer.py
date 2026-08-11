@@ -42,9 +42,14 @@ def test_backbone_bad_shape_raises():
         bb(torch.randn(2, 5, 8), torch.rand(2))
 
 
-def test_real_backbone_raises():
-    with pytest.raises(NotImplementedError):
-        build_renderer_backbone(_cfg(backbone="black-forest-labs/FLUX.1-dev"))
+def test_unknown_backbone_raises_but_flux_is_wired():
+    """Unknown ids still refuse; FLUX now routes to the real adapter.
+
+    FLUX coverage lives in tests/test_flux_renderer.py (against the genuine diffusers
+    classes); here we only assert that an unrecognised id is never substituted.
+    """
+    with pytest.raises(NotImplementedError, match="Refusing to substitute"):
+        build_renderer_backbone(_cfg(backbone="some/unknown-model"))
 
 
 # -- controlnet ------------------------------------------------------------------------

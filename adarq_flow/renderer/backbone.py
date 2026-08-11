@@ -62,8 +62,11 @@ def build_renderer_backbone(cfg: RendererConfig) -> nn.Module:
             cfg.latent_dim, cfg.model_dim, cfg.num_blocks, cfg.num_heads,
             cfg.num_image_tokens,
         )
+    from .flux import FluxRendererBackbone, is_flux
+
+    if is_flux(cfg.backbone):
+        return FluxRendererBackbone(cfg.backbone, cfg)
     raise NotImplementedError(
-        f"real renderer backbone '{cfg.backbone}' is not yet wired. The frozen "
-        "FLUX.1-dev transformer (gated, non-commercial; needs HF auth + GPU) lands as "
-        "a focused follow-up. For CPU runs set renderer.backbone='dummy'."
+        f"no adapter for renderer backbone '{cfg.backbone}'. Supported: 'dummy' (CPU "
+        "development) or a FLUX checkpoint. Refusing to substitute a stand-in."
     )

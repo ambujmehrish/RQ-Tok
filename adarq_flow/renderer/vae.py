@@ -21,9 +21,13 @@ def build_image_latent_encoder(cfg: RendererConfig) -> nn.Module:
     """Construct the encoder that produces Stage-B image-latent targets."""
     if cfg.vae == "dummy":
         return DummyCLIPEncoder(cfg.latent_dim, cfg.num_image_tokens)
+    from .flux import FluxVAE, is_flux
+
+    if is_flux(cfg.vae):
+        return FluxVAE(cfg.vae, cfg)
     raise NotImplementedError(
-        f"real image-latent encoder '{cfg.vae}' is not wired. Stage B needs the FLUX VAE "
-        "(gated, non-commercial; requires HF auth + GPU). Refusing to substitute the "
-        "development stand-in, which would make the renderer regress toward a random "
-        "projection. Set renderer.vae='dummy' only for run_mode='smoke'."
+        f"no adapter for image-latent encoder '{cfg.vae}'. Supported: 'dummy' (CPU "
+        "development) or a FLUX checkpoint whose VAE supplies Stage-B targets. Refusing "
+        "to substitute the stand-in, which would make the renderer regress toward a "
+        "random projection."
     )

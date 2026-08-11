@@ -212,7 +212,10 @@ the final development phase**:
   **post-merger** visual feature (2048-d), i.e. exactly what the LLM consumes — not the
   1280-d tower-internal state. Geometry is read off the checkpoint
   (`python -m adarq_flow.mllm.qwen <id>`), never hardcoded.
-- `DummyCLIPEncoder` → the real **MLLM-native CLIP visual tower**.
+- `DummyCLIPEncoder` → the real **MLLM-native CLIP visual tower**. **DONE** (Qwen tower).
+- `DummyFluxBackbone` / Stage-B target encoder → real **FLUX.1-dev** transformer + VAE.
+  **WIRED** (`adarq_flow/renderer/flux.py`), API-verified against the genuine diffusers
+  classes; real gated weights still to be confirmed on the GPU node.
 
 The swap is isolated by construction: the branch/heads/training/decoding (Component B) are
 backbone-agnostic and consume *context hidden states*; the tokenizer (Component A) is

@@ -214,17 +214,27 @@ class AdaRQFlowConfig:
     # ---- run-mode gate ---------------------------------------------------------------
     DUMMY = "dummy"
 
+    # Genuine architectures with RANDOM weights (hf-internal-testing/tiny-*). They are
+    # valid for verifying plumbing and worthless as results, so they must never satisfy
+    # run_mode="experiment" just because their id is not the literal string "dummy".
+    _FIXTURE_MARKERS = ("hf-internal-testing/", "tiny-random", "tiny-flux")
+
+    @classmethod
+    def _is_stand_in(cls, model_id: str) -> bool:
+        low = model_id.lower()
+        return model_id == cls.DUMMY or any(m in low for m in cls._FIXTURE_MARKERS)
+
     def dummy_components(self) -> dict[str, str]:
         """Every component currently backed by a development stand-in."""
         found = {}
-        if self.mllm.backbone == self.DUMMY:
-            found["mllm.backbone"] = "DummyMLLMBackbone (and the dummy CLIP encoder)"
-        if self.renderer.backbone == self.DUMMY:
-            found["renderer.backbone"] = "DummyFluxBackbone"
-        if self.renderer.vae == self.DUMMY:
-            found["renderer.vae"] = "DummyCLIPEncoder -- random projection as targets"
-        if self.train.dataset == self.DUMMY:
-            found["train.dataset"] = "DummyImageTextDataset -- zero image/text mutual info"
+        if self._is_stand_in(self.mllm.backbone):
+            found["mllm.backbone"] = f"stand-in: {self.mllm.backbone}"
+        if self._is_stand_in(self.renderer.backbone):
+            found["renderer.backbone"] = f"stand-in: {self.renderer.backbone}"
+        if self._is_stand_in(self.renderer.vae):
+            found["renderer.vae"] = f"stand-in: {self.renderer.vae} (random targets)"
+        if self._is_stand_in(self.train.dataset):
+            found["train.dataset"] = f"stand-in: {self.train.dataset}"
         return found
 
     def validate_run_mode(self) -> None:
@@ -252,7 +262,7 @@ class AdaRQFlowConfig:
                 "renderer.vae": self.renderer.vae,
                 "train.dataset": self.train.dataset,
             }
-            reals = {k: v for k, v in real_side.items() if v != self.DUMMY}
+            reals = {k: v for k, v in real_side.items() if not self._is_stand_in(v)}
             if reals:
                 raise ValueError(
                     "mixed real/stand-in configuration: "

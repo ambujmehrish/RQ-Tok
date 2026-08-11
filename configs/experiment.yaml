@@ -10,8 +10,13 @@
 # Do NOT hand-edit them: QwenBackbone / QwenVisionEncoder raise on a mismatch rather
 # than projecting, because a silent projection changes the bridge.
 #
-# Renderer half is NOT wired yet: this config still FAILS LOUDLY with
-# NotImplementedError on FLUX.1-dev. That is intended (ISSUES.md B3).
+# Renderer half is WIRED (adarq_flow/renderer/flux.py) but its geometry is NOT verified
+# here: FLUX.1-dev is gated and no token was available in the dev container.
+#   renderer.latent_dim=64   16 VAE channels x 2x2 packing (public FLUX config)
+# CONFIRM on the GPU node before trusting a run -- the adapter RAISES on a mismatch
+# rather than reshaping, so a wrong value fails loudly rather than silently:
+#   python -m adarq_flow.renderer.flux black-forest-labs/FLUX.1-dev
+# num_image_tokens must also be set for your resolution: (H/8/2)*(W/8/2).
 #
 # shared_codebook=false + include_zero_code=true are REQUIRED for rate-allocation
 # experiments (ISSUES.md D1/D2).
@@ -51,7 +56,7 @@ renderer:
   backbone: black-forest-labs/FLUX.1-dev
   vae: black-forest-labs/FLUX.1-dev
   image_size: 64
-  latent_dim: 32
+  latent_dim: 64
   model_dim: 64
   num_blocks: 2
   num_heads: 4
