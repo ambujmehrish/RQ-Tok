@@ -77,6 +77,20 @@ python3 "$REPO/scripts/extract_clip_latents.py" \
 rm -f "$ADARQ_CACHE/prefetch_probe.pt" "$ADARQ_CACHE/prefetch_probe.pt.meta.json"
 echo "  $(find "$IMAGES" -name '*.jpg' | wc -l) images cached"
 
+# -- 3b. real COCO captions (the real dataset's text half) -----------------------------
+step "downloading real COCO captions -> $ADARQ_CACHE/annotations"
+CAPTIONS="$ADARQ_CACHE/annotations/captions_val2017.json"
+if [ ! -f "$CAPTIONS" ]; then
+  ZIPDIR="$ADARQ_CACHE/_coco_ann_download"      # own dir: untrusted archive
+  mkdir -p "$ZIPDIR"
+  curl -sS -L -o "$ZIPDIR/ann.zip" \
+      "http://images.cocodataset.org/annotations/annotations_trainval2017.zip"
+  python3 -I "$REPO/scripts/extract_coco_captions.py" \
+      --zip "$ZIPDIR/ann.zip" --out-dir "$ADARQ_CACHE/annotations"
+  rm -rf "$ZIPDIR"
+fi
+python3 -I "$REPO/scripts/extract_coco_captions.py" --verify "$CAPTIONS"
+
 # -- 4. gated weights (opt-in) ---------------------------------------------------------
 if [ "$WANT_GATED" = "1" ]; then
   step "downloading GATED weights (requires prior 'hf auth login' + accepted licences)"
@@ -99,6 +113,7 @@ export HF_HOME="$HF_HOME"
 export HF_HUB_CACHE="$HF_HUB_CACHE"
 export TRANSFORMERS_CACHE="$TRANSFORMERS_CACHE"
 export ADARQ_IMAGES="$IMAGES"
+export ADARQ_CAPTIONS="$CAPTIONS"
 # Fail loudly instead of hanging on a network call that cannot succeed:
 export HF_HUB_OFFLINE=1
 export TRANSFORMERS_OFFLINE=1
@@ -109,7 +124,7 @@ cat <<EOF
 Compute-node usage (no internet required):
 
   source $ADARQ_CACHE/adarq_env.sh
-  bash scripts/smoke_test.sh          # picks up \$ADARQ_IMAGES automatically
+  bash scripts/smoke_test.sh          # picks up \$ADARQ_IMAGES / \$ADARQ_CAPTIONS
 
 Nothing was written under \$HOME.
 EOF

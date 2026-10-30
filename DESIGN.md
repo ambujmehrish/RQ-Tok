@@ -221,6 +221,14 @@ The swap is isolated by construction: the branch/heads/training/decoding (Compon
 backbone-agnostic and consume *context hidden states*; the tokenizer (Component A) is
 encoder-agnostic and consumes *CLIP patch latents*. Only the two `build_*` factories change.
 
+### 9.1 Real-component status
+
+| Component | Stand-in | Real | Verified |
+|---|---|---|---|
+| MLLM backbone + visual tower | `DummyMLLMBackbone` / `DummyCLIPEncoder` | Qwen2.5-VL (`mllm/qwen.py`) | **yes** — real 3B weights |
+| Renderer + VAE | `DummyFluxBackbone` / random projection | FLUX (`renderer/flux.py`) | API only (gated weights) |
+| Dataset | `DummyImageTextDataset` (no image-text MI) | COCO captions (`data/coco.py`) | **yes** — 25k captions / 5k images |
+
 ## 10. Build phases
 
 0. Repo scaffold, configs, design doc, tests. **(done)**

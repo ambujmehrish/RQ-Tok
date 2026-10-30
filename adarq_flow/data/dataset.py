@@ -40,7 +40,9 @@ class DummyImageTextDataset(Dataset):
         return img, text
 
 
-def build_dataset(cfg: AdaRQFlowConfig, length: int = 256) -> Dataset:
+def build_dataset(cfg: AdaRQFlowConfig, length: int = 256,
+                  image_dir: str | None = None, annotations: str | None = None,
+                  tokenize=None, image_transform=None) -> Dataset:
     """Construct the dataset named by ``cfg.train.dataset``."""
     name = cfg.train.dataset
     if name == "dummy":
@@ -49,9 +51,21 @@ def build_dataset(cfg: AdaRQFlowConfig, length: int = 256) -> Dataset:
                 f"renderer.image_size must be >= 8, got {cfg.renderer.image_size}")
         return DummyImageTextDataset(
             length=length, image_size=max(cfg.renderer.image_size // 8, 8))
+    if name == "coco":
+        from .coco import CocoCaptionsDataset
+
+        if not (image_dir and annotations and tokenize and image_transform):
+            raise ValueError(
+                "train.dataset='coco' needs image_dir, annotations, tokenize and "
+                "image_transform. The tokenizer and image transform must come from the "
+                "MLLM backbone itself; guessing them would silently change the data. "
+                "See scripts/train_real.py."
+            )
+        return CocoCaptionsDataset(image_dir, annotations, tokenize, image_transform)
     raise NotImplementedError(
-        f"dataset '{name}' is not yet wired. Implement an ImageNet/BLIP3-o loader that "
-        "yields (image, text_ids); for CPU runs set train.dataset='dummy'."
+        f"dataset '{name}' is not wired. Supported: 'dummy' (CPU development, zero "
+        "image-text mutual information) or 'coco' (real images + real captions). "
+        "Refusing to substitute synthetic data."
     )
 
 

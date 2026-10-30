@@ -18,6 +18,12 @@
 #   python -m adarq_flow.renderer.flux black-forest-labs/FLUX.1-dev
 # num_image_tokens must also be set for your resolution: (H/8/2)*(W/8/2).
 #
+# train.dataset=coco: real COCO photographs paired with their real human captions
+# (scripts/prefetch_assets.sh fetches both halves). The 'dummy' dataset has ZERO
+# image-text mutual information, so the branch stage is vacuous on it (ISSUES.md B4).
+# Launch with scripts/train_real.py, which supplies the MLLM's own tokenizer and image
+# processor -- a generic trainer cannot guess them.
+#
 # shared_codebook=false + include_zero_code=true are REQUIRED for rate-allocation
 # experiments (ISSUES.md D1/D2).
 name: adarq-flow-experiment
@@ -81,7 +87,7 @@ train:
   seed: 0
   device: cuda
   precision: bf16
-  dataset: blip3o
+  dataset: coco
   log_every: 10
   ckpt_dir: checkpoints
 dist:

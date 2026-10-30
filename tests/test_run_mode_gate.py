@@ -92,9 +92,10 @@ def test_experiment_config_fails_loud_rather_than_substituting(monkeypatch):
     monkeypatch.setenv("TRANSFORMERS_OFFLINE", "1")
     cfg = AdaRQFlowConfig.from_yaml("configs/experiment.yaml")
     cfg = dataclasses.replace(cfg, train=dataclasses.replace(cfg.train, device="cpu"))
-    with pytest.raises(Exception) as exc:
+    # BaseException, not Exception: a missing dependency raises SystemExit, which does
+    # not inherit from Exception. The property under test is that it refuses at all.
+    with pytest.raises(BaseException) as exc:
         Trainer(cfg, dataset_length=8, setup_dist=False)
-    # A silent success would mean a stand-in was substituted.
     assert exc.value is not None
 
 

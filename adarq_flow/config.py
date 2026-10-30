@@ -175,7 +175,10 @@ class TrainConfig:
     seed: int = 0
     device: str = "cpu"             # "cpu" | "cuda"
     precision: str = "fp32"         # "fp32" | "bf16"
-    dataset: str = "dummy"          # "dummy" | "imagenet" | "blip3o"
+    # "dummy" has ZERO image-text mutual information (ISSUES.md B4), so the branch
+    # stage and all CFG machinery are vacuous on it. "coco" = real photographs with
+    # their real human captions.
+    dataset: str = "dummy"          # "dummy" | "coco"
     log_every: int = 10
     ckpt_dir: str = "checkpoints"
 

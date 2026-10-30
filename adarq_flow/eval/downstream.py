@@ -73,7 +73,7 @@ class ClipTowerDistortion:
         self.ctx = ctx
         self.device = torch.device(device)
         model = CLIPModel.from_pretrained(model_id)
-        model = model.to(self.device)  # type: ignore[arg-type]
+        model = model.to(self.device)
         model.eval()
         for p in model.parameters():
             p.requires_grad_(False)
