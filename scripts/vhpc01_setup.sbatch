@@ -20,7 +20,8 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
-#SBATCH --gres=gpu:1                  # 1 GPU is enough to report the GPU facts
+#SBATCH --gres=gpu:h200:1
+# (gpus partition also holds Tesla/A40 nodes vhpc2/vhpc3; vhpc23 is the only H200 node)
 #SBATCH --time=00:10:00
 #SBATCH --output=logs/%x-%j.out
 #SBATCH --error=logs/%x-%j.out        # one file: easier to paste back

@@ -16,7 +16,8 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
-#SBATCH --gres=gpu:1
+#SBATCH --gres=gpu:h200:1
+# (plain gpu:1 could land on the A40/Tesla nodes and "verify" a GPU we never train on)
 #SBATCH --time=01:00:00
 #SBATCH --output=logs/%x-%j.out
 #SBATCH --error=logs/%x-%j.out
@@ -73,8 +74,10 @@ for i in range(n):
     p = torch.cuda.get_device_properties(i)
     print(f"  gpu{i}: {p.name}  {p.total_memory/1e9:.0f} GB  sm_{p.major}{p.minor}")
 cap = torch.cuda.get_device_capability(0)
-if cap[0] < 9:
-    print(f"  NOTE: sm_{cap[0]}{cap[1]} is not Hopper; expected sm_90 for H200")
+name = torch.cuda.get_device_name(0)
+if cap != (9, 0) or "H200" not in name:
+    sys.exit(f"FAIL: this job asked for an H200 but got {name} (sm_{cap[0]}{cap[1]}). "
+             "A pass here would certify a GPU we never train on.")
 # A real matmul in bf16: catches a wheel that imports but cannot execute.
 x = torch.randn(4096, 4096, device="cuda", dtype=torch.bfloat16)
 torch.cuda.synchronize()
