@@ -4,6 +4,8 @@
 #
 #   sbatch scripts/e0_downstream_64.sbatch
 #   sbatch --qos=gpulongjobs scripts/e0_downstream_64.sbatch   # if 'normal' is full
+#   E0_IMAGES=$HOME/work/adarq-cache/coco_val2017_512 NUM_IMAGES=512 MEAN_DEPTH=1.5 \
+#       sbatch --time=08:00:00 scripts/e0_downstream_64.sbatch  # bigger set / other rate
 #
 # vhpc01 has its H200s one per node (vhpc13 / vhpc14 / vhpc15, gpu:h200:1 each), so a
 # single job can never hold more than one. This job asks for exactly one and runs the
@@ -65,6 +67,8 @@ scripts/prefetch_assets.sh first (or set ADARQ_CACHE)"
 # shellcheck disable=SC1091
 source "$ADARQ_CACHE/adarq_env.sh"   # HF_HOME, ADARQ_IMAGES, HF_HUB_OFFLINE=1
 [ "${HF_HUB_OFFLINE:-0}" = "1" ] || die "adarq_env.sh did not set HF_HUB_OFFLINE=1"
+# E0_IMAGES points a run at a larger prefetched image set without editing adarq_env.sh
+ADARQ_IMAGES="${E0_IMAGES:-${ADARQ_IMAGES:-}}"
 [ -d "${ADARQ_IMAGES:-}" ] || die "ADARQ_IMAGES=${ADARQ_IMAGES:-<unset>} is not a directory"
 n_img=$(find "$ADARQ_IMAGES" -maxdepth 1 -name '*.jpg' | wc -l)
 [ "$n_img" -ge "$NUM_IMAGES" ] || die "only $n_img images in $ADARQ_IMAGES, need $NUM_IMAGES"
