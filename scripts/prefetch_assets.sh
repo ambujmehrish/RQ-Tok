@@ -72,6 +72,12 @@ if [ -n "${HF_HOME:-}" ]; then
 else
   export HF_HOME="$ADARQ_CACHE/hf"
   echo "HF_HOME unset; using $HF_HOME"
+  # `hf auth login` with HF_HOME unset saved the token under the default location;
+  # point at it explicitly, or moving HF_HOME would hide it.
+  if [ -z "${HF_TOKEN:-}" ] && [ -f "$HOME/.cache/huggingface/token" ]; then
+    export HF_TOKEN_PATH="$HOME/.cache/huggingface/token"
+    echo "using the token saved by 'hf auth login' at $HF_TOKEN_PATH"
+  fi
 fi
 export HF_HUB_CACHE="${HF_HUB_CACHE:-$HF_HOME/hub}"
 export HF_HUB_OFFLINE=0
@@ -145,7 +151,7 @@ try:
 except GatedRepoError as e:
     sys.exit(f"{repo} is gated and this account has no access yet.\n"
              f"  1. accept the licence at https://huggingface.co/{repo}\n"
-             f"  2. hf auth login   (token is read from $HF_HOME/token)\n{e}")
+             f"  2. hf auth login   (or export HF_TOKEN)\n{e}")
 print(f"  cached {repo} -> {path}")
 PY
 else
