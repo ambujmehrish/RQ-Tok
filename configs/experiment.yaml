@@ -10,12 +10,13 @@
 # Do NOT hand-edit them: QwenBackbone / QwenVisionEncoder raise on a mismatch rather
 # than projecting, because a silent projection changes the bridge.
 #
-# Renderer half is WIRED (adarq_flow/renderer/flux.py) but its geometry is NOT verified
-# here: FLUX.1-dev is gated and no token was available in the dev container.
-#   renderer.latent_dim=64   16 VAE channels x 2x2 packing (public FLUX config)
-# CONFIRM on the GPU node before trusting a run -- the adapter RAISES on a mismatch
-# rather than reshaping, so a wrong value fails loudly rather than silently:
-#   python -m adarq_flow.renderer.flux black-forest-labs/FLUX.1-dev
+# Renderer half is WIRED (adarq_flow/renderer/flux.py). Its geometry is CONFIRMED from
+# the real FLUX.1-dev configs in the vhpc01 cache (opened offline):
+#   renderer.latent_dim=64   VAE packed width 64 == transformer in_channels 64
+#   19 double / 38 single blocks; this config's ControlNet uses 4 / 1
+# A forward pass on the real weights has not run yet (needs a GPU). The adapter still
+# RAISES on any mismatch rather than reshaping. Re-check any other checkpoint with:
+#   python -m adarq_flow.renderer.flux <model_id>
 # num_image_tokens must also be set for your resolution: (H/8/2)*(W/8/2).
 #
 # train.dataset=coco: real COCO photographs paired with their real human captions

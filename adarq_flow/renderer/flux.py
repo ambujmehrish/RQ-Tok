@@ -24,10 +24,11 @@ ungated ``hf-internal-testing/tiny-flux-pipe`` fixture (real architecture, tiny 
 weights): latent channels / scaling / shift are read from the VAE config, and the
 transformer's forward really does accept the controlnet arguments used below.
 
-**Real FLUX.1-dev weights are NOT verified here** — the repo is gated and no token was
-available in the development container. Geometry is therefore *derived from the
-checkpoint config at load time* and checked, never hardcoded, and every mismatch raises.
-Validate on the GPU node before citing any renderer number.
+**Real FLUX.1-dev geometry is confirmed** from the downloaded checkpoint's own configs
+(vhpc01 cache, opened offline): VAE packed width 64 == transformer ``in_channels`` 64,
+19 double / 38 single blocks. **A forward pass on the real weights has not run yet** —
+that needs a GPU. Geometry is still derived from the config at load time and checked,
+never hardcoded, and every mismatch raises.
 """
 
 from __future__ import annotations
