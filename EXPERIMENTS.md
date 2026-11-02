@@ -95,6 +95,27 @@ aggregates across seeds and applies R1/R2 automatically: it refuses below 3 seed
 reports UNDERPOWERED below 32 images, and returns INCONCLUSIVE when the 2-sigma lower
 bound on headroom falls under the 10% floor. All six verdict branches are exercised.
 
+**Result — powered downstream E0 (2026-11, vhpc01 H200, job 1506210).** 64 distinct
+COCO val2017 images x 3 seeds (seeds vary the tokenizer fit; the images are fixed),
+CLIP ViT-B/32 quantized at layer 8, mean depth 2.49 / D_max 4, cosine distortion of the
+final CLIP embedding:
+
+| metric | mean | std |
+|---|---|---|
+| headroom (downstream oracle vs uniform) | **+31.1%** | 3.5% |
+| latent-L2 oracle vs uniform | +22.4% | 2.8% |
+| random vs uniform (control) | −0.1% | 1.4% |
+| criterion gap (share of headroom latent-L2 misses) | 27.9% | 1.2% |
+
+**Verdict: PROCEED.** The 2-sigma lower bound on headroom (24.1%) clears the 10% floor
+(R1); n = 64 >= 32 images and 3 seeds (R2); random is indistinguishable from uniform, so
+the gain is content-aware, not rate variance. Per-image gain spread is large (±18–25%),
+so the image-level variance is tested separately by the 512-image rate sweep
+(mean depth 1.5 / 2.5 / 3.0).
+What this does **not** show: the oracle sees the true distortion (a learned policy will
+recover only part of it); the decoder is the CLIP tower suffix, a semantic proxy, not
+FLUX; and nothing here measures image quality. C3 still needs the real renderer.
+
 **Interpretation guard.** `random` is the load-bearing control. If `random ≈ oracle`,
 the gain comes from *rate variance*, not from *content-aware* allocation, and the
 "adaptive" claim collapses even if the oracle beats uniform.
