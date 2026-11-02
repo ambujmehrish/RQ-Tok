@@ -10,7 +10,7 @@ fmt:
 	ruff check . --fix
 
 type:
-	mypy bifrost_flow/
+	mypy adarq_flow/
 
 test:
 	pytest -q
