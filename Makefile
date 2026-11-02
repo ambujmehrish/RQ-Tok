@@ -1,4 +1,4 @@
-.PHONY: install lint type test check fmt clean ablations smoke prefetch e0
+.PHONY: install lint type test check fmt clean ablations smoke prefetch e0 vhpc-setup vhpc-env vhpc-prefetch
 
 install:
 	pip install -e ".[dev,torch]"
@@ -19,7 +19,7 @@ test:
 check: lint type test
 
 ablations:
-	python -c "from bifrost_flow.eval import dump_ablation_configs; \
+	python -c "from adarq_flow.eval import dump_ablation_configs; \
 		print(dump_ablation_configs('configs/ablations', base='base_gpu'))"
 
 clean:
@@ -37,3 +37,11 @@ prefetch:
 # Submit the powered E0 downstream run (64 images x 3 seeds) on Leonardo.
 e0:
 	sbatch scripts/e0_downstream_64.sbatch
+
+# --- vhpc01 (3x H200, submit-only SLURM) ---------------------------------------------
+vhpc-setup:      # step 1: survey partitions / GPUs / egress from a compute node
+	sbatch scripts/vhpc01_setup.sbatch
+vhpc-env:        # step 2: build + verify the conda env on an H200
+	sbatch scripts/vhpc01_env.sbatch
+vhpc-prefetch:   # step 3: fetch models + data (needs ADARQ_CACHE and compute egress)
+	sbatch scripts/vhpc01_prefetch.sbatch

@@ -25,24 +25,37 @@ CLIP_MODEL="${CLIP_MODEL:-openai/clip-vit-base-patch32}"
 WANT_GATED=0
 [ "${1:-}" = "--gated" ] && WANT_GATED=1
 
-# -- 1. cache location must be explicit and must not sit in $HOME ----------------------
+# -- 1. cache location: explicit, and with enough room ---------------------------------
+# The check is on FREE SPACE, not on the path. An earlier version blacklisted $HOME,
+# which is wrong on clusters (vhpc01 among them) where $HOME is a large shared NFS
+# volume and the small/full filesystem is /scratch. What actually breaks a run is
+# running out of room mid-download, so that is what we measure.
+MIN_FREE_GB="${MIN_FREE_GB:-80}"     # CLIP + Qwen-VL-7B + FLUX.1-dev + images, bf16
 if [ -z "${ADARQ_CACHE:-}" ]; then
   cat >&2 <<'EOF'
-ADARQ_CACHE is not set. Point it at large shared storage, NOT $HOME:
+ADARQ_CACHE is not set. Point it at a volume with room for model weights, e.g.
 
-  export ADARQ_CACHE=$WORK/adarq-cache      # Cineca: $WORK or $SCRATCH
+  export ADARQ_CACHE=$HOME/work/adarq-cache     # vhpc01: /home is 26T, ~11T free
   bash scripts/prefetch_assets.sh
 
-Refusing to guess a location: defaulting to $HOME would silently fill your home quota.
+Refusing to guess a location: a wrong default silently fills someone's volume.
+Check candidates with:  df -h $HOME /scratch /tmp
 EOF
   exit 1
 fi
-case "$(readlink -m "$ADARQ_CACHE")/" in
-  "$(readlink -m "$HOME")"/*)
-    echo "ADARQ_CACHE ($ADARQ_CACHE) is inside \$HOME. Model weights belong on \$WORK or" >&2
-    echo "\$SCRATCH — \$HOME quotas are small and shared. Aborting." >&2
-    exit 1 ;;
-esac
+mkdir -p "$ADARQ_CACHE"
+FREE_GB=$(df -BG --output=avail "$ADARQ_CACHE" 2>/dev/null | tail -1 | tr -dc '0-9')
+if [ -z "$FREE_GB" ]; then
+  echo "could not determine free space on $ADARQ_CACHE; aborting rather than guessing" >&2
+  exit 1
+fi
+if [ "$FREE_GB" -lt "$MIN_FREE_GB" ]; then
+  echo "ADARQ_CACHE ($ADARQ_CACHE) has only ${FREE_GB}G free; need >= ${MIN_FREE_GB}G." >&2
+  echo "Pick a roomier volume (df -h \$HOME /scratch) or raise MIN_FREE_GB if you know" >&2
+  echo "the gated weights are already cached elsewhere. Aborting." >&2
+  exit 1
+fi
+echo "cache has ${FREE_GB}G free (need >= ${MIN_FREE_GB}G)"
 
 mkdir -p "$ADARQ_CACHE"
 export HF_HOME="$ADARQ_CACHE/hf"
