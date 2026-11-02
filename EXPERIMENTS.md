@@ -66,7 +66,7 @@ semantic structure show non-zero oracle gain (measured +6.8%) from per-sample
 quantization luck. Only gain *in excess of* the i.i.d. baseline is evidence for
 content-aware allocation.
 
-**Result on real data (2026-08, `scripts/smoke_test.sh`).** 64 real COCO val2017 images
+**Result on real data (2026-08, `scripts/smoke_test.sh`).** *Correction: these "64" images were 20 distinct photographs repeated (ISSUES.md F15); the effective n is 20 and the numbers below must be re-measured on distinct images before being cited.* 64 real COCO val2017 images
 → real CLIP-B/32 → 3136 patch latents, matched mean depth 2.5:
 `oracle vs uniform +34.2%`, `oracle vs random +34.1%` → **PROCEED** (well clear of the
 10% floor; the random control confirms the gain is content-aware). Note the shipped

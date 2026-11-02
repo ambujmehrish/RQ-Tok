@@ -81,15 +81,55 @@ def load_local_images(image_dir: str, n: int):
             "Run scripts/prefetch_assets.sh on a node WITH internet first; refusing to "
             "pad or to substitute synthetic data."
         )
-    return [Image.open(f).convert("RGB") for f in files[:n]]
+    files = files[:n]
+    # Caches written by the old downloader hold one image under several names
+    # (<id>_0001.jpg, <id>_0021.jpg, ...). Counting those as distinct inflates n.
+    stems = [f.stem.split("_")[0] for f in files]
+    dupes = sorted({s for s in stems if stems.count(s) > 1})
+    if dupes:
+        raise SystemExit(
+            f"{image_dir} contains the same COCO image under several filenames "
+            f"(e.g. {dupes[:3]}): {len(set(stems))} distinct of {len(files)} requested. "
+            "This cache was written by the old repeating downloader — delete it and "
+            "re-run scripts/prefetch_assets.sh."
+        )
+    return [Image.open(f).convert("RGB") for f in files]
 
 
-def fetch_images(n: int, timeout: int = 30, save_dir: str | None = None):
-    """Download real photographs. Raises unless at least `n` distinct images arrive."""
+def select_coco_ids(n: int, annotations: str | None = None, seed: int = 0) -> list[str]:
+    """``n`` DISTINCT COCO val2017 image ids.
+
+    An earlier version cycled the 20 built-in ids (``ids * k``), so "64 images" was 20
+    images repeated: every sample count above 20 was inflated, and minimum-sample guards
+    passed on duplicated data. With ``annotations`` (``captions_val2017.json``) the ids
+    are a seeded sample of the 5,000 captioned images; without it only the 20 built-in
+    ids exist and asking for more raises.
+    """
+    if annotations:
+        with open(annotations) as f:
+            pool = sorted({int(a["image_id"]) for a in json.load(f)["annotations"]})
+        source = f"{annotations} ({len(pool)} captioned images)"
+        ids = [f"{i:012d}" for i in pool]
+    else:
+        ids, source = list(COCO_VAL2017_IDS), "the 20 built-in ids"
+    if n > len(ids):
+        raise SystemExit(
+            f"asked for {n} distinct images but {source} only has {len(ids)}. Pass "
+            "--annotations captions_val2017.json for up to 5,000; refusing to repeat "
+            "images, which would inflate the sample count."
+        )
+    import random
+
+    return sorted(random.Random(seed).sample(ids, n)) if annotations else ids[:n]
+
+
+def fetch_images(n: int, timeout: int = 30, save_dir: str | None = None,
+                 annotations: str | None = None):
+    """Download ``n`` DISTINCT real photographs. Raises unless all of them arrive."""
     PIL = _require("PIL")
     from PIL import Image
 
-    ids = (COCO_VAL2017_IDS * (n // len(COCO_VAL2017_IDS) + 1))[:n]
+    ids = select_coco_ids(n, annotations)
     images, failures = [], []
     for img_id in ids:
         url = COCO_URL.format(img_id)
@@ -100,7 +140,7 @@ def fetch_images(n: int, timeout: int = 30, save_dir: str | None = None):
             if save_dir:
                 out = pathlib.Path(save_dir)
                 out.mkdir(parents=True, exist_ok=True)
-                (out / f"{img_id}_{len(images):04d}.jpg").write_bytes(raw)
+                (out / f"{img_id}.jpg").write_bytes(raw)
         except Exception as e:                      # noqa: BLE001 - reported, not hidden
             failures.append(f"{img_id}: {type(e).__name__}")
     if len(images) < n:
@@ -161,6 +201,9 @@ def main() -> None:
                          "(required on compute nodes without internet)")
     ap.add_argument("--save-images", default=None,
                     help="also write the downloaded images here, for later offline use")
+    ap.add_argument("--annotations", default=None,
+                    help="captions_val2017.json: choose DISTINCT images from its 5,000 "
+                         "captioned ids (required for more than 20 images)")
     ap.add_argument("--layer", type=int, default=None,
                     help="quantize at this encoder-layer input; the layers ABOVE it form "
                          "the frozen downstream decoder used by E0's downstream "
@@ -174,7 +217,8 @@ def main() -> None:
     else:
         print(f"[extract] fetching {args.num_images} real COCO val2017 images ...",
               flush=True)
-        images = fetch_images(args.num_images, save_dir=args.save_images)
+        images = fetch_images(args.num_images, save_dir=args.save_images,
+                              annotations=args.annotations)
     print(f"[extract] running real CLIP: {args.model}"
           + (f" (quantize at layer {args.layer})" if args.layer is not None else ""),
           flush=True)

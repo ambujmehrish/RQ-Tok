@@ -58,6 +58,10 @@ if [ -n "${ADARQ_IMAGES:-}" ]; then
   [ -d "$ADARQ_IMAGES" ] || fail "ADARQ_IMAGES=$ADARQ_IMAGES does not exist — run scripts/prefetch_assets.sh on a login node"
   EXTRA=(--image-dir "$ADARQ_IMAGES")
   echo "  offline mode: real images from $ADARQ_IMAGES"
+elif [ -n "${ADARQ_CAPTIONS:-}" ]; then
+  # Online: pick DISTINCT images from the captioned ids. Without a captions file the
+  # extractor only has 20 ids and refuses more, rather than repeating images (F15).
+  EXTRA=(--annotations "$ADARQ_CAPTIONS")
 fi
 python3 scripts/extract_clip_latents.py \
     --out "$LATENTS" --num-images "$NUM_IMAGES" "${EXTRA[@]+"${EXTRA[@]}"}" \

@@ -26,6 +26,7 @@ experiment is more dangerous than one that crashes.
 | F12 | **critical** | **Real FLUX renderer + VAE wired** (`adarq_flow/renderer/flux.py`). `FluxVAE` replaces the random-projection Stage-B targets (closes **B3**'s root cause); `FluxRendererBackbone` uses FLUX's **native** `controlnet_block_samples` interface rather than hand-patched residual injection. Verified against the genuine diffusers classes via the ungated `hf-internal-testing/tiny-flux-pipe` fixture: config-derived VAE geometry, packed latents `(2, 1024, 4)`, transformer velocity `(1, 16, 4)`, and both guards firing. **Real FLUX.1-dev weights are UNVERIFIED — the repo is gated and no token was available.** Geometry is derived at load time and every mismatch raises; confirm with `python -m adarq_flow.renderer.flux <id>` on the GPU node. |
 | F13 | major | **A random-weight fixture could satisfy `run_mode="experiment"`.** The gate only rejected the literal string `dummy`, so `hf-internal-testing/tiny-*` (genuine architecture, random weights) would have passed as "real" and produced citable-looking numbers from noise. Stand-in detection now covers fixture markers. |
 | F14 | **critical** | **Real image-caption dataset wired** (`adarq_flow/data/coco.py`). `CocoCaptionsDataset` pairs real COCO photographs with their real human captions from the official `captions_val2017.json` — verified: 25,014 captions over 5,000 images parsed, and a 6-image paired set built end to end with 100% distinct captions. This addresses **B4**'s root cause: the stand-in drew images and token ids independently, so image and text had zero mutual information and the branch stage plus all CFG machinery were vacuous by construction. Unmatched images **raise** rather than silently shrinking the corpus, and `mutual_information_sanity_check()` guards the degenerate case. `scripts/train_real.py` composes all three real components, supplying the MLLM's own tokenizer and image processor. |
+| F15 | **critical** | **"N images" was never more than 20 distinct images.** `extract_clip_latents.py` built its id list as `COCO_VAL2017_IDS * k`, cycling 20 built-in ids, while its docstring promised distinct images. Every run above 20 images used duplicates: the real-data E0 (R3, "64 images") had 20 distinct photographs, and the powered 64-image downstream job would have passed its 32-image minimum on duplicated data. Images are now a seeded sample of the 5,000 captioned val2017 ids (`--annotations`); without the captions file more than 20 images is refused, and caches left by the old downloader are rejected. |
 | F7 | minor | `scheduled_sampling_prob` silently ignored → now fails loud. `torch.load(weights_only=False)` → `True`. |
 
 ---
@@ -43,7 +44,9 @@ experiment is more dangerous than one that crashes.
 
 ## E0 on REAL data — the results that supersede the synthetic pilot
 
-Run: 64 real COCO val2017 photographs -> `openai/clip-vit-base-patch32` -> 3136 real
+**Correction (see F15):** the downloader repeated its 20 built-in ids, so the "64" images below were **20 distinct photographs**, most present 3x. The ratios are from real data, but the effective sample size is 20, and R3 should be re-measured on 64 distinct images.
+
+Run: 64 (= 20 distinct) real COCO val2017 photographs -> `openai/clip-vit-base-patch32` -> 3136 real
 patch latents (`scripts/smoke_test.sh`).
 
 | # | Severity | Finding |

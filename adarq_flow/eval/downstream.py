@@ -25,6 +25,7 @@ Two properties matter:
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Any
 
 import torch
 from torch import Tensor
@@ -72,7 +73,9 @@ class ClipTowerDistortion:
         self.metric = metric
         self.ctx = ctx
         self.device = torch.device(device)
-        model = CLIPModel.from_pretrained(model_id)
+        # Any: transformers' typing of .to() changes between releases, and a
+        # per-line ignore comment would be reported as unused on some versions.
+        model: Any = CLIPModel.from_pretrained(model_id)
         model = model.to(self.device)
         model.eval()
         for p in model.parameters():
