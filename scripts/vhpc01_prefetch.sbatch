@@ -9,9 +9,9 @@
 # If they do not, this job fails fast at the first download — it does not hang, and it
 # never substitutes anything.
 #
-# GATED=1 also pulls Qwen2.5-VL-7B and FLUX.1-dev. Those need a Hugging Face token
-# visible to the job (HF_TOKEN, or `hf auth login` beforehand, which writes a token file
-# under ~/.cache/huggingface) AND the licences accepted on huggingface.co.
+# Qwen2.5-VL-3B/7B are always pulled (open weights). GATED=1 adds FLUX.1-dev, which
+# needs a Hugging Face token visible to the job (HF_TOKEN, or `hf auth login`
+# beforehand) AND its licence accepted on huggingface.co.
 # =====================================================================================
 #SBATCH --job-name=adarq-prefetch
 #SBATCH --nodes=1

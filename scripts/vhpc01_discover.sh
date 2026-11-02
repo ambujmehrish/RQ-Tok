@@ -82,7 +82,7 @@ done
 echo "--- proxy vars ---"
 env | grep -iE '^(https?_proxy|no_proxy)=' || echo "  (none set)"
 
-sec "huggingface auth (FLUX.1-dev + Qwen are gated)"
+sec "huggingface auth (FLUX.1-dev is gated; Qwen2.5-VL is not)"
 echo "HF_HOME=${HF_HOME:-<unset>}  HF_TOKEN=${HF_TOKEN:+<set>}${HF_TOKEN:-<unset>}"
 ls -d "$HOME/hf_cache" 2>/dev/null && du -sh "$HOME/hf_cache" 2>/dev/null
 have hf && hf auth whoami 2>/dev/null | head -3

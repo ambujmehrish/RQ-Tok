@@ -51,8 +51,8 @@ Depending on the egress result above:
     the weights must be fetched wherever egress exists (login node, or copied in),
     then every run goes fully offline via $ADARQ_CACHE/adarq_env.sh (HF_HUB_OFFLINE=1).
 
-Either way, FLUX.1-dev and Qwen2.5-VL are GATED: a token must be present
-(hf auth login, or HF_TOKEN) on whichever machine does the downloading, and the model
-licences accepted on huggingface.co, or the fetch returns 401.
+Either way, FLUX.1-dev is GATED: a token must be present (hf auth login, or
+HF_TOKEN) on whichever machine does the downloading, and its licence accepted on
+huggingface.co, or the fetch returns 401. Qwen2.5-VL is open and needs neither.
 EOF
 echo "### done"
