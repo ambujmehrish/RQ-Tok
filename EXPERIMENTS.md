@@ -33,7 +33,12 @@ do at *any* hyperparameter. These are pass/fail, not effect sizes.
 
 ---
 
-## E0 — Headroom pilot. **Go / no-go for the entire thesis.**
+## E0 — Headroom pilot. **Pre-flight check, NOT a decision gate.**
+
+*Scope decision (2026-11):* E0 runs on CLIP ViT-B/32 at 224 px (49 patches) — a small
+proxy, not the Qwen2.5-VL + FLUX bridge. It checks that the tokenizer, allocators and
+measurement work end to end on real images. It does **not** decide the thesis; that is
+decided only by the trained system on a held-out test set against the baselines (C1–C6).
 
 *Run this before building the learned allocator, and before any A100 hours are spent on
 C3.* The central thesis is that non-uniform bit allocation matters. If it doesn't, no
@@ -95,7 +100,7 @@ aggregates across seeds and applies R1/R2 automatically: it refuses below 3 seed
 reports UNDERPOWERED below 32 images, and returns INCONCLUSIVE when the 2-sigma lower
 bound on headroom falls under the 10% floor. All six verdict branches are exercised.
 
-**Result — powered downstream E0 (2026-11, vhpc01 H200, job 1506210).** 64 distinct
+**Result — downstream E0 pre-flight (2026-11, vhpc01 H200, job 1506210).** 64 distinct
 COCO val2017 images x 3 seeds (seeds vary the tokenizer fit; the images are fixed),
 CLIP ViT-B/32 quantized at layer 8, mean depth 2.49 / D_max 4, cosine distortion of the
 final CLIP embedding:
@@ -107,7 +112,7 @@ final CLIP embedding:
 | random vs uniform (control) | −0.1% | 1.4% |
 | criterion gap (share of headroom latent-L2 misses) | 27.9% | 1.2% |
 
-**Verdict: PROCEED.** The 2-sigma lower bound on headroom (24.1%) clears the 10% floor
+**Pre-flight passes** (the script prints PROCEED; read it as "the instrument works and shows headroom", not as a decision). The 2-sigma lower bound on headroom (24.1%) clears the 10% floor
 (R1); n = 64 >= 32 images and 3 seeds (R2); random is indistinguishable from uniform, so
 the gain is content-aware, not rate variance. Per-image gain spread is large (±18–25%),
 so the image-level variance is tested separately by the 512-image rate sweep
@@ -115,6 +120,14 @@ so the image-level variance is tested separately by the 512-image rate sweep
 What this does **not** show: the oracle sees the true distortion (a learned policy will
 recover only part of it); the decoder is the CLIP tower suffix, a semantic proxy, not
 FLUX; and nothing here measures image quality. C3 still needs the real renderer.
+
+**Latent-L2 re-measurement on 64 distinct images (F15).** Oracle vs uniform: +9.6%,
++10.1%, +10.5% over 3 seeds (mean 10.1% ± 0.5%; 2-sigma lower bound 9.2%), i.e. at the
+10% floor. The earlier "+34%" came from 20 images repeated and is withdrawn. On latent
+L2 alone the pre-flight is INCONCLUSIVE; the downstream measure shows the larger effect.
+The per-seed lines also printed a threshold-rule gain (+11–12%, "117% of headroom")
+that was **not rate-matched** — the threshold ran at its own rate, not the budget. That
+report bug is fixed: the number is now shown only when rate-matched.
 
 **Interpretation guard.** `random` is the load-bearing control. If `random ≈ oracle`,
 the gain comes from *rate variance*, not from *content-aware* allocation, and the

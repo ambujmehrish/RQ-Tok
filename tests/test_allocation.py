@@ -137,6 +137,23 @@ def test_pilot_reports_rate_matched_policies():
     assert "VERDICT" in rep.summary()
 
 
+def test_threshold_gain_hidden_when_not_rate_matched():
+    """The threshold rule runs at its own rate; at a different budget its gain must not
+    be reported as a comparable number (it once 'captured 117%' of the oracle)."""
+    torch.manual_seed(0)
+    q = _quantizer(halt_residual_threshold=0.5)     # halts at an interior rate (~2.6)
+    z = torch.randn(256, 8)
+    _fit(q, z)
+    natural = float(headroom_pilot(q, z).by_name("threshold").mean_depth)
+    budget = 1.5 if natural > 2.5 else 3.5          # deliberately far from its own rate
+    rep = headroom_pilot(q, z, mean_depth=budget, real_data=True)
+    assert not rep.threshold_rate_matched
+    assert "not comparable" in rep.summary()
+    assert "threshold rule captures" not in rep.verdict
+    matched = headroom_pilot(q, z, real_data=True)   # budget = threshold's own rate
+    assert matched.threshold_rate_matched
+
+
 def test_synthetic_verdict_is_never_a_refutation():
     """Only real latents can refute the thesis; synthetic data validates the instrument."""
     torch.manual_seed(0)

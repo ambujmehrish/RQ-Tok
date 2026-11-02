@@ -57,6 +57,9 @@ class HeadroomReport:
     oracle_gain_vs_uniform: float = 0.0   # relative reduction in distortion
     oracle_gain_vs_random: float = 0.0
     threshold_gain_vs_uniform: float = 0.0
+    # The threshold rule runs at its OWN natural rate. Its gain is only comparable to
+    # the others when that rate happens to equal the budget (EXPERIMENTS.md R3).
+    threshold_rate_matched: bool = False
     effect_floor: float = 0.10
     verdict: str = ""
     # True when the requested rate left no allocation freedom and an interior rate was
@@ -69,6 +72,13 @@ class HeadroomReport:
             if p.name == name:
                 return p
         raise KeyError(name)
+
+    def _threshold_line(self) -> str:
+        if self.threshold_rate_matched:
+            return f"threshold vs unif : {self.threshold_gain_vs_uniform:+.1%}"
+        t = self.by_name("threshold").mean_depth
+        return (f"threshold vs unif : n/a — runs at its own rate {t:.2f}, not the budget "
+                f"{self.mean_depth_budget:.2f}; not comparable (R3)")
 
     def summary(self) -> str:
         lines = [f"E0 headroom pilot @ mean depth {self.mean_depth_budget:.2f}", ""]
@@ -88,7 +98,7 @@ class HeadroomReport:
                       "NOT the one requested."]
         lines += ["", f"oracle vs uniform : {self.oracle_gain_vs_uniform:+.1%}",
                   f"oracle vs random  : {self.oracle_gain_vs_random:+.1%}",
-                  f"threshold vs unif : {self.threshold_gain_vs_uniform:+.1%}",
+                  self._threshold_line(),
                   "", f"VERDICT: {self.verdict}"]
         return "\n".join(lines)
 
@@ -483,6 +493,7 @@ def headroom_pilot(quantizer: AdaptiveResidualQuantizer, latents: Tensor,
     rep.oracle_gain_vs_uniform = (u - o) / u if u > 0 else 0.0
     rep.oracle_gain_vs_random = (r - o) / r if r > 0 else 0.0
     rep.threshold_gain_vs_uniform = (u - t) / u if u > 0 else 0.0
+    rep.threshold_rate_matched = int(thr_depths.sum()) == total
 
     # Pre-registered verdicts (EXPERIMENTS.md E0).
     if rep.oracle_gain_vs_uniform < effect_floor:
@@ -510,9 +521,10 @@ def headroom_pilot(quantizer: AdaptiveResidualQuantizer, latents: Tensor,
     else:
         rep.verdict = (
             f"PROCEED — headroom {rep.oracle_gain_vs_uniform:.1%} over uniform and "
-            f"{rep.oracle_gain_vs_random:.1%} over random. The shipped threshold rule "
-            f"captures {rep.threshold_gain_vs_uniform:.1%}, i.e. "
-            f"{rep.threshold_gain_vs_uniform / max(rep.oracle_gain_vs_uniform, 1e-9):.0%} "
-            "of the available headroom."
+            f"{rep.oracle_gain_vs_random:.1%} over random."
         )
+        if rep.threshold_rate_matched:
+            share = rep.threshold_gain_vs_uniform / max(rep.oracle_gain_vs_uniform, 1e-9)
+            rep.verdict += (f" The shipped threshold rule captures "
+                            f"{rep.threshold_gain_vs_uniform:.1%}, i.e. {share:.0%} of it.")
     return rep

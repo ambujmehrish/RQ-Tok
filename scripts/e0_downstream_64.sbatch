@@ -114,6 +114,7 @@ for seed in "${SEEDS[@]}"; do
   echo "--- seed $seed: (A) latent-L2 E0"
   python scripts/e0_headroom_pilot.py --latents "$FINAL" --preset "$PRESET" \
       --fit-steps "$FIT_STEPS" --mean-depth "$MEAN_DEPTH" --seed "$seed" \
+      --json-out "$OUT/latent_l2_seed${seed}.json" \
       2>&1 | tee "$OUT/latent_l2_seed${seed}.log"
   echo "--- seed $seed: (B) downstream E0"
   python scripts/e0_headroom_pilot.py --latents "$LAYERED" --preset "$PRESET" \
@@ -123,7 +124,46 @@ for seed in "${SEEDS[@]}"; do
       2>&1 | tee "$OUT/downstream_seed${seed}.log"
 done
 
-# --- 3. aggregate the downstream runs and apply the pre-registered rules ---------------
+# --- 3a. aggregate the latent-L2 runs (A) -----------------------------------------------
+# Per-seed verdicts are point estimates; R1 needs the 2-sigma bound across seeds.
+python - "$OUT" "${#SEEDS[@]}" "$NUM_IMAGES" <<'PY'
+import json, pathlib, statistics as st, sys
+
+out, expected, n_img = pathlib.Path(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3])
+runs = [json.loads(p.read_text()) for p in sorted(out.glob("latent_l2_seed*.json"))]
+if len(runs) != expected or len(runs) < 3:
+    raise SystemExit(f"{len(runs)} latent-L2 seed results, expected {expected} (>= 3)")
+if any(r["budget_was_substituted"] for r in runs):
+    raise SystemExit("a latent-L2 run substituted the budget; results are not comparable")
+u = [r["oracle_gain_vs_uniform"] for r in runs]
+rnd = [r["oracle_gain_vs_random"] for r in runs]
+um, us, rm = st.mean(u), st.stdev(u), st.mean(rnd)
+FLOOR = 0.10
+print("\n" + "=" * 72)
+print(f"E0 LATENT-L2 — {n_img} images x {len(runs)} seeds, "
+      f"mean depth {runs[0]['mean_depth_budget']:.2f}")
+print("=" * 72)
+print(f"oracle vs uniform : {um:+.1%} +- {us:.1%}   (per seed: "
+      + ", ".join(f"{x:+.1%}" for x in u) + ")")
+print(f"oracle vs random  : {rm:+.1%} +- {st.stdev(rnd):.1%}")
+if n_img < 32:
+    v = f"UNDERPOWERED — {n_img} images (< 32)."
+elif um < FLOOR:
+    v = f"REFUTED on latent L2 — headroom {um:.1%} < {FLOOR:.0%}."
+elif um - 2 * us < FLOOR:
+    v = (f"INCONCLUSIVE — headroom {um:.1%} +- {us:.1%}; 2-sigma lower bound "
+         f"{um - 2*us:.1%} is below the {FLOOR:.0%} floor (R1).")
+elif rm < FLOOR:
+    v = f"CONTENT-AWARENESS REFUTED — oracle beats random by only {rm:.1%}."
+else:
+    v = f"PROCEED on latent L2 — headroom {um:.1%} +- {us:.1%}."
+print(f"\nVERDICT (latent L2): {v}")
+(out / "aggregate_latent_l2.json").write_text(json.dumps(
+    {"oracle_gain_vs_uniform": {"mean": um, "std": us},
+     "oracle_gain_vs_random": {"mean": rm, "std": st.stdev(rnd)}, "verdict": v}, indent=2))
+PY
+
+# --- 3b. aggregate the downstream runs (B) and apply the pre-registered rules ----------
 python - "$OUT" "${#SEEDS[@]}" <<'PY'
 import json, pathlib, statistics as st, sys
 

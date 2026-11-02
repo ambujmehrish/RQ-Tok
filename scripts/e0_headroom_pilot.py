@@ -73,7 +73,7 @@ def synth_heterogeneous(m: int, d: int, g: torch.Generator,
 
 def run(name: str, latents: torch.Tensor, preset: str, fit_steps: int,
         mean_depth: float | None, seed: int, real_data: bool = False,
-        zero_code: bool = True) -> None:
+        zero_code: bool = True, json_out: str | None = None) -> None:
     import dataclasses
     cfg = get_preset(preset)
     cfg = dataclasses.replace(cfg, tokenizer=dataclasses.replace(
@@ -107,6 +107,17 @@ def run(name: str, latents: torch.Tensor, preset: str, fit_steps: int,
               "\n  the RD curves are non-convex. The Lagrangian allocator solves the "
               "\n  CONVEXIFIED problem, so 'oracle' is a tight lower bound on the true "
               "\n  integer optimum, not necessarily the optimum itself.")
+    if json_out:
+        import json
+        pathlib.Path(json_out).parent.mkdir(parents=True, exist_ok=True)
+        pathlib.Path(json_out).write_text(json.dumps({
+            "seed": seed, "num_patches": int(latents.shape[0]),
+            "mean_depth_budget": rep.mean_depth_budget,
+            "budget_was_substituted": rep.budget_was_substituted,
+            "oracle_gain_vs_uniform": rep.oracle_gain_vs_uniform,
+            "oracle_gain_vs_random": rep.oracle_gain_vs_random,
+            "monotone": monotone, "verdict": rep.verdict}, indent=2))
+        print(f"  wrote {json_out}", flush=True)
 
 
 def run_downstream(latents_path: str, ctx_path: str, preset: str, fit_steps: int,
@@ -220,7 +231,7 @@ def main() -> None:
     ap.add_argument("--model", default="openai/clip-vit-base-patch32")
     ap.add_argument("--device", default="cpu", help="cpu | cuda")
     ap.add_argument("--json-out", default=None,
-                    help="write the downstream result as JSON (for multi-seed aggregation)")
+                    help="write the result as JSON (for multi-seed aggregation)")
     ap.add_argument("--max-images", type=int, default=8,
                     help="greedy downstream search is O(budget x N) decoder passes")
     ap.add_argument("--no-zero-code", action="store_true",
@@ -256,7 +267,7 @@ def main() -> None:
             raise ValueError(f"latents have dim {z.size(-1)}, preset expects {dim}")
         run("real latents", z, args.preset, args.fit_steps, args.mean_depth,
             args.seed, real_data=True,
-            zero_code=not args.no_zero_code)
+            zero_code=not args.no_zero_code, json_out=args.json_out)
         return
 
     if args.regime in ("homogeneous", "both"):
