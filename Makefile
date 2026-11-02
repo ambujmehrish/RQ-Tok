@@ -34,11 +34,11 @@ smoke:
 prefetch:
 	bash scripts/prefetch_assets.sh
 
-# Submit the powered E0 downstream run (64 images x 3 seeds) on Leonardo.
+# Powered E0 (64 distinct images x 3 seeds) on ONE vhpc01 H200, seeds sequential.
 e0:
 	sbatch scripts/e0_downstream_64.sbatch
 
-# --- vhpc01 (3x H200, submit-only SLURM) ---------------------------------------------
+# --- vhpc01 (3 H200 nodes x 1 GPU each, submit-only SLURM) ---------------------------------------------
 vhpc-setup:      # step 1: survey partitions / GPUs / egress from a compute node
 	sbatch scripts/vhpc01_setup.sbatch
 vhpc-env:        # step 2: build + verify the conda env on an H200

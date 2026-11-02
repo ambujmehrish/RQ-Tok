@@ -16,8 +16,12 @@
 #SBATCH --job-name=adarq-prefetch
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=8
-#SBATCH --time=04:00:00               # FLUX.1-dev alone is ~24 GB
+#SBATCH --cpus-per-task=4
+#SBATCH --gres=gpu:h200:1
+# project rule: jobs run on H200 nodes only (the download itself needs no GPU)
+#SBATCH --mem=16G
+#SBATCH --time=04:00:00
+# FLUX.1-dev alone is ~24 GB
 #SBATCH --output=logs/%x-%j.out
 #SBATCH --error=logs/%x-%j.out
 

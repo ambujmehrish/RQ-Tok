@@ -6,7 +6,7 @@
 #   GPU_CHECK=defer bash scripts/vhpc01_env.sbatch         # login node, GPUs down
 #
 # The check that matters is whether torch can see and USE an H200, which only a node
-# with one can answer. On the login node (e.g. while vhpc23 is in maintenance) the env
+# with one can answer (vhpc13/14/15, one H200 each). On the login node the env
 # can be built ahead of time, but the GPU check must be explicitly deferred with
 # GPU_CHECK=defer, and the job re-submitted later. Without that flag a host with no GPU
 # FAILS, so a CPU-only "install succeeded" is never mistaken for a verified env.
@@ -17,9 +17,10 @@
 #SBATCH --job-name=adarq-env
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=8
+#SBATCH --cpus-per-task=4
 #SBATCH --gres=gpu:h200:1
 # (plain gpu:1 could land on the A40/Tesla nodes and "verify" a GPU we never train on)
+#SBATCH --mem=32G
 #SBATCH --time=01:00:00
 #SBATCH --output=logs/%x-%j.out
 #SBATCH --error=logs/%x-%j.out
@@ -82,7 +83,7 @@ echo
 echo "===== verification ====="
 if [ "$HAVE_GPU" = "0" ]; then
   python -c "import torch; print('torch', torch.__version__, '| CUDA build', torch.version.cuda)"
-  echo "GPU check DEFERRED: re-run 'sbatch scripts/vhpc01_env.sbatch' once vhpc23 is up."
+  echo "GPU check DEFERRED: re-run 'sbatch scripts/vhpc01_env.sbatch' when an H200 node is up."
 else
 python - <<'PY'
 import sys

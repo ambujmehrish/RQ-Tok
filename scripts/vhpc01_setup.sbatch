@@ -21,10 +21,12 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
 #SBATCH --gres=gpu:h200:1
-# (gpus partition also holds Tesla/A40 nodes vhpc2/vhpc3; vhpc23 is the only H200 node)
+# H200s are vhpc13/14/15, ONE per node; the gpus partition also holds RTX6000/A40/Tesla
+#SBATCH --mem=8G
 #SBATCH --time=00:10:00
 #SBATCH --output=logs/%x-%j.out
-#SBATCH --error=logs/%x-%j.out        # one file: easier to paste back
+#SBATCH --error=logs/%x-%j.out
+# stdout and stderr in one file: easier to paste back
 
 set -uo pipefail
 mkdir -p logs
