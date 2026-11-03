@@ -16,7 +16,8 @@ from .test_bifrost_build import HIDDEN, tiny_vlm  # noqa: F401  (fixture)
 
 def _data(root, n=24, width=HIDDEN):
     rng = np.random.default_rng(0)
-    lat = torch.from_numpy(rng.standard_normal((n, 64, width)).astype(np.float32)).to(torch.bfloat16)
+    lat = torch.from_numpy(rng.standard_normal((n, 64, width)).astype(np.float32))
+    lat = lat.to(torch.bfloat16)
     np.save(root / "latents_train.npy", lat.view(torch.int16).numpy().view(np.uint16))
     np.save(root / "labels_train.npy", rng.integers(0, 1000, n).astype(np.int16))
     (root / "class_names.json").write_text(json.dumps([f"class {i}" for i in range(1000)]))
