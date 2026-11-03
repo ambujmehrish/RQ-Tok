@@ -126,6 +126,45 @@ checkpoint paths name a `QwenVL3B ... 224res_64tokens` run); vision-branch optim
 reference statistics (ADM ImageNet-256 reference batch, as in MAR/xAR which the paper
 follows). Each is recorded here, with its source, before the first training run.
 
+**Level B implementation spec (fixed before any training; source in brackets).** The
+baseline trains upstream's own released modules — `MultiModalityCausalLM` (its training
+`forward` and MSE loss), `Conversation.t2i_prompt`, `FluxControlNetModel` and
+`FluxControlNetPipeline` from `HL-hanlin/Bifrost-1@3047de2` — inside a loop we write,
+because upstream released no trainer. AdaRQ-Flow uses the same modules and changes only
+the bridge (head + loss + sampler), so the comparison isolates the bridge.
+
+*Data.* ImageNet-1k train `[paper §4]`; a fixed, seeded 10,000-image slice of train is
+held out for checkpoint selection only `[ours]`. Prompt = the first English name of the
+class from the dataset's `classes.py` `[ours: unstated]`. Image: resize short side to
+256 (bilinear) + centre crop 256 → FLUX VAE input `[diffusers train_controlnet_flux.py]`;
+the same crop resized to 224 → Qwen2.5-VL visual tower → 8x8 = 64 post-merger latents of
+width 2048 `[upstream path name 224res_64tokens; paper §5.1 uses 64 tokens]`. No flip.
+
+*Stage 1 — vision branch.* Qwen2.5-VL-3B frozen; branch = per-layer copies of
+q/k/v/o, MLP, both RMSNorms and the final norm, **initialised from the MLLM's weights**
+`[paper §3.2; upstream add_vision_* creates them randomly — the copy is ours, required by
+the paper]`; plus mask token, learnable position embedding and linear head. Mask ratio ~
+truncated N(1.0, 0.25) on [0.7, 1.0], random order `[paper §3.2]`; MSE over all 64
+positions `[upstream forward]`. AdamW, lr 5e-4, 5k warmup `[upstream path name]`, batch
+128 `[upstream path name t2i128]`, 16 epochs `[paper §5.1]`, bf16.
+
+*Stage 2 — latent ControlNet.* `FluxControlNetModel.from_transformer` with 4 double +
+1 single blocks; Qwen latents enter through upstream's `NHWCUpsampleBlock` (2x
+transposed conv: the 8x8 bridge grid -> FLUX's 16x16 token grid) and a zero-initialised
+linear `[upstream controlnet_flux.py]`, sized for 2048-d instead of upstream's hardcoded
+3584 (7B) `[forced by 3B]`. Trained on ground-truth Qwen latents (decoupled training
+`[paper §3.3]`), loss = MSE(v, noise − x0), logit-normal timesteps (0, 1), guidance
+input 3.5, AdamW lr 5e-6, betas (0.9, 0.999), wd 1e-2, eps 1e-8, grad clip 1.0, constant
+lr with 500 warmup steps, T5 at 512 tokens `[diffusers defaults, paper §4]`, batch 48
+`[paper §4]`, 2 epochs `[paper §5.1]`. **One ControlNet serves both arms**: both bridges
+emit latents in the same Qwen space, so the renderer is held fixed and only the bridge
+differs.
+
+*Sampling.* MAR decoding with one step per token (64), cosine schedule, random order
+`[upstream inference]`; FLUX 28 steps, ControlNet scale 0.7, guidance 3.5 `[paper §4]`;
+10,000 samples with classes uniform over 1,000 `[paper §5.1]`; scored against the ADM
+ImageNet-256 reference batch (FID, sFID, IS).
+
 **Faithfulness gate.** Our retrained Bifrost-1 must reach FID <= 30.9 (within 20% of
 25.77). If it does not, the baseline is not faithful and no comparison is reported until
 it is fixed.
