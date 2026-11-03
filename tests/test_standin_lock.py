@@ -9,7 +9,8 @@ import pytest
 BUILD = {
     "DummyMLLMBackbone": "from adarq_flow.mllm import DummyMLLMBackbone as C; C(32, 1, 2)",
     "DummyCLIPEncoder": "from adarq_flow.tokenizer import DummyCLIPEncoder as C; C(16, 4)",
-    "DummyFluxBackbone": "from adarq_flow.renderer import DummyFluxBackbone as C; C(8, 16, 1, 2, 4)",
+    "DummyFluxBackbone": ("from adarq_flow.renderer import DummyFluxBackbone as C; "
+                          "C(8, 16, 1, 2, 4)"),
     "DummyImageTextDataset": "from adarq_flow.data import DummyImageTextDataset as C; C(4)",
     "tiny_cpu tokenizer": ("from adarq_flow.config import get_preset; "
                            "from adarq_flow.tokenizer import build_tokenizer; "
