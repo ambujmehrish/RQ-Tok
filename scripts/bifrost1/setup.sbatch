@@ -98,13 +98,18 @@ python -m pip install -q --index-url "$TORCH_INDEX" torch==2.5.1 torchvision==0.
 # av. A4: protobuf is UNPINNED upstream and today resolves to a release whose runtime
 # rejects the generated code in the pinned sentencepiece 0.1.99 ("Descriptors cannot be
 # created directly"), which breaks FLUX's T5 tokenizer; protobuf 3.20.3 is pinned (allowed
-# by every Google package in the list). Any OTHER uninstallable pin still fails the job.
+# by every Google package in the list). The also-unpinned google-api-core and
+# googleapis-common-protos are pinned to their March-2025 releases (2.24.2 / 1.69.2), the
+# upstream requirements' era, which accept protobuf 3.20.3 — newer ones require >= 4.25.8.
+# Any OTHER uninstallable pin still fails the job.
 REQ="$BIFROST_ROOT/requirements.resolved.txt"
 sed -e 's/^av==14\.3\.0$/av==14.2.0/' -e 's/^protobuf$/protobuf==3.20.3/' \
+    -e 's/^google-api-core$/google-api-core==2.24.2/' \
+    -e 's/^googleapis-common-protos$/googleapis-common-protos==1.69.2/' \
     "$CODE/requirements.txt" > "$REQ"
 diff "$CODE/requirements.txt" "$REQ" || true          # print every substitution made
-[ "$(diff "$CODE/requirements.txt" "$REQ" | grep -c '^>')" -eq 2 ] \
-  || die "expected exactly two substituted pins (av, protobuf); requirements.txt changed upstream?"
+[ "$(diff "$CODE/requirements.txt" "$REQ" | grep -c '^>')" -eq 4 ] \
+  || die "expected exactly four substituted pins (A3/A4); requirements.txt changed upstream?"
 python -m pip install -q --only-binary=av -r "$REQ" \
     -c <(printf 'torch==2.5.1\ntorchvision==0.20.1\ntorchaudio==2.5.1\n')
 python - <<'PY'
@@ -172,7 +177,7 @@ json.dump({
         "A1": "bifrost/models/mar/utils.py missing upstream; sample_orders reproduced from MAR",
         "A2": "DPG-Bench prompts missing upstream; taken from TencentQQGYLab/ELLA",
         "A3": "av==14.3.0 removed from PyPI; av==14.2.0 (nearest cp311 wheel) installed; av is not imported upstream",
-        "A4": "protobuf unpinned upstream; pinned to 3.20.3 (newer protobuf rejects sentencepiece 0.1.99 pb2, breaking the T5 tokenizer)",
+        "A4": "protobuf unpinned upstream; pinned to 3.20.3 (newer protobuf rejects sentencepiece 0.1.99 pb2, breaking the T5 tokenizer); google-api-core 2.24.2 and googleapis-common-protos 1.69.2 pinned to match",
     },
 }, open(sys.argv[1], "w"), indent=2)
 PY
