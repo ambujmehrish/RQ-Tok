@@ -60,13 +60,30 @@ commit=$(git -C "$BIFROST_CODE" rev-parse HEAD)
 grep -q "\"upstream_commit\": \"$commit\"" "$BIFROST_ROOT/PROVENANCE.json" \
   || die "code checkout $commit does not match PROVENANCE.json"
 
-OUT="${OUT:-$BIFROST_ROOT/outputs/${BENCH}_${SLURM_JOB_ID:-local}}"
+# --- optional sharding (a benchmark that cannot finish inside the 24 h limit) ----------
+# Upstream reads its prompts from evaluation/... RELATIVE TO THE WORKING DIRECTORY and
+# imports bifrost/ from the script's own directory. A shard therefore runs the unmodified
+# script from a work dir holding a contiguous slice of the official prompt files. FLUX is
+# re-seeded with the same seed for every prompt, so slicing changes no image.
+NSHARDS="${NSHARDS:-1}"; SHARD="${SHARD:-0}"
+[ "$SHARD" -ge 0 ] && [ "$SHARD" -lt "$NSHARDS" ] || die "need 0 <= SHARD < NSHARDS"
+if [ "$NSHARDS" -gt 1 ]; then
+  OUT="${OUT:-$BIFROST_ROOT/outputs/${BENCH}_shard${SHARD}of${NSHARDS}_${SLURM_JOB_ID:-local}}"
+else
+  OUT="${OUT:-$BIFROST_ROOT/outputs/${BENCH}_${SLURM_JOB_ID:-local}}"
+fi
 mkdir -p "$OUT"
-echo "### $BENCH on $(hostname) ($gpu), upstream $commit -> $OUT"
+RUN_DIR="$BIFROST_CODE"
+if [ "$NSHARDS" -gt 1 ]; then
+  RUN_DIR="$OUT/workdir"
+  EXPECT=$(python "$REPO/scripts/bifrost1/shard_prompts.py" "$BENCH" "$BIFROST_CODE" \
+             "$RUN_DIR" "$SHARD" "$NSHARDS")
+  cp "$RUN_DIR/shard.json" "$OUT/shard.json"
+fi
+echo "### $BENCH shard $SHARD/$NSHARDS ($EXPECT prompts) on $(hostname) ($gpu), upstream $commit -> $OUT"
 date
 
-# upstream reads prompts via paths relative to its repo root
-( cd "$BIFROST_CODE" && python inference_geneval_dpgbench.py "${FLAGS[@]}" \
+( cd "$RUN_DIR" && python "$BIFROST_CODE/inference_geneval_dpgbench.py" "${FLAGS[@]}" \
     --output_dir "$OUT" --local_checkpoint_path "$BIFROST_CKPT" )
 
 # --- completeness: the benchmark must be fully covered, or the score is not comparable --

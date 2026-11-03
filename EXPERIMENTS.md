@@ -68,6 +68,11 @@ Deviations from upstream, each forced by a missing file and kept minimal:
   `protobuf==3.20.3` is pinned, with the also-unpinned `google-api-core==2.24.2` and
   `googleapis-common-protos==1.69.2` (March 2025, the upstream era) that accept it.
 Upstream NumPy RNG is unseeded, so decoding orders vary run to run; reported as-is.
+A benchmark that cannot finish inside the 24 h job limit is generated in shards: the
+unmodified script runs from a work dir holding a contiguous slice of the official
+prompt files (`scripts/bifrost1/shard_prompts.py`), and `merge_shards.py` rebuilds
+the full layout, checking every GenEval folder against the official metadata line.
+FLUX is re-seeded with the same seed for every prompt, so sharding changes no image.
 
 **Scoring stacks are calibrated before use.** GenEval (`djghosh13/geneval` @ `af4902f`,
 mmdetection 2.x @ `e9cae2d`, Mask2Former Swin-S + CLIP ViT-L-14) is run with its own
