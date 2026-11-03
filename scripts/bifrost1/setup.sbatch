@@ -95,12 +95,16 @@ python -m pip install -q --index-url "$TORCH_INDEX" torch==2.5.1 torchvision==0.
 # listed here explicitly (never silently). av 14.3.0 has no files left on PyPI and 14.4.0
 # ships no Python 3.11 wheel (it would compile against a system FFmpeg the nodes lack);
 # 14.2.0 is the nearest release with a cp311 manylinux wheel. No upstream code imports
-# av. Any OTHER uninstallable pin still fails the job.
+# av. A4: protobuf is UNPINNED upstream and today resolves to a release whose runtime
+# rejects the generated code in the pinned sentencepiece 0.1.99 ("Descriptors cannot be
+# created directly"), which breaks FLUX's T5 tokenizer; protobuf 3.20.3 is pinned (allowed
+# by every Google package in the list). Any OTHER uninstallable pin still fails the job.
 REQ="$BIFROST_ROOT/requirements.resolved.txt"
-sed -e 's/^av==14\.3\.0$/av==14.2.0/' "$CODE/requirements.txt" > "$REQ"
+sed -e 's/^av==14\.3\.0$/av==14.2.0/' -e 's/^protobuf$/protobuf==3.20.3/' \
+    "$CODE/requirements.txt" > "$REQ"
 diff "$CODE/requirements.txt" "$REQ" || true          # print every substitution made
-[ "$(diff "$CODE/requirements.txt" "$REQ" | grep -c '^>')" -eq 1 ] \
-  || die "expected exactly one substituted pin (av); requirements.txt changed upstream?"
+[ "$(diff "$CODE/requirements.txt" "$REQ" | grep -c '^>')" -eq 2 ] \
+  || die "expected exactly two substituted pins (av, protobuf); requirements.txt changed upstream?"
 python -m pip install -q --only-binary=av -r "$REQ" \
     -c <(printf 'torch==2.5.1\ntorchvision==0.20.1\ntorchaudio==2.5.1\n')
 python - <<'PY'
@@ -168,6 +172,7 @@ json.dump({
         "A1": "bifrost/models/mar/utils.py missing upstream; sample_orders reproduced from MAR",
         "A2": "DPG-Bench prompts missing upstream; taken from TencentQQGYLab/ELLA",
         "A3": "av==14.3.0 removed from PyPI; av==14.2.0 (nearest cp311 wheel) installed; av is not imported upstream",
+        "A4": "protobuf unpinned upstream; pinned to 3.20.3 (newer protobuf rejects sentencepiece 0.1.99 pb2, breaking the T5 tokenizer)",
     },
 }, open(sys.argv[1], "w"), indent=2)
 PY

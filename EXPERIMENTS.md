@@ -63,6 +63,9 @@ Deviations from upstream, each forced by a missing file and kept minimal:
 - **A3** `av==14.3.0` in upstream `requirements.txt` no longer has files on PyPI, and
   14.4.0 has no Python 3.11 wheel; `av==14.2.0`, the nearest release with one, is
   installed instead. No upstream code imports `av`.
+- **A4** `protobuf` is unpinned upstream and today resolves to a release that rejects the
+  generated code in the pinned `sentencepiece==0.1.99`, breaking FLUX's T5 tokenizer;
+  `protobuf==3.20.3` is pinned.
 Upstream NumPy RNG is unseeded, so decoding orders vary run to run; reported as-is.
 
 **Scoring stacks are calibrated before use.** GenEval (`djghosh13/geneval` @ `af4902f`,
