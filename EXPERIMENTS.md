@@ -73,8 +73,20 @@ rebuilt with torch 2.0.1+cu118 and mmcv-full 1.7.1 compiled for sm_90, all other
 Because the stack changed, it must first reproduce GenEval's published Stable Diffusion
 v1.5 score (0.43, regenerated with GenEval's own generator and defaults) within ±0.02;
 until that passes, no GenEval number is reported (`scripts/bench/geneval_score.sbatch
-CALIBRATE=1`). DPG-Bench (ELLA's `compute_dpg_bench.py`, mPLUG-large VQA) follows the
-same rule against its published SD v1.5 score.
+CALIBRATE=1`).
+
+DPG-Bench uses ELLA's own scorer (`TencentQQGYLab/ELLA` @ `3c228f1`, mPLUG-large judge),
+imported unmodified. Its requirements are unpinned and today resolve to versions that
+cannot load mPLUG, so the environment is a lock file verified to run the judge correctly
+(`scripts/bench/dpg_requirements.lock.txt`: modelscope 1.13.3, transformers 4.38.2,
+datasets 2.18.0, fairseq 0.12.2 — the benchmark's release era; torch 2.5.1+cu124).
+Deviation **D1**: ModelScope 1.13 can no longer download from today's hub, so mPLUG is
+downloaded by a current ModelScope CLI and loaded from disk; nothing else changes. The
+scorer silently skips images that raise, so every run must score all 1065 grids or fail.
+Calibration: SD v1.5 must reproduce ELLA's published 63.18 (Table 4) within ±2.0 —
+wider than GenEval's band because ELLA does not publish its SD v1.5 sampling settings
+(diffusers defaults: 512 px, 50 steps, guidance 7.5). Bifrost-1's own DPG grids are scored
+exactly as its script saves them (2x2 grid with 2-px padding, scored at 512-px tiles).
 
 ### Level B — controlled head-to-head (paper §5.1, ImageNet 256 x 256)
 

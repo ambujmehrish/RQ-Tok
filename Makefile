@@ -1,4 +1,4 @@
-.PHONY: install lint type test check fmt clean ablations smoke prefetch e0 vhpc-setup vhpc-env vhpc-prefetch bifrost1-setup bifrost1-geneval bifrost1-dpg geneval-setup geneval-calibrate
+.PHONY: install lint type test check fmt clean ablations smoke prefetch e0 vhpc-setup vhpc-env vhpc-prefetch bifrost1-setup bifrost1-geneval bifrost1-dpg geneval-setup geneval-calibrate dpg-setup dpg-calibrate
 
 install:
 	pip install -e ".[dev,torch]"
@@ -59,3 +59,7 @@ geneval-setup:      # official GenEval evaluator + Mask2Former, built for sm_90 
 	sbatch --qos=gpulongjobs scripts/bench/geneval_setup.sbatch
 geneval-calibrate:  # must reproduce SD v1.5 = 0.43 +- 0.02 before scoring any model
 	sbatch --qos=gpulongjobs --export=ALL,CALIBRATE=1 scripts/bench/geneval_score.sbatch
+dpg-setup:          # ELLA's DPG-Bench scorer + mPLUG-large, verified lock file (D1)
+	sbatch --qos=gpulongjobs scripts/bench/dpg_setup.sbatch
+dpg-calibrate:      # must reproduce SD v1.5 = 63.18 +- 2.0 before scoring any model
+	sbatch --qos=gpulongjobs --export=ALL,CALIBRATE=1 scripts/bench/dpg_score.sbatch
