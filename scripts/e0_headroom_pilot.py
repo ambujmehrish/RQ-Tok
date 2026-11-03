@@ -1,22 +1,17 @@
 #!/usr/bin/env python3
-"""E0 — headroom pilot (EXPERIMENTS.md §E0). Go / no-go for the rate-allocation thesis.
+"""E0 — headroom pilot (EXPERIMENTS.md E0). A PRE-FLIGHT CHECK, not a decision.
 
 Measures how much distortion a *perfect* allocator could save over a uniform one at the
-SAME mean rate, and whether that saving requires content-awareness (oracle vs random).
+SAME mean rate, and whether that saving needs content-awareness (oracle vs random), on
+REAL CLIP patch latents from real images:
 
-    python scripts/e0_headroom_pilot.py --regime both
+    python scripts/e0_headroom_pilot.py --latents L.pt                 # latent L2
+    python scripts/e0_headroom_pilot.py --latents L8.pt --downstream   # CLIP-tower suffix
 
-Regimes
--------
-`homogeneous`   i.i.d. latents — every patch is statistically identical. There is no
-                content structure to exploit, so a correct harness MUST report ~zero
-                headroom here. This is the harness's own negative control: if it shows
-                a gain on homogeneous data, the measurement is broken, not the thesis.
-`heterogeneous` patch complexity varies (a mixture of tight and diffuse clusters), which
-                is the property real images are assumed to have.
-
-The number that decides the project must come from **real CLIP latents** (`--latents`);
-synthetic regimes only validate the instrument and bound what to expect.
+Real data only: ``--latents`` is required and must carry a ``.meta.json`` marking it
+``"synthetic": false``. The quantizer is fitted on one set of images and scored on
+held-out images (ISSUES.md F17). Results are pilot signals; the thesis is decided only
+by the trained system on the held-out test set.
 """
 
 from __future__ import annotations
@@ -43,32 +38,7 @@ from adarq_flow.eval import (
     prefix_errors,
     prefix_zhat,
 )
-from adarq_flow.tokenizer import (
-    AdaptiveResidualQuantizer,
-    build_tokenizer,
-    fit_tokenizer,
-)
-
-
-def synth_homogeneous(m: int, d: int, g: torch.Generator) -> torch.Tensor:
-    """Every patch drawn from one isotropic Gaussian: no per-patch complexity structure."""
-    return torch.randn(m, d, generator=g)
-
-
-def synth_heterogeneous(m: int, d: int, g: torch.Generator,
-                        n_clusters: int = 16) -> torch.Tensor:
-    """Patches differ in how well a codeword can describe them.
-
-    Half the clusters are tight (a code captures them almost exactly -> extra depth is
-    wasted), half are diffuse (extra depth keeps paying). That heterogeneity is exactly
-    what a rate allocator is supposed to exploit.
-    """
-    centers = torch.randn(n_clusters, d, generator=g) * 3.0
-    spread = torch.where(torch.arange(n_clusters) < n_clusters // 2,
-                         torch.full((n_clusters,), 0.02),
-                         torch.full((n_clusters,), 1.5))
-    assign = torch.randint(n_clusters, (m,), generator=g)
-    return centers[assign] + spread[assign].unsqueeze(1) * torch.randn(m, d, generator=g)
+from adarq_flow.tokenizer import AdaptiveResidualQuantizer
 
 
 def run(name: str, latents: torch.Tensor, preset: str, fit_steps: int,
@@ -86,22 +56,19 @@ def run(name: str, latents: torch.Tensor, preset: str, fit_steps: int,
     cfg = dataclasses.replace(cfg, tokenizer=dataclasses.replace(
         cfg.tokenizer, include_zero_code=zero_code))
     torch.manual_seed(seed)
-    if real_data:
-        # Build ONLY the quantizer: real latents are supplied directly, so no image
-        # encoder is needed and no development stand-in is constructed at all.
-        q = AdaptiveResidualQuantizer(cfg.tokenizer)
-        gen = torch.Generator(device=latents.device).manual_seed(seed)
-        q.train()
-        for _ in range(fit_steps):
-            idx = torch.randint(latents.shape[0], (min(128, latents.shape[0]),),
-                                generator=gen, device=latents.device)
-            q(latents[idx], update_codebook=True)
-        q.eval()
-    else:
-        tok = build_tokenizer(cfg)
-        fit_tokenizer(tok, latents, steps=fit_steps, batch_size=128, seed=seed)
-        q = tok.quantizer
-    if real_data and eval_latents is None:
+    if not real_data:
+        raise ValueError("E0 runs on real latents only")
+    # Build ONLY the quantizer: real latents are supplied directly, so no image encoder
+    # is needed and no development stand-in is constructed at all.
+    q = AdaptiveResidualQuantizer(cfg.tokenizer)
+    gen = torch.Generator(device=latents.device).manual_seed(seed)
+    q.train()
+    for _ in range(fit_steps):
+        idx = torch.randint(latents.shape[0], (min(128, latents.shape[0]),),
+                            generator=gen, device=latents.device)
+        q(latents[idx], update_codebook=True)
+    q.eval()
+    if eval_latents is None:
         raise ValueError("real-data E0 needs held-out eval_latents (ISSUES.md F17)")
     fit_set = latents
     latents = eval_latents if eval_latents is not None else latents
@@ -238,13 +205,9 @@ def run_downstream(latents_path: str, ctx_path: str, preset: str, fit_steps: int
 
 def main() -> None:
     ap = argparse.ArgumentParser(description="E0 headroom pilot")
-    ap.add_argument("--regime", default="both",
-                    choices=["homogeneous", "heterogeneous", "both"])
-    ap.add_argument("--latents", default=None,
-                    help="path to a .pt tensor of REAL CLIP patch latents [M, d] "
-                         "(the only input whose verdict counts)")
-    ap.add_argument("--preset", default="tiny_cpu")
-    ap.add_argument("--patches", type=int, default=4096)
+    ap.add_argument("--latents", required=True,
+                    help="REAL CLIP patch latents [M, d] from extract_clip_latents.py")
+    ap.add_argument("--preset", default="clip_b32")
     ap.add_argument("--fit-steps", type=int, default=400)
     ap.add_argument("--mean-depth", type=float, default=None,
                     help="rate all policies are held to (default: the threshold rule's "
@@ -271,12 +234,17 @@ def main() -> None:
                          "quantizer harming itself at deeper levels")
     args = ap.parse_args()
 
+    import json
+
     dim = get_preset(args.preset).tokenizer.clip_dim
-    g = torch.Generator().manual_seed(args.seed)
+    meta_path = pathlib.Path(args.latents + ".meta.json")
+    if not meta_path.exists():
+        raise SystemExit(f"{meta_path} missing: cannot prove {args.latents} is real data")
+    meta = json.loads(meta_path.read_text())
+    if meta.get("synthetic") is not False:
+        raise SystemExit(f"{args.latents} is not marked as real latents (synthetic != false)")
 
     if args.downstream:
-        if not args.latents:
-            raise SystemExit("--downstream requires --latents (extracted with --layer)")
         ctx_path = args.ctx or (args.latents + ".ctx.pt")
         if not pathlib.Path(ctx_path).exists():
             raise SystemExit(
@@ -291,42 +259,22 @@ def main() -> None:
                        fit_fraction=args.fit_fraction)
         return
 
-    if args.latents:
-        z = torch.load(args.latents, map_location="cpu", weights_only=True)
-        if z.dim() == 3:
-            z = z.reshape(-1, z.size(-1))
-        if z.size(-1) != dim:
-            raise ValueError(f"latents have dim {z.size(-1)}, preset expects {dim}")
-        import json
-        meta_path = pathlib.Path(args.latents + ".meta.json")
-        if not meta_path.exists():
-            raise SystemExit(f"{meta_path} missing: image boundaries are needed to hold "
-                             "out whole images")
-        meta = json.loads(meta_path.read_text())
-        b, n = int(meta["num_images"]), int(meta["patches_per_image"])
-        if z.shape[0] != b * n:
-            raise ValueError(f"{z.shape[0]} latents != {b} images x {n} patches")
-        n_fit = int(b * args.fit_fraction)
-        if not 0 < n_fit < b:
-            raise ValueError(f"--fit-fraction {args.fit_fraction} leaves no fit or eval set")
-        print(f"  {n_fit} images fit the quantizer, {b - n_fit} held-out images are scored")
-        run("real latents (held-out images)", z[: n_fit * n], args.preset,
-            args.fit_steps, args.mean_depth, args.seed, real_data=True,
-            zero_code=not args.no_zero_code, json_out=args.json_out,
-            eval_latents=z[n_fit * n:])
-        return
-
-    if args.regime in ("homogeneous", "both"):
-        run("homogeneous (harness control — expect ~0 headroom)",
-            synth_homogeneous(args.patches, dim, g), args.preset, args.fit_steps,
-            args.mean_depth, args.seed, zero_code=not args.no_zero_code)
-    if args.regime in ("heterogeneous", "both"):
-        run("heterogeneous (structured — headroom should appear)",
-            synth_heterogeneous(args.patches, dim, g), args.preset, args.fit_steps,
-            args.mean_depth, args.seed, zero_code=not args.no_zero_code)
-
-    print("\nNOTE: synthetic regimes validate the instrument only. The go/no-go verdict "
-          "\nrequires real CLIP patch latents via --latents.")
+    z = torch.load(args.latents, map_location="cpu", weights_only=True)
+    if z.dim() == 3:
+        z = z.reshape(-1, z.size(-1))
+    if z.size(-1) != dim:
+        raise ValueError(f"latents have dim {z.size(-1)}, preset expects {dim}")
+    b, n = int(meta["num_images"]), int(meta["patches_per_image"])
+    if z.shape[0] != b * n:
+        raise ValueError(f"{z.shape[0]} latents != {b} images x {n} patches")
+    n_fit = int(b * args.fit_fraction)
+    if not 0 < n_fit < b:
+        raise ValueError(f"--fit-fraction {args.fit_fraction} leaves no fit or eval set")
+    print(f"  {n_fit} images fit the quantizer, {b - n_fit} held-out images are scored")
+    run("real latents (held-out images)", z[: n_fit * n], args.preset,
+        args.fit_steps, args.mean_depth, args.seed, real_data=True,
+        zero_code=not args.no_zero_code, json_out=args.json_out,
+        eval_latents=z[n_fit * n:])
 
 
 if __name__ == "__main__":

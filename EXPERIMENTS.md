@@ -60,6 +60,8 @@ Deviations from upstream, each forced by a missing file and kept minimal:
   upstream); `random_masking` is unused at inference and raises if called.
 - **A2** DPG-Bench prompts are not shipped; taken from the benchmark's own repo
   (`TencentQQGYLab/ELLA` @ `3c228f1`, 1065 prompts).
+- **A3** `av==14.3.0` in upstream `requirements.txt` no longer has files on PyPI;
+  `av==14.4.0` is installed instead. No upstream code imports `av`.
 Upstream NumPy RNG is unseeded, so decoding orders vary run to run; reported as-is.
 
 **Scoring stacks are calibrated before use.** GenEval (`djghosh13/geneval` @ `af4902f`,

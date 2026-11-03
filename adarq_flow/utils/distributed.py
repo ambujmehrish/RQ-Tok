@@ -117,7 +117,7 @@ def setup_distributed(backend: str = "nccl", init_timeout_min: int = 30) -> Dist
         raise RuntimeError(
             "Distributed run (world_size>1) is missing MASTER_ADDR/MASTER_PORT. "
             "Under torchrun these are set automatically; under SLURM, export them in "
-            "your sbatch script (see scripts/cineca_leonardo_4xA100.sbatch)."
+            "your sbatch script."
         )
 
     device = _select_device(backend, local_rank, allow_cpu=(backend == "gloo"))

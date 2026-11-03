@@ -20,7 +20,7 @@ check: lint type test
 
 ablations:
 	python -c "from adarq_flow.eval import dump_ablation_configs; \
-		print(dump_ablation_configs('configs/ablations', base='base_gpu'))"
+		print(dump_ablation_configs('configs/ablations', base='configs/experiment.yaml'))"
 
 clean:
 	rm -rf checkpoints/ .pytest_cache .mypy_cache .ruff_cache

@@ -139,7 +139,7 @@ distribution. The finite code vocabulary makes this gap small by construction.
 
 ### 5.1 Multi-GPU / distributed execution
 
-Target hardware: a single **Cineca Leonardo Booster** node = **4× A100-64GB**, SLURM.
+Target hardware: **vhpc01**, SLURM, three **H200** GPUs on three separate nodes (vhpc13/14/15, one each). Runs use one H200 each; cross-node DDP is possible but not required by the Bifrost-1 protocol (which the paper ran on one GH200).
 Topology (rank / world_size / local_rank) is read from the launcher env (`torchrun` or
 SLURM `srun`) — never hard-coded (`adarq_flow/utils/distributed.py`). Defaults
 (`DistConfig`): **DDP**, NCCL backend.
@@ -158,9 +158,8 @@ SLURM `srun`) — never hard-coded (`adarq_flow/utils/distributed.py`). Defaults
   (DDP/FSDP broadcast params from rank 0).
 - **Fail-loud:** a multi-rank world missing `MASTER_ADDR/PORT`, or NCCL without CUDA,
   raises immediately — no silent single-GPU fallback.
-- **Launch:** `scripts/cineca_leonardo_4xA100.sbatch` (sbatch → `srun`, 1 task/GPU) drives
-  `scripts/train_tokenizer_ddp.py` (Stage-0 + plumbing validation today; Phase-4 stage
-  trainers use the same launch path).
+- **Launch:** `torchrun`/`srun` drive `scripts/train_tokenizer_ddp.py`, a distributed
+  check of the Stage-0 quantizer on REAL latents only (no synthetic mode).
 
 ## 6. Inference
 

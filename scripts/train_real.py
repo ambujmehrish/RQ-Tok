@@ -95,6 +95,9 @@ def main() -> None:
             cfg, train=dataclasses.replace(cfg.train, max_steps=args.max_steps))
     cfg = dataclasses.replace(
         cfg, train=dataclasses.replace(cfg.train, stage=args.stage, dataset="coco"))
+    if cfg.train.run_mode != "experiment":
+        raise SystemExit(f"{args.config} has run_mode={cfg.train.run_mode!r}; real runs "
+                         "require run_mode='experiment' (no development stand-ins)")
     cfg.validate_run_mode()          # refuses any remaining stand-in
 
     print(f"[real] config={args.config} stage={args.stage}", flush=True)

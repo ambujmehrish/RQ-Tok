@@ -91,7 +91,15 @@ conda activate "$ENV_NAME"
 python -m pip install -q --upgrade pip
 # torch 2.5.1 as pinned upstream, from the CUDA 12.4 index (H200 = sm_90)
 python -m pip install -q --index-url "$TORCH_INDEX" torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1
-python -m pip install -q -r "$CODE/requirements.txt" \
+# A3: pins that no longer exist on PyPI are replaced by the nearest release, listed
+# here explicitly (never silently). av 14.3.0 has no files left on PyPI; no upstream
+# code imports av. Any OTHER unavailable pin still fails the job.
+REQ="$BIFROST_ROOT/requirements.resolved.txt"
+sed -e 's/^av==14\.3\.0$/av==14.4.0/' "$CODE/requirements.txt" > "$REQ"
+diff "$CODE/requirements.txt" "$REQ" || true          # print every substitution made
+[ "$(diff "$CODE/requirements.txt" "$REQ" | grep -c '^>')" -eq 1 ] \
+  || die "expected exactly one substituted pin (av); requirements.txt changed upstream?"
+python -m pip install -q -r "$REQ" \
     -c <(printf 'torch==2.5.1\ntorchvision==0.20.1\ntorchaudio==2.5.1\n')
 python - <<'PY'
 import torch, transformers, diffusers
@@ -157,6 +165,7 @@ json.dump({
     "deviations": {
         "A1": "bifrost/models/mar/utils.py missing upstream; sample_orders reproduced from MAR",
         "A2": "DPG-Bench prompts missing upstream; taken from TencentQQGYLab/ELLA",
+        "A3": "av==14.3.0 removed from PyPI; av==14.4.0 installed (not imported upstream)",
     },
 }, open(sys.argv[1], "w"), indent=2)
 PY

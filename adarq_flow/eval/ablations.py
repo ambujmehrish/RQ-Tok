@@ -31,15 +31,28 @@ def _with(cfg: AdaRQFlowConfig, **sub_overrides) -> AdaRQFlowConfig:
     return dataclasses.replace(cfg, **kwargs)
 
 
+def _load_base(base: str) -> tuple[AdaRQFlowConfig, str]:
+    """``base`` is a preset name or a YAML path (e.g. ``configs/experiment.yaml``)."""
+    if base.endswith((".yaml", ".yml")):
+        cfg = AdaRQFlowConfig.from_yaml(base)
+        return cfg, os.path.splitext(os.path.basename(base))[0]
+    return get_preset(base), base
+
+
 def ablation_configs(base: str = "tiny_cpu") -> dict[str, AdaRQFlowConfig]:
-    """Named ablation variants derived from ``base`` (named accordingly)."""
-    b = get_preset(base)
+    """Named ablation variants derived from ``base`` (named accordingly).
+
+    Every variant inherits ``base``'s components and run_mode, and each one is checked
+    with ``validate_run_mode``: deriving from ``configs/experiment.yaml`` yields
+    experiment-mode ablations with no development stand-ins.
+    """
+    b, tag = _load_base(base)
     out: dict[str, AdaRQFlowConfig] = {
-        "baseline": dataclasses.replace(b, name=f"{base}-baseline")
+        "baseline": dataclasses.replace(b, name=f"{tag}-baseline")
     }
 
     def add(name: str, **ov):
-        out[name] = _with(dataclasses.replace(b, name=f"{base}-{name}"), **ov)
+        out[name] = _with(dataclasses.replace(b, name=f"{tag}-{name}"), **ov)
 
     # --- Interface factorial: {discrete codes on/off} x {distributional/mean objective}
     # This 2x2 is what separates "codes help" from "the distributional objective helps".
@@ -61,7 +74,11 @@ def ablation_configs(base: str = "tiny_cpu") -> dict[str, AdaRQFlowConfig]:
     # --- Bridge capacity controls.
     add("codebook_16", **{"tokenizer.codebook_size": 16})
     add("codebook_256", **{"tokenizer.codebook_size": 256})
-    add("per_depth_codebook", **{"tokenizer.shared_codebook": False})
+    # toggle AWAY from the base value; a variant equal to the baseline is a no-op
+    if b.tokenizer.shared_codebook:
+        add("per_depth_codebook", **{"tokenizer.shared_codebook": False})
+    else:
+        add("shared_codebook", **{"tokenizer.shared_codebook": True})
     add("discrete_only", **{"mllm.flow_residual_head": False})
 
     # --- Guidance (only meaningful with a discrete interface).
@@ -70,6 +87,13 @@ def ablation_configs(base: str = "tiny_cpu") -> dict[str, AdaRQFlowConfig]:
 
     # --- Renderer conditioning distribution.
     add("no_exposure_fix", **{"renderer.train_on_dequantized": False})
+
+    ref = dataclasses.replace(out["baseline"], name="")
+    for name, cfg in out.items():
+        cfg.validate_run_mode()
+        if name != "baseline" and dataclasses.replace(cfg, name="") == ref:
+            raise ValueError(f"ablation {name!r} is identical to the baseline for base "
+                             f"{base!r}: it would measure nothing")
     return out
 
 

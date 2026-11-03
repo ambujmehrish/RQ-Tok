@@ -117,11 +117,15 @@ out = model.generate(text, tok.dequantize, cfg_scale=3.0)
 
 Decoupled training (Stage 0 tokenizer → A branch → B renderer), distributed-aware:
 
+Real data only. Every training run goes through `scripts/train_real.py` with a
+`run_mode: experiment` config (real Qwen2.5-VL, real FLUX.1-dev, real images + captions);
+the old development CLI (`python -m adarq_flow.training.train`) refuses to run, since it
+could only train on the dummy dataset. Jobs run on vhpc01 H200s via SLURM.
+
 ```bash
-python -m adarq_flow.training.train --preset tiny_cpu --stage tokenizer   # Stage 0
-python -m adarq_flow.training.train --preset tiny_cpu --stage branch      # Stage A
-python -m adarq_flow.training.train --preset tiny_cpu --stage renderer    # Stage B
-# multi-GPU (4x A100, Cineca Leonardo): sbatch scripts/cineca_leonardo_4xA100.sbatch
+python scripts/train_real.py --config configs/experiment.yaml --stage tokenizer   # Stage 0
+python scripts/train_real.py --config configs/experiment.yaml --stage branch      # Stage A
+python scripts/train_real.py --config configs/experiment.yaml --stage renderer    # Stage B
 ```
 
 End-to-end inference and the tokenizer reconstruction-vs-depth ablation:
