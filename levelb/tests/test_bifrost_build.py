@@ -52,7 +52,8 @@ def test_branch_is_initialised_from_mllm(model):
     for layer in lm.layers:
         att = layer.self_attn
         for name in ("q_proj", "k_proj", "v_proj", "o_proj"):
-            assert torch.equal(getattr(att, f"vision_branch_{name}").weight, getattr(att, name).weight)
+            branch = getattr(att, f"vision_branch_{name}")
+            assert torch.equal(branch.weight, getattr(att, name).weight)
         for a, b in zip(layer.vision_branch_mlp.parameters(), layer.mlp.parameters(), strict=True):
             assert torch.equal(a, b)
         assert torch.equal(layer.vision_branch_input_layernorm.weight, layer.input_layernorm.weight)
