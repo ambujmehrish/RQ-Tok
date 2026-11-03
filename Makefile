@@ -1,4 +1,4 @@
-.PHONY: install lint type test check fmt clean ablations smoke prefetch e0 vhpc-setup vhpc-env vhpc-prefetch
+.PHONY: install lint type test check fmt clean ablations smoke prefetch e0 vhpc-setup vhpc-env vhpc-prefetch bifrost1-setup bifrost1-geneval bifrost1-dpg
 
 install:
 	pip install -e ".[dev,torch]"
@@ -45,3 +45,11 @@ vhpc-env:        # step 2: build + verify the conda env on an H200
 	sbatch scripts/vhpc01_env.sbatch
 vhpc-prefetch:   # step 3: fetch models + data (needs ADARQ_CACHE and compute egress)
 	sbatch scripts/vhpc01_prefetch.sbatch
+
+# --- Bifrost-1 reference (Level A): official code + released checkpoint ------------------
+bifrost1-setup:    # pinned upstream code, its own env, checkpoint, DPG-Bench prompts
+	sbatch --qos=gpulongjobs scripts/bifrost1/setup.sbatch
+bifrost1-geneval:  # official generation on the 553 GenEval prompts
+	sbatch --qos=gpulongjobs --export=ALL,BENCH=geneval scripts/bifrost1/generate.sbatch
+bifrost1-dpg:      # official generation on the 1065 DPG-Bench prompts
+	sbatch --qos=gpulongjobs --export=ALL,BENCH=dpgbench scripts/bifrost1/generate.sbatch

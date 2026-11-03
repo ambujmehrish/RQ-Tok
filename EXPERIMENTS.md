@@ -33,6 +33,72 @@ do at *any* hyperparameter. These are pass/fail, not effect sizes.
 
 ---
 
+## Protocol — follow Bifrost-1 exactly (decided 2026-11)
+
+The baseline is **Bifrost-1** (Lin et al., arXiv 2508.05954, NeurIPS 2025), run under its
+own experimental protocol. Conclusions are drawn **only** from held-out test-set results;
+pilots (E0) decide nothing.
+
+**What upstream released.** Code: `github.com/HL-hanlin/Bifrost-1` @ `3047de2` — inference
+only (GenEval / DPG-Bench generation); no training code, data pipeline or ImageNet setup.
+Weights: `hanlincs/Bifrost-1` — the Table 3 model (Qwen2.5-VL-7B, 256 visual tokens at
+448 px, linear head, MSE, latent ControlNet with 4 double + 1 single FLUX.1-dev blocks).
+
+### Level A — reference reproduction (released checkpoint, official script)
+
+`scripts/bifrost1/setup.sbatch` then `scripts/bifrost1/generate.sbatch` (one H200 each).
+Generation uses upstream defaults unchanged: seed 42, 4 images per prompt, MAR decoding
+with one step per token (256), cosine mask schedule, `cfg_weight` 1.0, FLUX 28 steps,
+ControlNet scale 0.7, guidance 3.5, 512 x 512 output. Targets (paper Table 3, 7B):
+**GenEval 0.81, DPG-Bench 77.67, COCO-30k FID 34.35, MJHQ-30k FID 16.21.**
+This anchors our evaluation stack; it is *not* a head-to-head (62M training images,
+16 GB200 — not reproducible on 3 H200).
+
+Deviations from upstream, each forced by a missing file and kept minimal:
+- **A1** `bifrost/models/mar/utils.py` is imported but not shipped. `sample_orders` is
+  reproduced from MAR (one random permutation per sample, NumPy global RNG, unseeded as
+  upstream); `random_masking` is unused at inference and raises if called.
+- **A2** DPG-Bench prompts are not shipped; taken from the benchmark's own repo
+  (`TencentQQGYLab/ELLA` @ `3c228f1`, 1065 prompts).
+Upstream NumPy RNG is unseeded, so decoding orders vary run to run; reported as-is.
+
+### Level B — controlled head-to-head (paper §5.1, ImageNet 256 x 256)
+
+The protocol the paper ran on a single GH200, which a single H200 matches. Both arms use
+identical backbones, data, epochs and evaluation; only the bridge differs.
+
+| item | Bifrost-1 (retrained by us) | AdaRQ-Flow |
+|---|---|---|
+| MLLM | Qwen2.5-VL-3B, frozen, + trainable vision branch (LMFusion copy of QKV/MLP/norms) | same |
+| bridge | 64 continuous CLIP latents (224 px -> 8x8 post-merger), linear head, **MSE** | adaptive RVQ codes + flow-matching residual |
+| masking | MAR, ratio ~ truncated N(1.0, 0.25) on [0.7, 1.0] | same |
+| renderer | latent ControlNet (4 double + 1 single), FLUX.1-dev frozen, flow-matching loss | same |
+| epochs | vision branch 16, ControlNet 2 | same |
+| decoding | 64 steps (one per token), random order | same step budget |
+| FLUX inference | 28 steps, scale 0.7, guidance 3.5 | same |
+| test | 10K samples, classes uniform over 1k; FID / sFID / IS | same |
+
+Paper reference for the baseline: **FID 25.77, sFID 53.67, IS 98.57** (Table 1).
+
+Values the paper does not state, fixed **before** training and identical for both arms:
+Qwen size (3B: a trainable 7B branch with Adam does not fit 141 GB; upstream's own
+checkpoint paths name a `QwenVL3B ... 224res_64tokens` run); vision-branch optimizer
+(upstream paths name `lr5e4_warm5k_step50k`); batch size; ImageNet class prompt; FID
+reference statistics (ADM ImageNet-256 reference batch, as in MAR/xAR which the paper
+follows). Each is recorded here, with its source, before the first training run.
+
+**Faithfulness gate.** Our retrained Bifrost-1 must reach FID <= 30.9 (within 20% of
+25.77). If it does not, the baseline is not faithful and no comparison is reported until
+it is fixed.
+
+**Decision rule.** Validation: a fixed 10K-image slice held out from ImageNet train, used
+only for checkpoint selection. Test: the 10K-sample FID/sFID/IS evaluation, run once per
+final checkpoint, 3 sampling seeds. AdaRQ-Flow is reported better only if FID improves by
+>= 10% relative **and** by more than 2 sigma over the seeds (R1); anything else is
+reported as no improvement. Marginal gains are not claimed.
+
+---
+
 ## E0 — Headroom pilot. **Pre-flight check, NOT a decision gate.**
 
 *Scope decision (2026-11):* E0 runs on CLIP ViT-B/32 at 224 px (49 patches) — a small
