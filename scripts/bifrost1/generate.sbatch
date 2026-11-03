@@ -21,7 +21,9 @@
 #SBATCH --ntasks=1
 #SBATCH --gres=gpu:h200:1
 #SBATCH --cpus-per-task=4
-#SBATCH --mem=96G
+#SBATCH --mem=180G
+# upstream loads FLUX (12B), T5 and the ControlNet in fp32 on the CPU before casting;
+# 96G was not enough headroom. vhpc13-15 have 200 GB each, one GPU each.
 #SBATCH --time=24:00:00
 #SBATCH --output=logs/%x-%j.out
 #SBATCH --error=logs/%x-%j.out
@@ -46,7 +48,11 @@ source "$BIFROST_ROOT/bifrost1_env.sh"
 # shellcheck disable=SC1090
 source "$HOME/miniforge3/etc/profile.d/conda.sh"
 conda activate "$BIFROST_ENV"
-[ "${HF_HUB_OFFLINE:-0}" = "1" ] || die "bifrost1_env.sh must set HF_HUB_OFFLINE=1"
+# diffusers 0.33.1 (pinned upstream) calls the Hub API to list the shards of a sharded
+# checkpoint even when every file is cached, so FLUX.1-dev cannot load with
+# HF_HUB_OFFLINE=1. The compute nodes have internet; the run goes online and the exact
+# revisions it resolved are recorded in RUN.json below.
+export HF_HUB_OFFLINE=0 TRANSFORMERS_OFFLINE=0
 
 gpu=$(nvidia-smi --query-gpu=name --format=csv,noheader 2>/dev/null | head -1 || true)
 [[ "$gpu" == *H200* ]] || die "expected an H200, got '${gpu:-no GPU}'"
@@ -75,8 +81,13 @@ else
 fi
 python - "$OUT/RUN.json" "$BENCH" "$commit" "$gpu" <<'PY'
 import json, sys, socket, time
+from huggingface_hub import HfApi
 out, bench, commit, gpu = sys.argv[1:]
+api = HfApi()
+revisions = {r: api.model_info(r).sha for r in
+             ("black-forest-labs/FLUX.1-dev", "Qwen/Qwen2.5-VL-7B-Instruct")}
 json.dump({"bench": bench, "upstream_commit": commit, "gpu": gpu,
+           "backbone_revisions": revisions,
            "host": socket.gethostname(), "finished": time.strftime("%F %T")},
           open(out, "w"), indent=2)
 PY
