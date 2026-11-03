@@ -62,6 +62,17 @@ Deviations from upstream, each forced by a missing file and kept minimal:
   (`TencentQQGYLab/ELLA` @ `3c228f1`, 1065 prompts).
 Upstream NumPy RNG is unseeded, so decoding orders vary run to run; reported as-is.
 
+**Scoring stacks are calibrated before use.** GenEval (`djghosh13/geneval` @ `af4902f`,
+mmdetection 2.x @ `e9cae2d`, Mask2Former Swin-S + CLIP ViT-L-14) is run with its own
+evaluator and thresholds. Deviation **E1**: its environment pins PyTorch 1.12 / CUDA 11.3,
+which cannot target the H200 (sm_90), and the evaluator asserts CUDA; the scorer is
+rebuilt with torch 2.0.1+cu118 and mmcv-full 1.7.1 compiled for sm_90, all other pins kept.
+Because the stack changed, it must first reproduce GenEval's published Stable Diffusion
+v1.5 score (0.43, regenerated with GenEval's own generator and defaults) within ±0.02;
+until that passes, no GenEval number is reported (`scripts/bench/geneval_score.sbatch
+CALIBRATE=1`). DPG-Bench (ELLA's `compute_dpg_bench.py`, mPLUG-large VQA) follows the
+same rule against its published SD v1.5 score.
+
 ### Level B — controlled head-to-head (paper §5.1, ImageNet 256 x 256)
 
 The protocol the paper ran on a single GH200, which a single H200 matches. Both arms use

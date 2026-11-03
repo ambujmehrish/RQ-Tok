@@ -1,4 +1,4 @@
-.PHONY: install lint type test check fmt clean ablations smoke prefetch e0 vhpc-setup vhpc-env vhpc-prefetch bifrost1-setup bifrost1-geneval bifrost1-dpg
+.PHONY: install lint type test check fmt clean ablations smoke prefetch e0 vhpc-setup vhpc-env vhpc-prefetch bifrost1-setup bifrost1-geneval bifrost1-dpg geneval-setup geneval-calibrate
 
 install:
 	pip install -e ".[dev,torch]"
@@ -53,3 +53,9 @@ bifrost1-geneval:  # official generation on the 553 GenEval prompts
 	sbatch --qos=gpulongjobs --export=ALL,BENCH=geneval scripts/bifrost1/generate.sbatch
 bifrost1-dpg:      # official generation on the 1065 DPG-Bench prompts
 	sbatch --qos=gpulongjobs --export=ALL,BENCH=dpgbench scripts/bifrost1/generate.sbatch
+
+# --- benchmark scorers (calibrated before any model is scored) --------------------------
+geneval-setup:      # official GenEval evaluator + Mask2Former, built for sm_90 (E1)
+	sbatch --qos=gpulongjobs scripts/bench/geneval_setup.sbatch
+geneval-calibrate:  # must reproduce SD v1.5 = 0.43 +- 0.02 before scoring any model
+	sbatch --qos=gpulongjobs --export=ALL,CALIBRATE=1 scripts/bench/geneval_score.sbatch
