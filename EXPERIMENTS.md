@@ -134,7 +134,7 @@ because upstream released no trainer. AdaRQ-Flow uses the same modules and chang
 the bridge (head + loss + sampler), so the comparison isolates the bridge.
 
 *Data.* ImageNet-1k train `[paper §4]`; a fixed, seeded 10,000-image slice of train is
-held out for checkpoint selection only `[ours]`. Prompt = the first English name of the
+held out for monitoring only `[ours]`. Prompt = the first English name of the
 class from the dataset's `classes.py` `[ours: unstated]`. Image: resize short side to
 256 (bilinear) + centre crop 256 → FLUX VAE input `[diffusers train_controlnet_flux.py]`;
 the same crop resized to 224 → Qwen2.5-VL visual tower → 8x8 = 64 post-merger latents of
@@ -149,8 +149,13 @@ q/k/v/o, MLP, both RMSNorms and the final norm, **initialised from the MLLM's we
 `[paper §3.2; upstream add_vision_* creates them randomly — the copy is ours, required by
 the paper]`; plus mask token, learnable position embedding and linear head. Mask ratio ~
 truncated N(1.0, 0.25) on [0.7, 1.0], random order `[paper §3.2]`; MSE over all 64
-positions `[upstream forward]`. AdamW, lr 5e-4, 5k warmup `[upstream path name]`, batch
-128 `[upstream path name t2i128]`, 16 epochs `[paper §5.1]`, bf16.
+positions `[upstream forward]`. lr 5e-4, 5k warmup `[upstream path name]`, batch
+128 `[upstream path name t2i128]`, 16 epochs `[paper §5.1]`; optimiser and schedule are
+the HF `Trainer` defaults implied by upstream's `TrainingArguments`: AdamW (0.9, 0.999),
+eps 1e-8, no weight decay, linear decay after warmup, grad-norm clip 1.0, bf16 autocast
+`[upstream uses transformers.TrainingArguments]`. The held-out slice is evaluated (fixed
+subset, fixed masks) for monitoring only; the test uses the FINAL checkpoint at the fixed
+budget, the same rule for both arms, so held-out data cannot favour either.
 
 *Stage 2 — latent ControlNet.* `FluxControlNetModel.from_transformer` with 4 double +
 1 single blocks; Qwen latents enter through upstream's `NHWCUpsampleBlock` (2x
