@@ -35,7 +35,9 @@ BENCH_ROOT="${BENCH_ROOT:-$HOME/work/bench}"
 source "$BENCH_ROOT/dpg_env.sh"
 # shellcheck disable=SC1090
 source "$HOME/miniforge3/etc/profile.d/conda.sh"
+set +u   # conda's activate.d/deactivate.d scripts read unset variables; nounset off for conda only
 conda activate "$DPG_ENV"
+set -u
 gpu=$(nvidia-smi --query-gpu=name --format=csv,noheader 2>/dev/null | head -1 || true)
 [[ "$gpu" == *H200* ]] || die "expected an H200, got '${gpu:-no GPU}'"
 [ "$(git -C "$ELLA_CODE" rev-parse HEAD)" = "$ELLA_COMMIT" ] || die "ELLA checkout moved"

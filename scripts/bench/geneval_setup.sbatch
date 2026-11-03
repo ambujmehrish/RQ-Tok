@@ -58,6 +58,7 @@ git -C "$M" fetch -q origin 2.x && git -C "$M" checkout -q "$MMDET_COMMIT"
 step "env '$ENV_NAME' (python 3.9 as upstream; torch 2.0.1+cu118 for sm_90 — E1)"
 # shellcheck disable=SC1090
 source "$HOME/miniforge3/etc/profile.d/conda.sh"
+set +u   # conda's activate.d/deactivate.d scripts read unset variables; nounset off for conda only
 conda env list | awk '{print $1}' | grep -qx "$ENV_NAME" \
   || conda create -y -q -n "$ENV_NAME" python=3.9
 conda activate "$ENV_NAME"
@@ -67,6 +68,7 @@ export CUDA_HOME="$CONDA_PREFIX"
 # nvcc 11.8 accepts host compilers up to gcc 11; the nodes' system gcc is newer. Use
 # conda-forge gcc/g++ 11 rather than -allow-unsupported-compiler (risk of bad kernels).
 conda install -y -q -c conda-forge "gcc_linux-64=11" "gxx_linux-64=11"
+set -u
 export CC="$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-gcc"
 export CXX="$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-g++"
 export CUDAHOSTCXX="$CXX"

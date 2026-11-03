@@ -55,9 +55,11 @@ n=$(find "$E/dpg_bench/prompts" -name '*.txt' | wc -l)
 step "env '$ENV_NAME' (python 3.10, verified lock + torch 2.5.1+cu124)"
 # shellcheck disable=SC1090
 source "$HOME/miniforge3/etc/profile.d/conda.sh"
+set +u   # conda's activate.d/deactivate.d scripts read unset variables; nounset off for conda only
 conda env list | awk '{print $1}' | grep -qx "$ENV_NAME" \
   || conda create -y -q -n "$ENV_NAME" python=3.10
 conda activate "$ENV_NAME"
+set -u
 # fairseq 0.12.2 depends on omegaconf 2.0.x, whose metadata pip >= 24.1 rejects
 python -m pip install -q "pip<24.1"
 python -m pip install -q --index-url https://download.pytorch.org/whl/cu124 \

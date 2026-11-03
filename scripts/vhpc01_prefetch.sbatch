@@ -32,7 +32,9 @@ cd "${SLURM_SUBMIT_DIR:-$PWD}"
 : "${ADARQ_CACHE:?set ADARQ_CACHE, e.g. ADARQ_CACHE=\$HOME/work/adarq-cache sbatch ...}"
 
 source "$HOME/miniforge3/etc/profile.d/conda.sh"
+set +u   # conda's activate.d/deactivate.d scripts read unset variables; nounset off for conda only
 conda activate "${ENV_NAME:-adarq}"
+set -u
 
 # Fail in seconds, not after a long timeout, if this node has no egress.
 code=$(curl -sS -o /dev/null -m 20 -w '%{http_code}' https://huggingface.co 2>/dev/null || true)

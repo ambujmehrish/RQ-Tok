@@ -56,6 +56,7 @@ CONDA_SH="$HOME/miniforge3/etc/profile.d/conda.sh"
 [ -f "$CONDA_SH" ] || { echo "no conda.sh at $CONDA_SH" >&2; exit 1; }
 # shellcheck disable=SC1090
 source "$CONDA_SH"
+set +u   # conda's activate.d/deactivate.d scripts read unset variables; nounset off for conda only
 
 if conda env list | awk '{print $1}' | grep -qx "$ENV_NAME"; then
   echo "### env '$ENV_NAME' exists — updating in place"
@@ -64,6 +65,7 @@ else
   conda create -y -n "$ENV_NAME" "python=$PY_VER"
 fi
 conda activate "$ENV_NAME"
+set -u
 python -VV
 
 # --- deps --------------------------------------------------------------------------

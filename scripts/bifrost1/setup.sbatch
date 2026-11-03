@@ -85,9 +85,11 @@ echo "  DPG-Bench prompts: $n_dpg   GenEval prompts: $n_gen"
 step "conda env '$ENV_NAME' from upstream requirements.txt"
 # shellcheck disable=SC1090
 source "$HOME/miniforge3/etc/profile.d/conda.sh"
+set +u   # conda's activate.d/deactivate.d scripts read unset variables; nounset off for conda only
 conda env list | awk '{print $1}' | grep -qx "$ENV_NAME" \
   || conda create -y -q -n "$ENV_NAME" python=3.11
 conda activate "$ENV_NAME"
+set -u
 python -m pip install -q --upgrade pip
 # torch 2.5.1 as pinned upstream, from the CUDA 12.4 index (H200 = sm_90)
 python -m pip install -q --index-url "$TORCH_INDEX" torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1

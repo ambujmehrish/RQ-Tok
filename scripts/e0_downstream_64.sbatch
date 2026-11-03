@@ -61,7 +61,9 @@ CONDA_SH="$HOME/miniforge3/etc/profile.d/conda.sh"
 [ -f "$CONDA_SH" ] || die "no conda at $CONDA_SH (run scripts/vhpc01_env.sbatch first)"
 # shellcheck disable=SC1090
 source "$CONDA_SH"
+set +u   # conda's activate.d/deactivate.d scripts read unset variables; nounset off for conda only
 conda activate "${ENV_NAME:-adarq}"
+set -u
 [ -f "$ADARQ_CACHE/adarq_env.sh" ] || die "$ADARQ_CACHE/adarq_env.sh missing — run \
 scripts/prefetch_assets.sh first (or set ADARQ_CACHE)"
 # shellcheck disable=SC1091

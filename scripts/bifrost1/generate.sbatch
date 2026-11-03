@@ -47,7 +47,9 @@ BIFROST_ROOT="${BIFROST_ROOT:-$HOME/work/bifrost1}"
 source "$BIFROST_ROOT/bifrost1_env.sh"
 # shellcheck disable=SC1090
 source "$HOME/miniforge3/etc/profile.d/conda.sh"
+set +u   # conda's activate.d/deactivate.d scripts read unset variables; nounset off for conda only
 conda activate "$BIFROST_ENV"
+set -u
 # diffusers 0.33.1 (pinned upstream) calls the Hub API to list the shards of a sharded
 # checkpoint even when every file is cached, so FLUX.1-dev cannot load with
 # HF_HUB_OFFLINE=1. The compute nodes have internet; the run goes online and the exact
