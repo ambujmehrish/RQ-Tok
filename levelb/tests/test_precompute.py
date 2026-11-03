@@ -40,7 +40,8 @@ def tiny_imagenet(tmp_path_factory):
     for shard, rows in enumerate([[0, 1], [2]]):
         blobs = [_jpeg(*sizes[i], seed=i) for i in rows]
         table = pa.table({
-            "image": pa.array([{"bytes": b, "path": f"{i}.jpg"} for i, b in zip(rows, blobs, strict=True)]),
+            "image": pa.array([{"bytes": b, "path": f"{i}.jpg"}
+                               for i, b in zip(rows, blobs, strict=True)]),
             "label": pa.array([7 * i for i in rows], type=pa.int64())})
         pq.write_table(table, root / "data" / f"train-{shard:05d}-of-00002.parquet")
     return root, [_jpeg(*s, seed=i) for i, s in enumerate(sizes)]
