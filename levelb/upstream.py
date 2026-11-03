@@ -38,3 +38,13 @@ def require_official_model(name: str) -> None:
         return
     raise SystemExit(f"{name!r} is not an official Qwen2.5-VL checkpoint {OFFICIAL_VLMS}; "
                      "real runs use the real model only")
+
+
+OFFICIAL_FLUX = ("black-forest-labs/FLUX.1-dev",)
+
+
+def require_official_flux(name: str) -> None:
+    """Real runs use FLUX.1-dev only; tiny fixtures are for the unit tests."""
+    if name in OFFICIAL_FLUX or os.environ.get("ADARQ_ALLOW_STAND_INS") == "1":
+        return
+    raise SystemExit(f"{name!r} is not {OFFICIAL_FLUX[0]}; real runs use the real model only")

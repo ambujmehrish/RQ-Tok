@@ -165,7 +165,13 @@ linear `[upstream controlnet_flux.py]`, sized for 2048-d instead of upstream's h
 `[paper §3.3]`), loss = MSE(v, noise − x0), logit-normal timesteps (0, 1), guidance
 input 3.5, AdamW lr 5e-6, betas (0.9, 0.999), wd 1e-2, eps 1e-8, grad clip 1.0, constant
 lr with 500 warmup steps, T5 at 512 tokens `[diffusers defaults, paper §4]`, batch 48
-`[paper §4]`, 2 epochs `[paper §5.1]`. **One ControlNet serves both arms**: both bridges
+`[paper §4]`, 2 epochs `[paper §5.1]`. Notes on the diffusers defaults: its
+`get_scheduler("constant")` ignores the 500 warmup steps, so the lr is constant from step 0;
+its loss is unweighted (logit-normal only samples timesteps); `mixed_precision` is bf16 with
+an fp32 ControlNet (accelerate's behaviour); gradient checkpointing is on (memory only).
+The 1000 class prompts are encoded once with FLUX's own `encode_prompt` (frozen encoders,
+so exact). The builder refuses if FLUX has fewer blocks than requested, since upstream's
+`strict=False` copy would otherwise leave them random. **One ControlNet serves both arms**: both bridges
 emit latents in the same Qwen space, so the renderer is held fixed and only the bridge
 differs.
 
