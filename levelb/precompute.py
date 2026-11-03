@@ -31,7 +31,7 @@ import torch
 from PIL import Image
 
 from . import imagenet as inet
-from .upstream import add_upstream_to_path
+from .upstream import add_upstream_to_path, require_official_model
 
 TOKENS = (inet.QWEN_RES // 28) ** 2     # 14-px patches, 2x2 merge: 224 px -> 8x8 = 64
 
@@ -69,6 +69,7 @@ def main() -> None:
     ap.add_argument("--expect-total", type=int, default=inet.NUM_TRAIN,
                     help="total train rows the shards must contain")
     args = ap.parse_args()
+    require_official_model(args.vlm)
 
     import pyarrow.parquet as pq
 

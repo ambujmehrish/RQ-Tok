@@ -24,3 +24,17 @@ def add_upstream_to_path(code_dir: str | None = None) -> pathlib.Path:
     if str(code) not in sys.path:
         sys.path.insert(0, str(code))
     return code
+
+
+OFFICIAL_VLMS = ("Qwen/Qwen2.5-VL-3B-Instruct", "Qwen/Qwen2.5-VL-7B-Instruct")
+
+
+def require_official_model(name: str) -> None:
+    """Real runs load the official Qwen2.5-VL checkpoints only. A local or tiny model path
+    is accepted solely inside the unit tests (ADARQ_ALLOW_STAND_INS=1, set by conftest)."""
+    if name in OFFICIAL_VLMS:
+        return
+    if os.environ.get("ADARQ_ALLOW_STAND_INS") == "1":
+        return
+    raise SystemExit(f"{name!r} is not an official Qwen2.5-VL checkpoint {OFFICIAL_VLMS}; "
+                     "real runs use the real model only")

@@ -13,6 +13,7 @@ import torch
 from torch import Tensor, nn
 
 from ..config import MLLMConfig
+from ..standins import require_test_context
 from .layers import SelfBlock, causal_mask
 
 QWEN_HINT = "(Qwen/Qwen2.5-VL-*, Qwen/Qwen2-VL-*)"
@@ -24,6 +25,7 @@ class DummyMLLMBackbone(nn.Module):
     def __init__(self, hidden_dim: int, num_layers: int, num_heads: int,
                  vocab_size: int = 256, max_tokens: int = 64) -> None:
         super().__init__()
+        require_test_context("DummyMLLMBackbone")
         self.hidden_dim = hidden_dim
         self.num_layers = num_layers
         self.num_heads = num_heads

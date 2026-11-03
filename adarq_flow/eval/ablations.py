@@ -39,7 +39,7 @@ def _load_base(base: str) -> tuple[AdaRQFlowConfig, str]:
     return get_preset(base), base
 
 
-def ablation_configs(base: str = "tiny_cpu") -> dict[str, AdaRQFlowConfig]:
+def ablation_configs(base: str) -> dict[str, AdaRQFlowConfig]:
     """Named ablation variants derived from ``base`` (named accordingly).
 
     Every variant inherits ``base``'s components and run_mode, and each one is checked
@@ -97,7 +97,7 @@ def ablation_configs(base: str = "tiny_cpu") -> dict[str, AdaRQFlowConfig]:
     return out
 
 
-def dump_ablation_configs(out_dir: str, base: str = "tiny_cpu") -> list[str]:
+def dump_ablation_configs(out_dir: str, base: str) -> list[str]:
     """Write every ablation config to ``out_dir/<name>.yaml``; returns the paths."""
     os.makedirs(out_dir, exist_ok=True)
     paths = []

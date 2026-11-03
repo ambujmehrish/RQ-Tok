@@ -31,6 +31,7 @@ import torch
 
 from . import bifrost_build as bb
 from .precompute import read_latents
+from .upstream import require_official_model
 
 _STOP = {"flag": False}
 
@@ -119,6 +120,8 @@ def main() -> None:
                     help="stop after this many steps in THIS run (resumable); the schedule "
                          "still spans the full budget")
     args = ap.parse_args()
+    require_official_model(args.vlm)
+    require_official_model(args.processor)
 
     signal.signal(signal.SIGTERM, _on_signal)
     signal.signal(signal.SIGUSR1, _on_signal)

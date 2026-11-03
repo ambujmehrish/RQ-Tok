@@ -17,6 +17,7 @@ import torch
 from torch import Tensor, nn
 
 from ..config import TokenizerConfig
+from ..standins import require_test_context
 
 
 class DummyCLIPEncoder(nn.Module):
@@ -30,6 +31,7 @@ class DummyCLIPEncoder(nn.Module):
 
     def __init__(self, clip_dim: int, num_patches: int, in_channels: int = 3) -> None:
         super().__init__()
+        require_test_context("DummyCLIPEncoder")
         side = int(round(math.sqrt(num_patches)))
         if side * side != num_patches:
             raise ValueError(

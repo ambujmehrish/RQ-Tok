@@ -59,59 +59,27 @@ adarq_flow/
   eval/            # FID/sFID/IS, rFID/SSIM/PSNR/LPIPS, GenEval, DPG-Bench
   data/            # ImageNet / BLIP3-o loaders
   utils/
-configs/           # tiny_cpu.yaml, base_gpu.yaml
-tests/
+configs/           # experiment.yaml + ablations/ (all real models, real data)
+levelb/            # Level B: Bifrost-1 protocol on ImageNet-256 (upstream modules)
+scripts/           # SLURM jobs for vhpc01 (H200 only)
+tests/             # unit tests; tests/fixtures/configs holds the dev-only configs
 ```
 
-## Quickstart (dev)
+## Real models and real data only
+
+Development stand-ins (dummy MLLM, dummy CLIP encoder, dummy FLUX DiT, dummy dataset) and
+tiny random checkpoints exist **only for the unit tests**. Their constructors call
+`adarq_flow.standins.require_test_context`, which raises unless `ADARQ_ALLOW_STAND_INS=1`
+— set solely by `tests/conftest.py` and `levelb/tests/conftest.py`. No script, job or
+notebook can build one. Real runs use `configs/experiment.yaml` (`run_mode: experiment`,
+which additionally rejects any stand-in id) or the Level B jobs, which accept only the
+official Qwen2.5-VL checkpoints.
 
 ```bash
-pip install -e ".[dev]"                          # config/scaffold tests, no torch
-pip install -e ".[dev,torch]"                    # also run the tokenizer (Phase 1) tests
-pytest -q                                         # tokenizer tests auto-skip without torch
-python -m adarq_flow.config --print tiny_cpu   # inspect a config preset
+pip install -e ".[dev,torch]"
+pytest -q                                    # unit tests (the only place stand-ins exist)
+python -m adarq_flow.config --print qwen2_5_vl_3b   # inspect a real config preset
 ```
-
-The adaptive RVQ-CLIP tokenizer (Phase 1) runs on CPU:
-
-```python
-import torch
-from adarq_flow.config import get_preset
-from adarq_flow.tokenizer import build_tokenizer, fit_tokenizer
-
-tok = build_tokenizer(get_preset("tiny_cpu"))
-z   = tok.encode(torch.randn(8, 3, 8, 8))   # frozen dummy CLIP -> patch latents
-fit_tokenizer(tok, z, steps=200)            # Stage-0 EMA codebook fit
-out = tok.tokenize(torch.randn(8, 3, 8, 8)) # adaptive RVQ codes + halt depths + residual
-```
-
-The MLLM vision-generation branch + hybrid head (Phase 2) also runs on CPU:
-
-```python
-from adarq_flow.config import get_preset
-from adarq_flow.tokenizer import build_tokenizer
-from adarq_flow.mllm import build_vision_gen_model
-
-cfg = get_preset("tiny_cpu")
-tok = build_tokenizer(cfg)
-model = build_vision_gen_model(cfg)            # frozen (dummy) MLLM + trainable branch
-
-z  = tok.encode(torch.randn(2, 3, 8, 8))       # CLIP latents
-qo = tok(z, update_codebook=False)             # RVQ codes / depths / residual / prefix
-B, N, D, d = 2, cfg.tokenizer.num_patches, cfg.tokenizer.max_depth, cfg.tokenizer.clip_dim
-text = torch.randint(0, 256, (B, 5))
-
-# MAR masked training: cross-entropy (codes + <halt>) + flow-matching (residual)
-loss = model.compute_loss(text, qo.codes.reshape(B, N, D),
-                          qo.res.reshape(B, N, d), qo.zhat.reshape(B, N, d))
-
-# MaskGIT decode (CFG) + flow residual sampling -> latents for the renderer (Phase 3)
-out = model.generate(text, tok.dequantize, cfg_scale=3.0)
-```
-
-> The dummy MLLM backbone and dummy CLIP encoder are CPU development stand-ins; they
-> are replaced by the real frozen **Qwen2.5-VL** and its CLIP visual tower after the
-> final development phase (see `DESIGN.md` §9). All other code is unchanged by that swap.
 
 ## Training, inference, eval
 
@@ -128,25 +96,11 @@ python scripts/train_real.py --config configs/experiment.yaml --stage branch    
 python scripts/train_real.py --config configs/experiment.yaml --stage renderer    # Stage B
 ```
 
-End-to-end inference and the tokenizer reconstruction-vs-depth ablation:
+Generation for experiments runs through the Level B sampler (real Qwen2.5-VL and
+FLUX.1-dev, real class prompts); the old demo CLI (`python -m adarq_flow.inference.generate`)
+refuses to run, since it only ran the dummy preset on random token ids.
 
-```python
-import torch
-from adarq_flow.config import get_preset
-from adarq_flow.inference import build_pipeline
-from adarq_flow.tokenizer import build_tokenizer, fit_tokenizer
-from adarq_flow.eval import evaluate_tokenizer
-
-cfg = get_preset("tiny_cpu")
-pipe = build_pipeline(cfg)
-out = pipe.generate(torch.randint(0, 256, (2, 5)), cfg_scale=3.0)   # codes -> image latents
-
-tok = build_tokenizer(cfg); z = tok.encode(torch.randn(64, 3, 8, 8))
-fit_tokenizer(tok, z, steps=200)
-report = evaluate_tokenizer(tok, z)        # recon MSE/PSNR, mean depth, depth curve, perplexity
-```
-
-Ablation configs are in `configs/ablations/` and are runnable via `--config`. They include
+Ablation configs are in `configs/ablations/`, all derived from `configs/experiment.yaml` (real models, real data), and are run via `scripts/train_real.py --config`. They include
 the **{codes on/off} × {flow/mse} factorial** used to separate "discrete codes help" from
 "the distributional objective helps", at identical head capacity. Every ablation is guarded
 by `tests/test_ablations_effective.py`, which asserts the mechanism is actually removed —
@@ -165,14 +119,12 @@ CI (`.github/workflows/ci.yml`) runs ruff, mypy, and the CPU test suite (incl. t
 
 ## Status — read before citing any number
 
-The architecture is implemented and its **mechanics** are verified on CPU stand-ins
-(ruff + mypy clean, 102 tests). That is all it establishes.
-
-- **No quantitative claim is currently supported.** The renderer stage regresses toward a
-  randomly-initialized projection and the dummy dataset has zero image↔text mutual
-  information, so loss curves from this configuration measure optimizer plumbing, not
-  generative quality. See [`ISSUES.md`](ISSUES.md) (B1–B6, BLOCKING).
-- **Remaining for real results:** swap the dummy MLLM/CLIP/FLUX stand-ins for the real
-  frozen models, wire real datasets and external metrics, then run
-  [`EXPERIMENTS.md`](EXPERIMENTS.md) **E0** — the go/no-go headroom pilot for the central
-  thesis.
+- **No quantitative claim is supported yet.** The thesis is decided only by the trained
+  system on held-out test data under Bifrost-1's own protocol (`EXPERIMENTS.md`,
+  "Protocol"): Level A reproduces the released Bifrost-1 checkpoint with its official
+  script; Level B retrains Bifrost-1 and trains AdaRQ-Flow on ImageNet-256 with identical
+  backbones, data and evaluation. E0 is a pre-flight pilot and decides nothing.
+- **Everything that runs uses real models and real data**: Qwen2.5-VL, FLUX.1-dev,
+  ImageNet-1k / COCO, the benchmarks' own prompts and scorers. Stand-ins are confined to
+  the unit tests by a hard lock (see above). Open blockers are tracked in
+  [`ISSUES.md`](ISSUES.md).

@@ -75,7 +75,8 @@ def test_unknown_key_rejected():
 
 @pytest.mark.parametrize("fname", ["tiny_cpu.yaml", "base_gpu.yaml"])
 def test_yaml_configs_load(fname):
-    path = os.path.join(CONFIG_DIR, fname)
+    # development configs live with the tests, not in configs/ (stand-ins are test-only)
+    path = os.path.join(os.path.dirname(__file__), "fixtures", "configs", fname)
     cfg = AdaRQFlowConfig.from_yaml(path)
     assert isinstance(cfg, AdaRQFlowConfig)
     # YAML matches the corresponding preset.

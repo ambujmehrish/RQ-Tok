@@ -16,6 +16,7 @@ from torch import Tensor, nn
 
 from ..config import RendererConfig
 from ..mllm.layers import SelfBlock, TimeEmbedding
+from ..standins import require_test_context
 
 
 class DummyFluxBackbone(nn.Module):
@@ -24,6 +25,7 @@ class DummyFluxBackbone(nn.Module):
     def __init__(self, latent_dim: int, model_dim: int, num_blocks: int,
                  num_heads: int, num_tokens: int) -> None:
         super().__init__()
+        require_test_context("DummyFluxBackbone")
         if num_blocks < 1:
             raise ValueError(f"num_blocks must be >= 1, got {num_blocks}")
         self.latent_dim = latent_dim

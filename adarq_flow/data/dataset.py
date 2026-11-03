@@ -12,6 +12,7 @@ from torch import Tensor
 from torch.utils.data import DataLoader, Dataset
 
 from ..config import AdaRQFlowConfig
+from ..standins import require_test_context
 
 
 class DummyImageTextDataset(Dataset):
@@ -19,6 +20,7 @@ class DummyImageTextDataset(Dataset):
 
     def __init__(self, length: int = 256, image_size: int = 8, channels: int = 3,
                  text_len: int = 8, vocab: int = 256, seed: int = 0) -> None:
+        require_test_context("DummyImageTextDataset")
         if length < 1:
             raise ValueError(f"length must be >= 1, got {length}")
         self.length = length
