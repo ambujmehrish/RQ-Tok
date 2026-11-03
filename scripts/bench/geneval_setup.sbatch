@@ -64,6 +64,14 @@ conda activate "$ENV_NAME"
 # nvcc + headers to compile mmcv's CUDA ops for sm_90
 conda install -y -q -c "nvidia/label/cuda-11.8.0" cuda-toolkit
 export CUDA_HOME="$CONDA_PREFIX"
+# nvcc 11.8 accepts host compilers up to gcc 11; the nodes' system gcc is newer. Use
+# conda-forge gcc/g++ 11 rather than -allow-unsupported-compiler (risk of bad kernels).
+conda install -y -q -c conda-forge "gcc_linux-64=11" "gxx_linux-64=11"
+export CC="$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-gcc"
+export CXX="$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-g++"
+export CUDAHOSTCXX="$CXX"
+"$CC" --version | head -1
+"$CC" -dumpversion | grep -q '^11' || die "host compiler is not gcc 11"
 python -m pip install -q --upgrade "pip<24.1"
 python -m pip install -q --index-url https://download.pytorch.org/whl/cu118 \
     torch==2.0.1 torchvision==0.15.2
