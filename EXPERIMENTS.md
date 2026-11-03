@@ -69,7 +69,11 @@ Upstream NumPy RNG is unseeded, so decoding orders vary run to run; reported as-
 mmdetection 2.x @ `e9cae2d`, Mask2Former Swin-S + CLIP ViT-L-14) is run with its own
 evaluator and thresholds. Deviation **E1**: its environment pins PyTorch 1.12 / CUDA 11.3,
 which cannot target the H200 (sm_90), and the evaluator asserts CUDA; the scorer is
-rebuilt with torch 2.0.1+cu118 and mmcv-full 1.7.1 compiled for sm_90, all other pins kept.
+rebuilt with torch 2.0.1+cu118 and mmcv-full 1.7.1 compiled for sm_90. Only the
+packages the evaluator imports are installed, at GenEval's own pins
+(`scripts/bench/geneval_requirements.txt`); `clip-benchmark` 1.4.0 declares torch<2 and
+is installed without its dependency check (its zero-shot colour classifier was verified
+on torch 2.0); `pytorch-lightning` 1.9.5 replaces 1.4.2 for the calibration generator.
 Because the stack changed, it must first reproduce GenEval's published Stable Diffusion
 v1.5 score (0.43, regenerated with GenEval's own generator and defaults) within ±0.02;
 until that passes, no GenEval number is reported (`scripts/bench/geneval_score.sbatch

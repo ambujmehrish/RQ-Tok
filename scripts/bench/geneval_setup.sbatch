@@ -69,15 +69,13 @@ python -m pip install -q --index-url https://download.pytorch.org/whl/cu118 \
     torch==2.0.1 torchvision==0.15.2
 TORCH_PIN='torch==2.0.1
 torchvision==0.15.2'
-# GenEval's own pins for everything the evaluator imports
-python -m pip install -q -c <(echo "$TORCH_PIN") \
-    numpy==1.23.1 pandas==1.5.3 pillow==9.4.0 scipy==1.9.1 open-clip-torch==2.20.0 \
-    clip-benchmark==1.4.0 mmengine==0.7.3 timm==0.9.2 transformers==4.36.1 \
-    diffusers==0.24.0 huggingface_hub==0.19.4 einops==0.3.0 safetensors==0.3.1 \
-    opencv-python==4.6.0.66 pycocotools==2.0.6 terminaltables==3.1.10 accelerate \
-    "pytorch-lightning==1.9.5"
-# (pytorch-lightning: GenEval pins 1.4.2, which cannot import with torch 2.0; the
-#  calibration generator uses it only for seed_everything. Part of deviation E1.)
+# Exactly what the evaluator imports, at GenEval's own pins (tested resolvable with
+# torch 2.0.1): scripts/bench/geneval_requirements.txt. clip-benchmark 1.4.0 declares
+# torch<2, so it goes in with --no-deps (E1); its zero-shot classifier was verified on
+# torch 2.0 (correct colour predictions). pytorch-lightning 1.9.5 replaces GenEval's 1.4.2,
+# which cannot import with torch 2.0; the calibration generator only uses seed_everything.
+python -m pip install -q -c <(echo "$TORCH_PIN") -r "$REPO/scripts/bench/geneval_requirements.txt"
+python -m pip install -q --no-deps clip-benchmark==1.4.0
 step "mmcv-full 1.7.1 from source for sm_90 (slow)"
 if ! python -c "import mmcv; from mmcv.ops import MultiScaleDeformableAttention" 2>/dev/null; then
   MMCV_WITH_OPS=1 FORCE_CUDA=1 TORCH_CUDA_ARCH_LIST="9.0" MAX_JOBS="${SLURM_CPUS_PER_TASK:-8}" \

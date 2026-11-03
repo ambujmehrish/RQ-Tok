@@ -1,0 +1,39 @@
+# GenEval scorer dependencies — exactly the packages evaluation/evaluate_images.py imports
+# (directly or through mmdet/mmcv/open_clip), at the versions GenEval's environment.yml pins.
+# torch/torchvision (2.0.1/0.15.2, cu118) and mmcv-full (1.7.1, built for sm_90) are
+# installed separately by geneval_setup.sbatch (deviation E1). clip-benchmark 1.4.0 caps
+# torch < 2 in its metadata, so it is installed with --no-deps (also E1); the evaluator
+# uses only clip_benchmark.metrics.zeroshot_classification.
+numpy==1.23.1
+pandas==1.5.3
+pillow==9.4.0
+scipy==1.9.1
+six==1.16.0
+setuptools==66.0.0
+packaging==23.1
+tqdm==4.65.0
+open-clip-torch==2.20.0
+timm==0.9.2
+ftfy==6.1.1
+regex==2023.5.5
+sentencepiece==0.1.99
+protobuf==3.20.3
+mmengine==0.7.3
+addict==2.4.0
+yapf==0.33.0
+opencv-python==4.6.0.66
+pycocotools==2.0.6
+terminaltables==3.1.10
+matplotlib==3.7.1
+einops==0.3.0
+scikit-learn==1.2.2
+joblib==1.2.0
+threadpoolctl==3.1.0
+# calibration generator (generation/diffusers_generate.py)
+diffusers==0.24.0
+transformers==4.36.1
+tokenizers==0.15.0
+safetensors==0.3.1
+huggingface_hub==0.19.4
+accelerate==0.25.0
+pytorch-lightning==1.9.5
