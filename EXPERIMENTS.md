@@ -138,7 +138,11 @@ held out for checkpoint selection only `[ours]`. Prompt = the first English name
 class from the dataset's `classes.py` `[ours: unstated]`. Image: resize short side to
 256 (bilinear) + centre crop 256 → FLUX VAE input `[diffusers train_controlnet_flux.py]`;
 the same crop resized to 224 → Qwen2.5-VL visual tower → 8x8 = 64 post-merger latents of
-width 2048 `[upstream path name 224res_64tokens; paper §5.1 uses 64 tokens]`. No flip.
+width 2048 `[upstream path name 224res_64tokens; paper §5.1 uses 64 tokens]`; the
+224 view is the 256 crop resized bicubically, so the latent grid is aligned with the FLUX
+token grid. No flip. The frozen tower's latents are computed once
+(`levelb/precompute.py`, fixed batch 128 in dataset order) and fed to upstream's forward
+as `image_clip_embs`, which it accepts; both arms and the ControlNet read the same file.
 
 *Stage 1 — vision branch.* Qwen2.5-VL-3B frozen; branch = per-layer copies of
 q/k/v/o, MLP, both RMSNorms and the final norm, **initialised from the MLLM's weights**
