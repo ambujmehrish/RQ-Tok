@@ -129,6 +129,23 @@ The per-seed lines also printed a threshold-rule gain (+11–12%, "117% of headr
 that was **not rate-matched** — the threshold ran at its own rate, not the budget. That
 report bug is fixed: the number is now shown only when rate-matched.
 
+**512-image rate sweep (jobs 1506211–13, 3 seeds each, same-data fit — see F17).**
+
+| mean depth | downstream headroom | latent-L2 oracle | random | criterion gap |
+|---|---|---|---|---|
+| 2.49 | +11.3% ± 6.5% | +3.3% ± 3.0% | +0.2% ± 0.6% | 73% ± 11% |
+| 3.00 | +10.1% ± 4.0% | +2.4% ± 2.0% | 0.0% ± 0.0% | 78% ± 19% |
+
+With 8x more images the downstream headroom fell from +31% to about +10–11%. It stays
+positive at both rates and random stays at zero, so the signal is content-aware, but it is
+noisy across tokenizer fits. **Known flaw in all of the above (F17):** the tokenizer was
+fitted and scored on the same images, which favours small sets. E0 now holds out images.
+
+**How these numbers are used.** E0 is a pilot on a small proxy and decides nothing — small
+sets can swing either way (+31% at 64 images, ~+10% at 512). Conclusions about the thesis
+come only from the trained system on the held-out test set, against the Bifrost-1 baseline
+under Bifrost-1's own protocol.
+
 **Interpretation guard.** `random` is the load-bearing control. If `random ≈ oracle`,
 the gain comes from *rate variance*, not from *content-aware* allocation, and the
 "adaptive" claim collapses even if the oracle beats uniform.

@@ -48,6 +48,12 @@ class PolicyResult:
     distortion: float
 
 
+# E0 is a small pilot on a proxy (CLIP ViT-B/32). It reports a SIGNAL, never a decision:
+# the thesis is decided only by the trained system on the held-out test set (C1-C6).
+PILOT_NOTE = (" Pilot signal only — no conclusion is drawn from E0; the decision is made "
+              "on the trained system's held-out test-set results (EXPERIMENTS.md C1-C6).")
+
+
 @dataclass
 class HeadroomReport:
     """Result of the E0 pilot, with the pre-registered verdicts already applied."""
@@ -99,7 +105,7 @@ class HeadroomReport:
         lines += ["", f"oracle vs uniform : {self.oracle_gain_vs_uniform:+.1%}",
                   f"oracle vs random  : {self.oracle_gain_vs_random:+.1%}",
                   self._threshold_line(),
-                  "", f"VERDICT: {self.verdict}"]
+                  "", f"PILOT SIGNAL: {self.verdict}"]
         return "\n".join(lines)
 
 
@@ -393,7 +399,7 @@ class DownstreamReport:
                   f"random control                  : {self.random_gain:+.1%}",
                   f"per-image gain spread           : +-{self.gain_std:.1%} "
                   f"(n={self.num_images})",
-                  "", f"VERDICT: {self.verdict()}"]
+                  "", f"PILOT SIGNAL: {self.verdict()}"]
         return "\n".join(lines)
 
     def verdict(self) -> str:
@@ -406,19 +412,16 @@ class DownstreamReport:
                 "seeds per EXPERIMENTS.md R2 before drawing any conclusion."
             )
         if self.headroom < self.effect_floor:
-            return (f"REFUTED on the correct objective — headroom {self.headroom:.1%} "
-                    f"< {self.effect_floor:.0%} floor. Allocation does not matter "
-                    "downstream; do not proceed to C3.")
+            return (f"BELOW FLOOR — downstream headroom {self.headroom:.1%} < "
+                    f"{self.effect_floor:.0%} on this pilot." + PILOT_NOTE)
         if self.random_gain >= self.headroom - 1e-9:
-            return ("CONTENT-AWARENESS REFUTED — random allocation matches the oracle, "
-                    "so only rate variance matters.")
+            return ("NO CONTENT SIGNAL — random allocation matches the oracle on this "
+                    "pilot." + PILOT_NOTE)
         if self.criterion_gap < 0.10:
-            return (f"PROCEED, but latent-L2 already captures "
-                    f"{1 - self.criterion_gap:.0%} of the headroom — a downstream-aware "
-                    "allocator has little left to win. The C3 contribution would be thin.")
-        return (f"PROCEED — headroom {self.headroom:.1%} on the correct objective, and a "
-                f"latent-L2 allocator misses {self.criterion_gap:.0%} of it. Optimizing "
-                "reconstruction is measurably the wrong criterion (NOVELTY.md 6).")
+            return (f"POSITIVE HEADROOM {self.headroom:.1%}; latent-L2 already captures "
+                    f"{1 - self.criterion_gap:.0%} of it." + PILOT_NOTE)
+        return (f"POSITIVE HEADROOM {self.headroom:.1%}; a latent-L2 allocator misses "
+                f"{self.criterion_gap:.0%} of it." + PILOT_NOTE)
 
 
 def marginal_returns_are_monotone(errs: Tensor) -> bool:
@@ -499,10 +502,8 @@ def headroom_pilot(quantizer: AdaptiveResidualQuantizer, latents: Tensor,
     if rep.oracle_gain_vs_uniform < effect_floor:
         if real_data:
             rep.verdict = (
-                f"THESIS REFUTED — oracle beats uniform by only "
-                f"{rep.oracle_gain_vs_uniform:.1%} (< {effect_floor:.0%} floor) on real "
-                "latents. Non-uniform allocation does not matter for this bridge; do not "
-                "proceed to C3."
+                f"BELOW FLOOR — oracle beats uniform by {rep.oracle_gain_vs_uniform:.1%} "
+                f"(< {effect_floor:.0%}) in latent L2 on this pilot." + PILOT_NOTE
             )
         else:
             rep.verdict = (
@@ -514,17 +515,17 @@ def headroom_pilot(quantizer: AdaptiveResidualQuantizer, latents: Tensor,
             )
     elif rep.oracle_gain_vs_random < effect_floor:
         rep.verdict = (
-            f"CONTENT-AWARENESS REFUTED — oracle beats random by only "
-            f"{rep.oracle_gain_vs_random:.1%}. The gain comes from rate VARIANCE, not "
-            "from content-aware allocation; the adaptive claim does not stand."
+            f"WEAK CONTENT SIGNAL — oracle beats random by only "
+            f"{rep.oracle_gain_vs_random:.1%} on this pilot." + PILOT_NOTE
         )
     else:
         rep.verdict = (
-            f"PROCEED — headroom {rep.oracle_gain_vs_uniform:.1%} over uniform and "
+            f"POSITIVE HEADROOM — {rep.oracle_gain_vs_uniform:.1%} over uniform and "
             f"{rep.oracle_gain_vs_random:.1%} over random."
         )
         if rep.threshold_rate_matched:
             share = rep.threshold_gain_vs_uniform / max(rep.oracle_gain_vs_uniform, 1e-9)
             rep.verdict += (f" The shipped threshold rule captures "
                             f"{rep.threshold_gain_vs_uniform:.1%}, i.e. {share:.0%} of it.")
+        rep.verdict += PILOT_NOTE
     return rep

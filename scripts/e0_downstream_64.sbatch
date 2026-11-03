@@ -13,7 +13,7 @@
 # waiting for all three.
 #
 # Two measurements, both on the same 64 distinct images:
-#   A. latent-L2 E0 (final-layer latents) — re-measures the earlier "+34% PROCEED",
+#   A. latent-L2 E0 (final-layer latents) — re-measures the earlier "+34%" figure,
 #      which was in fact computed on only 20 distinct images (ISSUES.md F15).
 #   B. downstream E0 (layer-L latents through the real CLIP tower suffix) — the
 #      objective that matters. The CPU pilots were UNDERPOWERED (6-8 images, headroom
@@ -149,15 +149,17 @@ print(f"oracle vs random  : {rm:+.1%} +- {st.stdev(rnd):.1%}")
 if n_img < 32:
     v = f"UNDERPOWERED — {n_img} images (< 32)."
 elif um < FLOOR:
-    v = f"REFUTED on latent L2 — headroom {um:.1%} < {FLOOR:.0%}."
+    v = f"BELOW FLOOR — latent-L2 headroom {um:.1%} < {FLOOR:.0%}."
 elif um - 2 * us < FLOOR:
-    v = (f"INCONCLUSIVE — headroom {um:.1%} +- {us:.1%}; 2-sigma lower bound "
-         f"{um - 2*us:.1%} is below the {FLOOR:.0%} floor (R1).")
+    v = (f"NOISY — headroom {um:.1%} +- {us:.1%}; 2-sigma lower bound "
+         f"{um - 2*us:.1%} is below the {FLOOR:.0%} floor.")
 elif rm < FLOOR:
-    v = f"CONTENT-AWARENESS REFUTED — oracle beats random by only {rm:.1%}."
+    v = f"WEAK CONTENT SIGNAL — oracle beats random by only {rm:.1%}."
 else:
-    v = f"PROCEED on latent L2 — headroom {um:.1%} +- {us:.1%}."
-print(f"\nVERDICT (latent L2): {v}")
+    v = f"POSITIVE HEADROOM on latent L2 — {um:.1%} +- {us:.1%}."
+v += (" Pilot signal only: no conclusion is drawn from E0; the decision is made on the "
+      "trained system's held-out test-set results (EXPERIMENTS.md C1-C6).")
+print(f"\nPILOT SIGNAL (latent L2): {v}")
 (out / "aggregate_latent_l2.json").write_text(json.dumps(
     {"oracle_gain_vs_uniform": {"mean": um, "std": us},
      "oracle_gain_vs_random": {"mean": rm, "std": st.stdev(rnd)}, "verdict": v}, indent=2))
@@ -196,22 +198,20 @@ FLOOR = 0.10
 
 print()
 if n_img < 32:
-    print(f"VERDICT: UNDERPOWERED — {n_img} images (< 32).")
+    sig = f"UNDERPOWERED — {n_img} images (< 32)."
 elif h_m < FLOOR:
-    print(f"VERDICT: REFUTED on the correct objective — headroom {h_m:.1%} < {FLOOR:.0%}. "
-          "Allocation does not matter downstream; do not proceed to C3.")
+    sig = f"BELOW FLOOR — downstream headroom {h_m:.1%} < {FLOOR:.0%}."
 elif h_m - 2 * h_s < FLOOR:
-    print(f"VERDICT: INCONCLUSIVE — headroom {h_m:.1%} +- {h_s:.1%}; the 2-sigma lower "
-          f"bound ({h_m - 2*h_s:.1%}) falls below the {FLOOR:.0%} floor (R1).")
+    sig = (f"NOISY — headroom {h_m:.1%} +- {h_s:.1%}; 2-sigma lower bound "
+           f"{h_m - 2*h_s:.1%} is below the {FLOOR:.0%} floor.")
 elif r_m >= h_m - 1e-9:
-    print("VERDICT: CONTENT-AWARENESS REFUTED — random matches the oracle at equal rate.")
-elif g_m < 0.10:
-    print(f"VERDICT: PROCEED, but latent-L2 already captures {1-g_m:.0%} of the headroom "
-          "— a downstream-aware allocator has little left to win; C3 would be thin.")
+    sig = "NO CONTENT SIGNAL — random matches the oracle at equal rate."
 else:
-    print(f"VERDICT: PROCEED — headroom {h_m:.1%} +- {h_s:.1%} on the correct objective, "
-          f"and a latent-L2 allocator misses {g_m:.0%} of it. Optimizing reconstruction "
-          "is measurably the wrong criterion (NOVELTY.md 6).")
+    sig = (f"POSITIVE HEADROOM — {h_m:.1%} +- {h_s:.1%}; latent-L2 misses "
+           f"{g_m:.0%} of it.")
+print(f"PILOT SIGNAL (downstream): {sig}")
+print("Pilot signal only: no conclusion is drawn from E0; the decision is made on the "
+      "trained system's held-out test-set results (EXPERIMENTS.md C1-C6).")
 print("\nNOTE: greedy search on a non-separable objective is not provably optimal, so "
       "headroom is a LOWER bound. The decoder is the real CLIP tower suffix, a SEMANTIC "
       "proxy — the eventual C3 claim needs the actual renderer.")

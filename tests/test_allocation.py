@@ -134,7 +134,8 @@ def test_pilot_reports_rate_matched_policies():
     for name in ("uniform", "random", "oracle"):
         assert abs(rep.by_name(name).mean_depth - rep.mean_depth_budget) < 1e-2
     assert rep.oracle_gain_vs_uniform >= -1e-9
-    assert "VERDICT" in rep.summary()
+    assert "PILOT SIGNAL" in rep.summary()
+    assert "no conclusion is drawn from E0" in rep.verdict
 
 
 def test_threshold_gain_hidden_when_not_rate_matched():

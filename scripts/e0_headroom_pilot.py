@@ -73,7 +73,14 @@ def synth_heterogeneous(m: int, d: int, g: torch.Generator,
 
 def run(name: str, latents: torch.Tensor, preset: str, fit_steps: int,
         mean_depth: float | None, seed: int, real_data: bool = False,
-        zero_code: bool = True, json_out: str | None = None) -> None:
+        zero_code: bool = True, json_out: str | None = None,
+        eval_latents: torch.Tensor | None = None) -> None:
+    """Fit the quantizer on ``latents`` and measure on ``eval_latents``.
+
+    Real data REQUIRES a held-out ``eval_latents``: fitting and scoring on the same
+    patches lets a 4 x 512-code RVQ nearly memorize a small set, which inflated an
+    earlier 64-image result (ISSUES.md F17).
+    """
     import dataclasses
     cfg = get_preset(preset)
     cfg = dataclasses.replace(cfg, tokenizer=dataclasses.replace(
@@ -94,6 +101,12 @@ def run(name: str, latents: torch.Tensor, preset: str, fit_steps: int,
         tok = build_tokenizer(cfg)
         fit_tokenizer(tok, latents, steps=fit_steps, batch_size=128, seed=seed)
         q = tok.quantizer
+    if real_data and eval_latents is None:
+        raise ValueError("real-data E0 needs held-out eval_latents (ISSUES.md F17)")
+    fit_set = latents
+    latents = eval_latents if eval_latents is not None else latents
+    print(f"  fit on {fit_set.shape[0]} patches, measured on {latents.shape[0]} "
+          f"{'held-out ' if eval_latents is not None else ''}patches", flush=True)
     errs = prefix_errors(q, latents)
     monotone = marginal_returns_are_monotone(errs)
 
@@ -112,6 +125,7 @@ def run(name: str, latents: torch.Tensor, preset: str, fit_steps: int,
         pathlib.Path(json_out).parent.mkdir(parents=True, exist_ok=True)
         pathlib.Path(json_out).write_text(json.dumps({
             "seed": seed, "num_patches": int(latents.shape[0]),
+            "num_fit_patches": int(fit_set.shape[0]),
             "mean_depth_budget": rep.mean_depth_budget,
             "budget_was_substituted": rep.budget_was_substituted,
             "oracle_gain_vs_uniform": rep.oracle_gain_vs_uniform,
@@ -122,7 +136,8 @@ def run(name: str, latents: torch.Tensor, preset: str, fit_steps: int,
 
 def run_downstream(latents_path: str, ctx_path: str, preset: str, fit_steps: int,
                    mean_depth: float, model_id: str, max_images: int, seed: int,
-                   device: str = "cpu", json_out: str | None = None) -> None:
+                   device: str = "cpu", json_out: str | None = None,
+                   fit_fraction: float = 0.5) -> None:
     """E0 measured through a REAL frozen decoder (the CLIP tower suffix).
 
     Distortion here is non-separable across patches, so the Lagrangian oracle does not
@@ -136,7 +151,15 @@ def run_downstream(latents_path: str, ctx_path: str, preset: str, fit_steps: int
     ctx = load_tower_context(ctx_path, device=device)
     n, d = ctx.patches_per_image, z.shape[-1]
     b_all = ctx.num_images
-    n_img = min(max_images, b_all)
+    if z.shape[0] != b_all * n:
+        raise ValueError(f"{z.shape[0]} latents != {b_all} images x {n} patches")
+    # Held-out split BY IMAGE: the quantizer never sees the images it is scored on.
+    n_fit = int(b_all * fit_fraction)
+    if not 0 < n_fit < b_all:
+        raise ValueError(f"fit_fraction={fit_fraction} leaves no fit or no eval images")
+    n_img = min(max_images, b_all - n_fit)
+    z_fit = z[: n_fit * n]
+    z_eval = z[n_fit * n:(n_fit + n_img) * n]
     cfg = dataclasses.replace(get_preset(preset).tokenizer, clip_dim=d)
 
     torch.manual_seed(seed)
@@ -144,14 +167,17 @@ def run_downstream(latents_path: str, ctx_path: str, preset: str, fit_steps: int
     q.train()
     g = torch.Generator(device=dev).manual_seed(seed)
     for _ in range(fit_steps):
-        q(z[torch.randint(z.shape[0], (min(128, z.shape[0]),), generator=g, device=dev)],
-          update_codebook=True)
+        q(z_fit[torch.randint(z_fit.shape[0], (min(128, z_fit.shape[0]),), generator=g,
+                              device=dev)], update_codebook=True)
     q.eval()
+    print(f"  tokenizer fit on {n_fit} images ({fit_steps} steps, "
+          f"~{fit_steps * 128 / z_fit.shape[0]:.1f} passes); scored on {n_img} "
+          "HELD-OUT images", flush=True)
 
     dist = ClipTowerDistortion(model_id, ctx, device=device, metric="cosine")
-    table = prefix_zhat(q, z).reshape(b_all, n, cfg.max_depth + 1, d)
-    errs = prefix_errors(q, z).reshape(b_all, n, cfg.max_depth + 1)
-    ref = z.reshape(b_all, n, d)
+    table = prefix_zhat(q, z_eval).reshape(n_img, n, cfg.max_depth + 1, d)
+    errs = prefix_errors(q, z_eval).reshape(n_img, n, cfg.max_depth + 1)
+    ref = z_eval.reshape(n_img, n, d)
     budget = int(round(mean_depth * n))
     idx = torch.arange(n, device=dev)
 
@@ -159,7 +185,7 @@ def run_downstream(latents_path: str, ctx_path: str, preset: str, fit_steps: int
                                    ("uniform", "random", "oracle_l2", "oracle_down")}
     per_image: list[float] = []
     for i in range(n_img):
-        cls = ctx.cls_tokens[i:i + 1]
+        cls = ctx.cls_tokens[n_fit + i:n_fit + i + 1]
         e_ref = dist.embed(ref[i:i + 1], cls=cls)
 
         def score(lat, e_ref=e_ref, cls=cls):
@@ -196,7 +222,8 @@ def run_downstream(latents_path: str, ctx_path: str, preset: str, fit_steps: int
         import json
         pathlib.Path(json_out).parent.mkdir(parents=True, exist_ok=True)
         pathlib.Path(json_out).write_text(json.dumps({
-            "seed": seed, "num_images": rep.num_images, "layer": rep.layer,
+            "seed": seed, "num_images": rep.num_images, "num_fit_images": n_fit,
+            "layer": rep.layer,
             "mean_depth_budget": rep.mean_depth_budget,
             "uniform": rep.uniform, "random": rep.random,
             "oracle_latent_l2": rep.oracle_latent_l2,
@@ -233,7 +260,11 @@ def main() -> None:
     ap.add_argument("--json-out", default=None,
                     help="write the result as JSON (for multi-seed aggregation)")
     ap.add_argument("--max-images", type=int, default=8,
-                    help="greedy downstream search is O(budget x N) decoder passes")
+                    help="cap on HELD-OUT images scored; the greedy downstream search "
+                         "is O(budget x N) decoder passes")
+    ap.add_argument("--fit-fraction", type=float, default=0.5,
+                    help="share of images used ONLY to fit the quantizer; the rest are "
+                         "held out and scored (ISSUES.md F17)")
     ap.add_argument("--no-zero-code", action="store_true",
                     help="disable the reserved zero codeword; RVQ then is NOT monotone "
                          "in depth and the headroom measurement is confounded by the "
@@ -256,7 +287,8 @@ def main() -> None:
         run_downstream(args.latents, ctx_path, args.preset, args.fit_steps,
                        args.mean_depth if args.mean_depth else 2.5,
                        args.model, args.max_images, args.seed,
-                       device=args.device, json_out=args.json_out)
+                       device=args.device, json_out=args.json_out,
+                       fit_fraction=args.fit_fraction)
         return
 
     if args.latents:
@@ -265,9 +297,23 @@ def main() -> None:
             z = z.reshape(-1, z.size(-1))
         if z.size(-1) != dim:
             raise ValueError(f"latents have dim {z.size(-1)}, preset expects {dim}")
-        run("real latents", z, args.preset, args.fit_steps, args.mean_depth,
-            args.seed, real_data=True,
-            zero_code=not args.no_zero_code, json_out=args.json_out)
+        import json
+        meta_path = pathlib.Path(args.latents + ".meta.json")
+        if not meta_path.exists():
+            raise SystemExit(f"{meta_path} missing: image boundaries are needed to hold "
+                             "out whole images")
+        meta = json.loads(meta_path.read_text())
+        b, n = int(meta["num_images"]), int(meta["patches_per_image"])
+        if z.shape[0] != b * n:
+            raise ValueError(f"{z.shape[0]} latents != {b} images x {n} patches")
+        n_fit = int(b * args.fit_fraction)
+        if not 0 < n_fit < b:
+            raise ValueError(f"--fit-fraction {args.fit_fraction} leaves no fit or eval set")
+        print(f"  {n_fit} images fit the quantizer, {b - n_fit} held-out images are scored")
+        run("real latents (held-out images)", z[: n_fit * n], args.preset,
+            args.fit_steps, args.mean_depth, args.seed, real_data=True,
+            zero_code=not args.no_zero_code, json_out=args.json_out,
+            eval_latents=z[n_fit * n:])
         return
 
     if args.regime in ("homogeneous", "both"):
