@@ -1,4 +1,4 @@
-.PHONY: install lint type test check fmt clean ablations smoke prefetch e0 vhpc-setup vhpc-env vhpc-prefetch bifrost1-setup bifrost1-geneval bifrost1-dpg geneval-setup geneval-calibrate dpg-setup dpg-calibrate
+.PHONY: install lint type test check fmt clean ablations smoke prefetch e0 vhpc-setup vhpc-env vhpc-prefetch bifrost1-setup bifrost1-geneval bifrost1-dpg geneval-setup geneval-calibrate dpg-setup dpg-calibrate imagenet-prefetch
 
 install:
 	pip install -e ".[dev,torch]"
@@ -63,3 +63,7 @@ dpg-setup:          # ELLA's DPG-Bench scorer + mPLUG-large, verified lock file 
 	sbatch --qos=gpulongjobs scripts/bench/dpg_setup.sbatch
 dpg-calibrate:      # must reproduce SD v1.5 = 63.18 +- 2.0 before scoring any model
 	sbatch --qos=gpulongjobs --export=ALL,CALIBRATE=1 scripts/bench/dpg_score.sbatch
+
+# --- Level B data ---------------------------------------------------------------------
+imagenet-prefetch:  # ILSVRC/imagenet-1k (gated; approve ambujm22 first) + ADM ref batch
+	sbatch --qos=gpulongjobs scripts/imagenet/prefetch.sbatch

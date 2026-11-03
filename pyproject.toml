@@ -30,6 +30,10 @@ models = [
     "accelerate>=0.34",
     "safetensors>=0.4",
 ]
+imagenet = [
+    "pyarrow>=14",
+    "huggingface_hub>=0.25",
+]
 dev = [
     "pytest>=7.4",
     "ruff>=0.6",
