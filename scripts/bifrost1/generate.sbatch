@@ -12,6 +12,8 @@
 # selected. Scoring (GenEval detector, DPG-Bench mPLUG VQA) is a separate step.
 #
 # The upstream script has no resume: a killed job restarts from the first prompt.
+# The vhpc01 'gpus' partition caps jobs at 24 h (MaxTime=1-00:00:00), so that is the
+# limit here; if a benchmark cannot finish inside it, it must be split, not extended.
 # PREREQUISITE: scripts/bifrost1/setup.sbatch has completed.
 # =====================================================================================
 #SBATCH --job-name=bifrost1-gen
@@ -20,7 +22,7 @@
 #SBATCH --gres=gpu:h200:1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=96G
-#SBATCH --time=48:00:00
+#SBATCH --time=24:00:00
 #SBATCH --output=logs/%x-%j.out
 #SBATCH --error=logs/%x-%j.out
 
