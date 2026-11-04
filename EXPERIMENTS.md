@@ -88,6 +88,25 @@ v1.5 score (0.43, regenerated with GenEval's own generator and defaults) within 
 until that passes, no GenEval number is reported (`scripts/bench/geneval_score.sbatch
 CALIBRATE=1`).
 
+**GenEval calibration result (vhpc01 H200, job 1506374): PASSED.** SD v1.5 regenerated with
+GenEval's generator and defaults, scored by the rebuilt evaluator:
+
+| task | ours | GenEval paper |
+|---|---|---|
+| single object | 0.953 | 0.97 |
+| two object | 0.384 | 0.38 |
+| counting | 0.366 | 0.35 |
+| colors | 0.758 | 0.76 |
+| position | 0.035 | 0.04 |
+| color attribution | 0.045 | 0.06 |
+| **overall** | **0.423** | **0.43** |
+
+Every task is within 0.02 of the published value, so deviation E1 does not change the scorer.
+
+**Bifrost-1 reference generation (Level A).** GenEval: 553 prompts x 4 images, job
+1506357, 17.6 h on one H200 (~115 s per prompt). DPG-Bench: 1065 prompts in 4 shards,
+jobs 1506375-78, 8.6-8.9 h each.
+
 DPG-Bench uses ELLA's own scorer (`TencentQQGYLab/ELLA` @ `3c228f1`, mPLUG-large judge),
 imported unmodified. Its requirements are unpinned and today resolve to versions that
 cannot load mPLUG, so the environment is a lock file verified to run the judge correctly
