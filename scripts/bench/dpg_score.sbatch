@@ -28,6 +28,11 @@ REPO="${SLURM_SUBMIT_DIR:-$PWD}"
 cd "$REPO"
 mkdir -p logs
 die() { echo "FAILED: $*" >&2; exit 1; }
+# multiprocessing workers cannot delete their temp dirs on NFS (".nfs..." busy);
+# keep temporary files on the node's local disk.
+export TMPDIR="/tmp/$USER-${SLURM_JOB_ID:-local}"
+mkdir -p "$TMPDIR"
+trap 'rm -rf "$TMPDIR"' EXIT
 
 BENCH_ROOT="${BENCH_ROOT:-$HOME/work/bench}"
 [ -f "$BENCH_ROOT/dpg_env.sh" ] || die "run scripts/bench/dpg_setup.sbatch first"

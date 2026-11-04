@@ -194,8 +194,12 @@ so exact). The builder refuses if FLUX has fewer blocks than requested, since up
 emit latents in the same Qwen space, so the renderer is held fixed and only the bridge
 differs.
 
-*Sampling.* MAR decoding with one step per token (64), cosine schedule, random order
-`[upstream inference]`; FLUX 28 steps, ControlNet scale 0.7, guidance 3.5 `[paper §4]`;
+*Sampling.* MAR decoding with one step per token (64), cosine schedule, random order,
+guidance `uncond + 1.0 * (cond - uncond)` `[upstream inference, ported line for line in
+levelb/sample.py]`. Upstream's guidance slices the flattened predictions per step, which
+is valid only if exactly one token is revealed per step; simulated for 64 and 256 tokens
+and asserted on every batch. Upstream leaves NumPy unseeded; each batch is seeded from
+(seed, index) so sample sets are reproducible; FLUX 28 steps, ControlNet scale 0.7, guidance 3.5 `[paper §4]`;
 10,000 samples with classes uniform over 1,000 `[paper §5.1]`; scored against the ADM
 ImageNet-256 reference batch (FID, sFID, IS).
 
