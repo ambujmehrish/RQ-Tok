@@ -44,6 +44,26 @@ only (GenEval / DPG-Bench generation); no training code, data pipeline or ImageN
 Weights: `hanlincs/Bifrost-1` — the Table 3 model (Qwen2.5-VL-7B, 256 visual tokens at
 448 px, linear head, MSE, latent ControlNet with 4 double + 1 single FLUX.1-dev blocks).
 
+### Test vs validation — binding rules (decided 2026-11)
+
+Every reported number follows Bifrost-1's protocol and comes from a **test** set; nothing
+is reported from validation data.
+
+| | role | Level A | Level B |
+|---|---|---|---|
+| **test** | the only source of reported results; each final model scored once per seed | GenEval (553 prompts), DPG-Bench (1065 prompts) — the benchmarks' official evaluation sets | Bifrost-1 §5.1: 10K samples, classes uniform over 1000, FID / sFID / IS against the ADM ImageNet-256 reference batch. Secondary (ours, reported separately): FID against the 50,000 ImageNet **validation** images, which no stage ever trains on |
+| **validation** | training dynamics and hyper-parameter tuning only; never reported | — (no training) | the fixed 10,000-image slice held out of ImageNet train: held-out losses during training, and any setting the paper and upstream leave open (e.g. the ControlNet micro-batch if 48 does not fit) |
+| **train** | fitting only | — | ImageNet train minus the validation slice |
+
+Settings the paper or upstream fixes are used as given; validation may only choose what
+they leave open, and any such choice is recorded here before test scoring. The test runs
+on the final checkpoint at the fixed training budget, identically for both arms.
+
+**Level A result — GenEval (job 1506427): Bifrost-1 reproduced, 0.804 vs paper 0.81.**
+Released checkpoint, official script, calibrated scorer. By task: single object 0.997,
+two object 0.922, counting 0.713, colors 0.838, position 0.718, color attribution 0.638
+(the paper reports only the overall score).
+
 ### Level A — reference reproduction (released checkpoint, official script)
 
 `scripts/bifrost1/setup.sbatch` then `scripts/bifrost1/generate.sbatch` (one H200 each).

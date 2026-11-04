@@ -9,8 +9,9 @@
 # ELLA's requirements-for-dpg_bench.txt pins nothing; installed today it resolves to
 # transformers 5 / modelscope 1.40, which cannot load mPLUG. The environment is therefore
 # the one verified to run the scorer correctly (scripts/bench/dpg_requirements.lock.txt:
-# modelscope 1.13.3, transformers 4.38.2, datasets 2.18.0, fairseq 0.12.2 — the benchmark's
-# release era), with torch 2.5.1+cu124 for the H200. Deviation D1: mPLUG is downloaded by
+# modelscope 1.13.3, transformers 4.38.2, datasets 2.18.0, diffusers 0.27.2,
+# huggingface_hub 0.23.5, fairseq 0.12.2 — the benchmark's release era, resolved in one
+# pass), with torch 2.5.1+cu124 for the H200. Deviation D1: mPLUG is downloaded by
 # a current ModelScope CLI and loaded from disk (scripts/bench/dpg_compute.py).
 # Calibration (dpg_score.sbatch CALIBRATE=1) must reproduce SD v1.5 = 63.18 before use.
 # =====================================================================================
@@ -64,8 +65,11 @@ set -u
 python -m pip install -q "pip<24.1"
 python -m pip install -q --index-url https://download.pytorch.org/whl/cu124 \
     torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1
-python -m pip install -q -r "$REPO/scripts/bench/dpg_requirements.lock.txt" \
-    -c <(printf 'torch==2.5.1\ntorchvision==0.20.1\ntorchaudio==2.5.1\n')
+# The lock is a complete, consistent environment (resolved in ONE pass and verified:
+# mPLUG known-answer test, ELLA scorer, SD v1.5 generator import). Install it exactly as
+# frozen — no re-resolution — then let pip check it is self-consistent.
+python -m pip install -q --no-deps -r "$REPO/scripts/bench/dpg_requirements.lock.txt"
+python -m pip check || die "the DPG-Bench environment is inconsistent (pip check failed)"
 
 step "mPLUG-large (downloaded with a current ModelScope CLI in its own venv — D1)"
 MPLUG="$BENCH_ROOT/mplug_large"
