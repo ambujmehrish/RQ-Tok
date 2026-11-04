@@ -91,6 +91,80 @@ def mar_decode(model, conv, prompts: list[str], cfg_weight: float = 1.0,
     return tokens, revealed
 
 
+@torch.no_grad()
+def mar_decode_adarq(model, heads, conv, prompts: list[str], cfg_weight: float = 1.0,
+                     np_seed: int | None = None, flow_steps: int = 32,
+                     generator: torch.Generator | None = None):
+    """The same MAR loop as ``mar_decode`` (unconditional + conditional halves, random
+    order, one token per step, cosine schedule); the revealed patch is produced by the
+    AdaRQ heads instead of the linear head: codes depth by depth from guided logits, then
+    the residual by Euler integration of the guided flow velocity. Returns tokens, the
+    reveal count per step, and each patch's sampled depth."""
+    add_upstream_to_path()
+    from bifrost.models.mar.utils import sample_orders
+
+    n_tok = bb.NUM_TOKENS
+    bsz = len(prompts)
+    dev = next(model.parameters()).device
+    input_ids, _, attn, img_pos, pos_ids = conv.t2i_prompt(
+        [""] * bsz + list(prompts), img_h=bb.RESOLUTION, img_w=bb.RESOLUTION,
+        num_visual_gen_tokens=n_tok)
+    if pos_ids.shape[1] == 3:
+        pos_ids = rearrange(pos_ids, "bsz k c -> k bsz c")
+    text = model.vision_language_model.model.embed_tokens(input_ids[:, :-n_tok].to(dev))
+    if np_seed is not None:
+        np.random.seed(np_seed)
+    mask = torch.ones(bsz, n_tok, device=dev)
+    tokens = model.mask_token.repeat(bsz, n_tok, 1)
+    orders = sample_orders(bsz, n_tok).to(dev)
+    depths = torch.zeros(bsz, n_tok, dtype=torch.long, device=dev)
+    revealed = []
+    for step in range(n_tok):
+        cur = tokens.clone()
+        tokens = torch.cat([tokens, tokens], dim=0) + model.learnable_pos_emb
+        mask = torch.cat([mask, mask], dim=0)
+        emb = torch.cat((text, tokens), dim=1)
+        out = model.vision_language_model(inputs_embeds=emb, use_cache=None,
+                                          attention_mask=attn.to(dev), past_key_values=None,
+                                          return_dict=True, position_ids=pos_ids.to(dev),
+                                          image_position_mask=img_pos.to(dev), t_emb=None)
+        hid = out["hidden_states"][:, -n_tok:]
+        ratio = np.cos(math.pi / 2.0 * (step + 1) / n_tok)
+        mask_len = torch.tensor([np.floor(n_tok * ratio)], device=dev)
+        mask_len = torch.maximum(torch.tensor([1.0], device=dev),
+                                 torch.minimum(mask.sum(-1, keepdim=True) - 1, mask_len))
+        mask_next = _mask_by_order(mask_len[0].item(), orders, bsz, n_tok, dev)
+        to_pred = mask[:bsz].bool() if step >= n_tok - 1 else torch.logical_xor(
+            mask[:bsz].bool(), mask_next)
+        revealed.append(int(to_pred[0].sum()))
+        mask = mask_next.float()
+        where = to_pred.nonzero(as_tuple=True)
+        lat, dep = heads.sample(hid[bsz:][where], hid[:bsz][where], cfg_weight=cfg_weight,
+                                flow_steps=flow_steps, generator=generator)
+        cur[where] = lat.to(cur.dtype)
+        depths[where] = dep
+        tokens = cur
+    return tokens, revealed, depths
+
+
+def load_adarq(vlm: str, width: int, branch_ckpt: str, heads_ckpt: str, tok_dir: str,
+               device, flow_width: int, flow_depth: int):
+    from .adarq_model import AdaRQHeads
+    from .adarq_tokenizer import load_books
+
+    model = bb.build_model(vlm, inner_dim=width)
+    state = torch.load(branch_ckpt, map_location="cpu")
+    named = dict(model.named_parameters())
+    for n, t in state.items():
+        if n not in named:
+            raise KeyError(f"{branch_ckpt}: unknown parameter {n}")
+        named[n].data.copy_(t.to(named[n].dtype))
+    books, res_rms, _, _ = load_books(str(pathlib.Path(tok_dir) / "tokenizer.pt"))
+    heads = AdaRQHeads(width, books, res_rms, flow_width, flow_depth)
+    heads.load_state_dict(torch.load(heads_ckpt, map_location="cpu"))
+    return model.to(device).eval(), heads.to(device).eval()
+
+
 def load_bifrost_branch(vlm: str, width: int, ckpt: str, device):
     model = bb.build_model(vlm, inner_dim=width)
     state = torch.load(ckpt, map_location="cpu")
@@ -127,7 +201,10 @@ def load_pipeline(flux_id: str, controlnet_ckpt: str, width: int, device, dtype)
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--arm", choices=["bifrost"], required=True)
+    ap.add_argument("--arm", choices=["bifrost", "adarq"], required=True)
+    ap.add_argument("--heads", default=None, help="adarq: final_heads.pt")
+    ap.add_argument("--tok", default=None, help="adarq: Stage-0 dir (tokenizer.pt)")
+    ap.add_argument("--flow-steps", type=int, default=32)
     ap.add_argument("--branch", required=True, help="final_trainable.pt of Stage 1")
     ap.add_argument("--controlnet", required=True, help="final_controlnet.pt of Stage 2")
     ap.add_argument("--data", required=True, help="imagenet256 dir (class names, FLUX text)")
@@ -169,19 +246,38 @@ def main() -> None:
         print(f"{part} exists; nothing to do")
         return
 
-    model = load_bifrost_branch(args.vlm, width, args.branch, dev)
-    # upstream inference casts the whole model to bf16; CPU (tests only) runs in fp32
+    heads = None
+    if args.arm == "adarq":
+        if not (args.heads and args.tok):
+            raise SystemExit("--arm adarq needs --heads and --tok")
+        trained = json.loads((pathlib.Path(args.heads).parent / "config.json").read_text())
+        model, heads = load_adarq(args.vlm, width, args.branch, args.heads, args.tok, dev,
+                                  int(trained["flow_width"]), int(trained["flow_depth"]))
+    else:
+        model = load_bifrost_branch(args.vlm, width, args.branch, dev)
+    # upstream inference casts the whole model to bf16; CPU (tests only) runs in fp32.
+    # The AdaRQ heads stay fp32 (they are small; sampling precision for the flow ODE).
     model = model.to(torch.bfloat16) if dev.type == "cuda" else model.float()
     conv = bb.make_conversation(args.processor)
     pipe = load_pipeline(args.flux, args.controlnet, width, dev, dtype)
 
     imgs = np.zeros((hi - lo, args.res, args.res, 3), dtype=np.uint8)
+    depth_sum, depth_n = 0, 0
     for s in range(lo, hi, args.batch):
         e = min(s + args.batch, hi)
         lab = classes[s:e]
         bseed = args.seed * 1_000_003 + s
-        tokens, revealed = mar_decode(model, conv, [names[int(c)] for c in lab],
-                                      cfg_weight=args.cfg_weight, np_seed=bseed)
+        names_b = [names[int(c)] for c in lab]
+        if heads is None:
+            tokens, revealed = mar_decode(model, conv, names_b, cfg_weight=args.cfg_weight,
+                                          np_seed=bseed)
+        else:
+            tokens, revealed, depth = mar_decode_adarq(
+                model, heads, conv, names_b, cfg_weight=args.cfg_weight, np_seed=bseed,
+                flow_steps=args.flow_steps,
+                generator=torch.Generator(device=dev).manual_seed(bseed))
+            depth_sum += int(depth.sum())
+            depth_n += depth.numel()
         if set(revealed) != {1}:
             raise RuntimeError(f"MAR revealed {sorted(set(revealed))} tokens per step; "
                                "upstream's guidance slicing needs exactly 1")
@@ -196,7 +292,8 @@ def main() -> None:
         print(f"  {e - lo}/{hi - lo} images", flush=True)
     np.savez(part, arr_0=imgs, labels=classes[lo:hi])
     (out / f"shard{args.shard:02d}of{args.nshards:02d}.json").write_text(json.dumps(
-        {**vars(args), "range": [lo, hi]}, indent=2))
+        {**vars(args), "range": [lo, hi],
+         "mean_depth": (depth_sum / depth_n) if depth_n else None}, indent=2))
     print(f"wrote {part}")
 
 

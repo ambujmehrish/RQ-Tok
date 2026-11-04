@@ -162,3 +162,13 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+
+def load_books(path: str) -> tuple[torch.Tensor, float, float, AdaptiveResidualQuantizer]:
+    """Stage-0 artefact -> (codebooks [D, K, d], residual RMS, tau, quantizer)."""
+    blob = torch.load(path, map_location="cpu", weights_only=False)
+    q = make_quantizer(blob["width"], blob["codebook_size"], blob["max_depth"],
+                       tau=blob["tau"], adaptive=True)
+    q.load_state_dict(blob["state_dict"])
+    books = torch.stack([q._book(k).embed.detach().clone() for k in range(q.max_depth)])
+    return books, float(blob["res_rms"]), float(blob["tau"]), q.eval()

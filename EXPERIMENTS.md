@@ -237,6 +237,26 @@ and asserted on every batch. Upstream leaves NumPy unseeded; each batch is seede
 10,000 samples with classes uniform over 1,000 `[paper §5.1]`; scored against the ADM
 ImageNet-256 reference batch (FID, sFID, IS).
 
+*AdaRQ-Flow arm (same backbone, branch, loop; only the bridge differs).*
+`levelb/adarq_tokenizer.py`, `levelb/adarq_model.py`, `levelb/train_adarq.py`.
+- **Stage 0:** adaptive RVQ on the precomputed Qwen latents. Per-depth codebooks of K = 1024
+  with a reserved zero codeword, D_max = 4, EMA 0.99, dead-code reinit below 0.5, fitted at
+  full depth on the train split (20k steps x 64 images). The halting threshold is chosen on
+  the validation slice for a **mean depth of 2.0** — a rate choice fixed here, not tuned for
+  quality. Codes are prefix-nested, so the threshold only truncates them.
+- **Heads on upstream's hidden states** (`branch_hidden` reproduces upstream's training forward
+  exactly; upstream's MSE loss is recovered bit for bit): a depth-autoregressive code head,
+  `W_k LN(h + P(zhat^(k)) + e_k)` over K + 1 symbols, no halt at level 1; a flow-matching residual
+  head (AdaLN MLP, width 1024, 3 blocks) on the residual normalised by its RMS, conditioned on
+  `h + Q(zhat)`, 4 timesteps per token. Loss = CE (masked patches, levels up to the first halt)
+  + flow loss. Upstream's linear head is unused and frozen; head sizes are logged against it.
+- **Training:** identical to the Bifrost-1 arm (seed, data order, masks, optimiser, schedule,
+  budget, held-out monitoring, final checkpoint).
+- **Sampling:** the same MAR loop. The revealed patch's codes are sampled depth by depth from
+  guided logits (guidance on raw logits, then halt forbidden at level 1), then its residual by
+  32 Euler steps of the guided velocity; guidance weight 1.0 as in the Bifrost-1 arm. The same
+  ControlNet renders both arms.
+
 **Faithfulness gate.** Our retrained Bifrost-1 must reach FID <= 30.9 (within 20% of
 25.77). If it does not, the baseline is not faithful and no comparison is reported until
 it is fixed.

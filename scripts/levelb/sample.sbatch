@@ -27,7 +27,7 @@ cd "$REPO"
 mkdir -p logs
 die() { echo "FAILED: $*" >&2; exit 1; }
 
-ARM="${ARM:?set ARM=bifrost}"
+ARM="${ARM:?set ARM=bifrost or ARM=adarq}"
 SEED="${SEED:?set SEED (0, 1, 2)}"
 SHARD="${SHARD:-0}"; NSHARDS="${NSHARDS:-1}"
 LEVELB_ROOT="${LEVELB_ROOT:-$HOME/work/levelb}"
@@ -50,7 +50,13 @@ gpu=$(nvidia-smi --query-gpu=name --format=csv,noheader 2>/dev/null | head -1 ||
 [[ "$gpu" == *H200* ]] || die "expected an H200, got '${gpu:-no GPU}'"
 export PYTHONPATH="$REPO${PYTHONPATH:+:$PYTHONPATH}"
 
-python -m levelb.sample --arm "$ARM" --branch "$BRANCH" --controlnet "$CN" \
+EXTRA=()
+if [ "$ARM" = "adarq" ]; then
+  HEADS="$LEVELB_ROOT/branch_adarq/final_heads.pt"
+  [ -f "$HEADS" ] || die "$HEADS missing: AdaRQ-Flow Stage 1 has not finished"
+  EXTRA=(--heads "$HEADS" --tok "$LEVELB_ROOT/adarq_tok")
+fi
+python -m levelb.sample --arm "$ARM" --branch "$BRANCH" --controlnet "$CN" "${EXTRA[@]+"${EXTRA[@]}"}" \
     --data "$LEVELB_ROOT/imagenet256" --seed "$SEED" --n 10000 \
     --shard "$SHARD" --nshards "$NSHARDS" --out "$OUT"
 echo "=== shard $SHARD/$NSHARDS of $ARM seed $SEED done: $OUT ==="

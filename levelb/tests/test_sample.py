@@ -70,3 +70,41 @@ def test_sample_end_to_end_and_reproducible(tiny_vlm, tiny_flux, transformer, tm
     assert za["labels"].tolist() == np.random.default_rng(0).integers(0, 1000, 3).tolist()
     path = merge(str(a), nshards=1, n=3)
     assert np.load(path)["arr_0"].shape[0] == 3
+
+
+def _adarq_setup(tmp, vlm):
+    from levelb import adarq_model as am
+    from levelb import adarq_tokenizer as at
+
+    q = at.make_quantizer(HIDDEN, 16, 4, tau=0.5, adaptive=True)
+    tok = tmp / "tok"
+    tok.mkdir()
+    torch.save({"state_dict": q.state_dict(), "tau": 0.5, "res_rms": 0.1, "codebook_size": 16,
+                "max_depth": 4, "width": HIDDEN}, tok / "tokenizer.pt")
+    books, rms, _, _ = at.load_books(str(tok / "tokenizer.pt"))
+    model = bb.build_model(vlm, inner_dim=HIDDEN)
+    heads = am.AdaRQHeads(HIDDEN, books, rms, flow_width=32, flow_depth=2)
+    am.set_trainable_adarq(model, heads)
+    run = tmp / "adarq"
+    run.mkdir()
+    torch.save({n: p.detach() for n, p in model.named_parameters() if p.requires_grad},
+               run / "final_trainable.pt")
+    torch.save(heads.state_dict(), run / "final_heads.pt")
+    (run / "config.json").write_text(json.dumps({"flow_width": 32, "flow_depth": 2}))
+    return tok, run
+
+
+def test_adarq_sample_end_to_end(tiny_vlm, tiny_flux, transformer, tmp_path):  # noqa: F811
+    data, _, cn = _setup(tmp_path, tiny_vlm, tiny_flux, transformer)
+    tok, run = _adarq_setup(tmp_path, tiny_vlm)
+    out = tmp_path / "s"
+    cmd = [sys.executable, "-m", "levelb.sample", "--arm", "adarq",
+           "--branch", str(run / "final_trainable.pt"), "--heads", str(run / "final_heads.pt"),
+           "--tok", str(tok), "--controlnet", str(cn), "--data", str(data), "--vlm", tiny_vlm,
+           "--flux", tiny_flux, "--n", "3", "--seed", "0", "--batch", "2", "--steps", "2",
+           "--flow-steps", "2", "--res", "32", "--device", "cpu", "--out", str(out)]
+    subprocess.run(cmd, check=True, capture_output=True, text=True)
+    z = np.load(out / "shard00of01.npz")
+    meta = json.loads((out / "shard00of01.json").read_text())
+    assert z["arr_0"].shape == (3, 32, 32, 3)
+    assert 1.0 <= meta["mean_depth"] <= 4.0
