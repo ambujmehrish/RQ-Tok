@@ -68,9 +68,16 @@ RES="$OUT/results.txt"
     --image-root-path "$IMAGES" --resolution "$RESOLUTION" --pic-num 4 \
     --csv "$ELLA_CODE/dpg_bench/dpg_bench.csv" --res-path "$RES" ) 2>&1 | tee "$OUT/log.txt"
 
-grep -q "Failed filename" "$OUT/log.txt" && die "some images failed to score (see $OUT/log.txt)"
+# ELLA's prepare_dpg_data skips CSV row 0 (`if i == 0: continue`), which is proposition 1 of
+# partiprompts97; that prompt's dependency lookup then raises KeyError(1) for EVERY model,
+# so the official script averages 1064 prompts. That one known exclusion is reproduced as
+# is (ELLA's scorer is not patched); any other failure stops the job.
+failed=$(sed -n 's/^Failed filename: \([^ ]*\).*/\1/p' "$OUT/log.txt" | sort -u | tr '\n' ' ')
+[ "$failed" = "partiprompts97.png " ] || [ -z "$failed" ] \
+  || die "unexpected scoring failures: $failed(see $OUT/log.txt)"
 scored=$(grep -c '\.png, ' "$RES" || true)
-[ "$scored" -eq 1065 ] || die "only $scored of 1065 grids were scored"
+want=$([ -z "$failed" ] && echo 1065 || echo 1064)
+[ "$scored" -eq "$want" ] || die "only $scored grids scored, expected $want"
 score=$(sed -n 's/^DPG-Bench score: //p' "$RES" | tail -1)
 [ -n "$score" ] || die "no DPG-Bench score in $RES"
 
@@ -85,4 +92,4 @@ print("CALIBRATION PASSED")
 PY
   touch "$BENCH_ROOT/DPG_CALIBRATED"
 fi
-echo "=== DPG-Bench score: $score  (all 1065 grids scored; $OUT) ==="
+echo "=== DPG-Bench score: $score  ($scored grids scored; $OUT) ==="

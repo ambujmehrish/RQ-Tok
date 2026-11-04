@@ -134,7 +134,11 @@ cannot load mPLUG, so the environment is a lock file verified to run the judge c
 datasets 2.18.0, fairseq 0.12.2 — the benchmark's release era; torch 2.5.1+cu124).
 Deviation **D1**: ModelScope 1.13 can no longer download from today's hub, so mPLUG is
 downloaded by a current ModelScope CLI and loaded from disk; nothing else changes. The
-scorer silently skips images that raise, so every run must score all 1065 grids or fail.
+scorer silently skips images that raise, so every run must score all grids or fail —
+with one exception that is ELLA's own: its `prepare_dpg_data` skips CSV row 0
+(`if i == 0: continue`), proposition 1 of `partiprompts97`, so that prompt raises
+`KeyError(1)` for every model and the official script averages **1064** prompts. That
+exclusion is reproduced, not patched (D2); any other failure stops the job.
 Calibration: SD v1.5 must reproduce ELLA's published 63.18 (Table 4) within ±2.0 —
 wider than GenEval's band because ELLA does not publish its SD v1.5 sampling settings
 (diffusers defaults: 512 px, 50 steps, guidance 7.5). Bifrost-1's own DPG grids are scored
