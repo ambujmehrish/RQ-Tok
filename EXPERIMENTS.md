@@ -140,6 +140,18 @@ wider than GenEval's band because ELLA does not publish its SD v1.5 sampling set
 (diffusers defaults: 512 px, 50 steps, guidance 7.5). Bifrost-1's own DPG grids are scored
 exactly as its script saves them (2x2 grid with 2-px padding, scored at 512-px tiles).
 
+**ImageNet-256 scorer (Level B test).** OpenAI's ADM evaluation suite
+(`openai/guided-diffusion` @ `22e0df8`, `evaluations/evaluator.py`, unmodified, with its
+Inception-v3 graph and the ImageNet-256 reference batch) — the suite that computes sFID,
+as reported by Bifrost-1 §5.1. Its requirements say `tensorflow-gpu>=2.0`; the environment
+is a lock verified here: tensorflow-cpu 2.15.1, numpy 1.23.5 (numpy >= 1.24 removed `np.bool`,
+which the evaluator's precision/recall uses), oneDNN off; two runs on the same inputs are
+bit-identical. Calibration (`scripts/bench/adm_score.sbatch CALIBRATE=1`) must reproduce the
+README's published ADM-G + ADM-U numbers — IS 215.837 (±1.0), FID 3.9426 (±0.05), sFID
+6.1404 (±0.10), Precision 0.8265 (±0.005), Recall 0.5309 (±0.005) — before any model is
+scored. Secondary test reference: the 50,000 ImageNet validation images, same 256 crop as
+training (`levelb/val_ref.py`).
+
 ### Level B — controlled head-to-head (paper §5.1, ImageNet 256 x 256)
 
 The protocol the paper ran on a single GH200, which a single H200 matches. Both arms use

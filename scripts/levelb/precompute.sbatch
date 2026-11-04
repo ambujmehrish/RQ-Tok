@@ -60,5 +60,8 @@ inet.save_class_names(names, f"{out}/class_names.json")
 print(f"split: {len(train)} train / {len(held)} held-out | {len(names)} class prompts, "
       f"e.g. {names[:3]}")
 PY
+# secondary test reference: ImageNet validation, never trained on
+[ -f "$OUT/val_ref_50000.npz" ] || python -m levelb.val_ref --imagenet "$IMAGENET_ROOT/hf" \
+    --out "$OUT/val_ref_50000.npz"
 cp "$IMAGENET_ROOT/PROVENANCE.json" "$OUT/imagenet_provenance.json"
 echo "=== done: $OUT ==="
