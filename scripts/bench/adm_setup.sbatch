@@ -54,10 +54,8 @@ set -u
 python -m pip install -q --no-deps -r "$REPO/scripts/bench/adm_requirements.lock.txt"
 python -m pip check || die "the ADM evaluator environment is inconsistent"
 
-fetch() {   # $1 = url, $2 = destination
-  [ -f "$2" ] && return 0
-  curl -sS -L --fail -o "$2.part" "$1" || die "could not download $1"
-  mv "$2.part" "$2"
+fetch() {   # $1 = url, $2 = destination: verified byte-range chunks, resumes a .part file
+  python "$REPO/scripts/bench/fetch_ranged.py" "$1" "$2" || die "could not download $1 (resubmit to resume)"
 }
 fetch "$BASE/classify_image_graph_def.pb" "$ADM/classify_image_graph_def.pb"
 fetch "$BASE/imagenet/256/VIRTUAL_imagenet256_labeled.npz" "$ADM/VIRTUAL_imagenet256_labeled.npz"
