@@ -63,7 +63,11 @@ def main() -> None:
     ap.add_argument("--imagenet", required=True, help="dir with data/train-*.parquet")
     ap.add_argument("--out", required=True)
     ap.add_argument("--vlm", default="Qwen/Qwen2.5-VL-3B-Instruct")
-    ap.add_argument("--batch", type=int, default=128)
+    # Upstream's visual tower uses eager attention over ONE block-diagonal matrix for
+    # the whole batch, so memory grows with batch^2 (128 images = 64 GiB per matrix).
+    # Upstream ships window tables for exactly bsz 32 at 16x16 patches (224 px):
+    # precomputed_tensors_bsz32_grid16x16.py. Use that batch.
+    ap.add_argument("--batch", type=int, default=32)
     ap.add_argument("--workers", type=int, default=int(os.environ.get("SLURM_CPUS_PER_TASK", 4)))
     ap.add_argument("--device", default="cuda")
     ap.add_argument("--expect-total", type=int, default=inet.NUM_TRAIN,

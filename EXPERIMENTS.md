@@ -192,7 +192,9 @@ the same crop resized to 224 → Qwen2.5-VL visual tower → 8x8 = 64 post-merge
 width 2048 `[upstream path name 224res_64tokens; paper §5.1 uses 64 tokens]`; the
 224 view is the 256 crop resized bicubically, so the latent grid is aligned with the FLUX
 token grid. No flip. The frozen tower's latents are computed once
-(`levelb/precompute.py`, fixed batch 128 in dataset order) and fed to upstream's forward
+(`levelb/precompute.py`, fixed batch 32 in dataset order — upstream's visual tower
+uses eager attention over one block-diagonal matrix per batch, memory ~ batch^2, and
+upstream ships window tables for exactly bsz 32 at 224 px) and fed to upstream's forward
 as `image_clip_embs`, which it accepts; both arms and the ControlNet read the same file.
 
 *Stage 1 — vision branch.* Qwen2.5-VL-3B frozen; branch = per-layer copies of

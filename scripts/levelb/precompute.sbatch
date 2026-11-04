@@ -47,7 +47,7 @@ free=$(df -BG --output=avail "$OUT" | tail -1 | tr -dc '0-9')
 
 export PYTHONPATH="$REPO${PYTHONPATH:+:$PYTHONPATH}"
 python -m levelb.precompute --imagenet "$IMAGENET_ROOT/hf" --out "$OUT" \
-    --vlm Qwen/Qwen2.5-VL-3B-Instruct --batch 128
+    --vlm Qwen/Qwen2.5-VL-3B-Instruct --batch 32
 
 # fixed held-out slice (checkpoint selection only) and the class prompts
 python - "$OUT" "$IMAGENET_ROOT/hf/classes.py" <<'PY'
