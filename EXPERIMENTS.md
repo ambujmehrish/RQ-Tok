@@ -161,6 +161,16 @@ README's published ADM-G + ADM-U numbers — IS 215.837 (±1.0), FID 3.9426 (±0
 6.1404 (±0.10), Precision 0.8265 (±0.005), Recall 0.5309 (±0.005) — before any model is
 scored. Secondary test reference: the 50,000 ImageNet validation images, same 256 crop as
 training (`levelb/val_ref.py`).
+First calibration attempt (job 1506465, on an H200 node): IS 215.837158 matched, then FID
+raised "Imaginary component 0.0646" inside the evaluator. Diagnosis (`scripts/bench/adm_diag.*`):
+the same lock, commit and official batches reproduce the published FID/sFID with a real
+sqrtm off-cluster (3.94257 / 6.14043; scipy 1.15.3, 1.11.4, 1.10.1 identical; every OpenBLAS
+kernel type and thread count tried) and on a vhpc CPU node (job 1506499: IS 215.83711, FID
+3.94257, sFID 6.14043). The H200-node failure was not reproduced elsewhere; the most likely
+cause is BLAS threading on that node, not proven. Scoring therefore runs CPU-only (the
+evaluator is tensorflow-cpu) with BLAS threads pinned to the allocated CPUs, the node and
+CPU are recorded with every result, and the full five-number calibration is rerun on that
+setup before any model is scored.
 
 ### Level B — controlled head-to-head (paper §5.1, ImageNet 256 x 256)
 

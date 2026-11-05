@@ -12,11 +12,16 @@
 # Calibration requires every published value (guided-diffusion evaluations/README.md:
 # IS 215.837, FID 3.9426, sFID 6.1404, Precision 0.8265, Recall 0.5309) within tolerance;
 # until it passes no model is scored. Writes <samples>.<ref>.metrics.json.
+#
+# CPU only: the evaluator runs on tensorflow-cpu. On an H200 node (job 1506465) its FID
+# raised "Imaginary component 0.0646"; on a CPU node (adm_diag, job 1506499) and off-cluster
+# the same lock, commit and batches reproduce FID 3.9426 / sFID 6.1404 with a real sqrtm.
+# BLAS threads are pinned to the allocated CPUs; the node and CPU are recorded with every
+# result, and calibration and scoring run on the same kind of node.
 # =====================================================================================
 #SBATCH --job-name=adm-score
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --gres=gpu:h200:1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=64G
 #SBATCH --time=12:00:00
@@ -41,6 +46,10 @@ conda activate "$ADM_ENV"
 set -u
 [ "$(git -C "$ADM_DIR/guided-diffusion" rev-parse HEAD)" = "$ADM_COMMIT" ] || die "evaluator checkout moved"
 export TMPDIR="/tmp/$USER-${SLURM_JOB_ID:-local}"; mkdir -p "$TMPDIR"; trap 'rm -rf "$TMPDIR"' EXIT
+NCPU="${SLURM_CPUS_PER_TASK:?run through sbatch}"
+export OMP_NUM_THREADS="$NCPU" OPENBLAS_NUM_THREADS="$NCPU" MKL_NUM_THREADS="$NCPU"
+CPU_MODEL=$(lscpu | sed -n 's/^Model name: *//p' | head -1)
+echo "  node $(hostname) | $CPU_MODEL | $NCPU threads"
 
 CALIBRATE="${CALIBRATE:-0}"
 if [ "$CALIBRATE" = "1" ]; then
@@ -72,9 +81,10 @@ PY
 OUT="${SAMPLES%.npz}.${REF}.metrics"
 ( cd "$ADM_DIR" && python guided-diffusion/evaluations/evaluator.py "$REF_NPZ" "$SAMPLES" ) \
   2>&1 | tee "$OUT.log"
-python - "$OUT.log" "$OUT.json" "$CALIBRATE" <<'PY'
+python - "$OUT.log" "$OUT.json" "$CALIBRATE" "$(hostname)" "$CPU_MODEL" "$NCPU" <<'PY'
 import json, re, sys
 log, out, calibrate = sys.argv[1], sys.argv[2], sys.argv[3] == "1"
+node = {"host": sys.argv[4], "cpu": sys.argv[5], "threads": int(sys.argv[6])}
 text = open(log).read()
 keys = {"Inception Score": "IS", "FID": "FID", "sFID": "sFID",
         "Precision": "Precision", "Recall": "Recall"}
@@ -84,7 +94,7 @@ for label, k in keys.items():
     if not hit:
         sys.exit(f"evaluator output has no '{label}' line")
     m[k] = float(hit[-1])
-json.dump(m, open(out, "w"), indent=2)
+json.dump({**m, "node": node}, open(out, "w"), indent=2)
 print("  " + "  ".join(f"{k} {v:.4f}" for k, v in m.items()))
 if calibrate:
     ref = {"IS": (215.837, 1.0), "FID": (3.9426, 0.05), "sFID": (6.1404, 0.10),
@@ -96,5 +106,5 @@ if calibrate:
         sys.exit(f"CALIBRATION FAILED on {sorted(bad)} — do not use this evaluator")
     print("CALIBRATION PASSED — the evaluator reproduces ADM's published numbers.")
 PY
-[ "$CALIBRATE" = "1" ] && touch "$BENCH_ROOT/ADM_CALIBRATED"
+[ "$CALIBRATE" = "1" ] && echo "$(hostname) | $CPU_MODEL" > "$BENCH_ROOT/ADM_CALIBRATED"
 echo "=== metrics: $OUT.json ==="
