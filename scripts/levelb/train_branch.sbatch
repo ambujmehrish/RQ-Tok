@@ -44,7 +44,8 @@ export PYTHONPATH="$REPO${PYTHONPATH:+:$PYTHONPATH}"
 # SLURM signals the batch shell (B:USR1); forward it so Python checkpoints and exits.
 # batch 128 does not fit 141 GB in one pass (3B frozen + 2.8B trainable branch);
 # accumulate micro-batches of MICRO (default 32): the update equals the full-batch one
-export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+# no PYTORCH_CUDA_ALLOC_CONF=expandable_segments: the vhpc H200 nodes reject it
+# ("CUDA driver error: operation not supported", jobs 1506492/1506493)
 python -m levelb.train_branch --data "$DATA" --out "$OUT" --micro-batch "${MICRO:-32}" &
 PID=$!
 trap 'echo "### USR1: asking trainer to checkpoint"; kill -USR1 "$PID"' USR1
