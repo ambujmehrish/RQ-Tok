@@ -128,8 +128,11 @@ def test_train_and_resume(tiny_flux, transformer, tmp_path):
     assert vals and all(np.isfinite(vals))
 
 
-def test_heldout_eval_does_not_touch_training_rng(tiny_flux, tmp_path):
+def test_heldout_eval_does_not_touch_training_rng(tiny_flux, tmp_path, monkeypatch):
     """heldout_loss reseeds for fixed noise; training with and without it is bit-identical."""
+    # one CPU thread: multithreaded reductions can differ by an ulp between identical runs
+    monkeypatch.setenv("OMP_NUM_THREADS", "1")
+    monkeypatch.setenv("MKL_NUM_THREADS", "1")
     data = tmp_path / "data"
     data.mkdir()
     _data(data, tiny_flux)

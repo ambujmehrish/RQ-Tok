@@ -45,10 +45,13 @@ def test_adarq_train_resume(tiny_vlm, tmp_path):  # noqa: F811
     assert any("heldout_code_ce" in r for r in recs)
 
 
-def test_heldout_eval_does_not_touch_training_rng(tiny_vlm, tmp_path):  # noqa: F811
+def test_heldout_eval_does_not_touch_training_rng(tiny_vlm, tmp_path, monkeypatch):  # noqa: F811
     """--seed fixes the initial weights and evals reseed their own stream only: two runs
     without evals and one with an eval every step are bit-identical (the flow loss draws t
     and noise from the global torch RNG)."""
+    # one CPU thread: multithreaded reductions can differ by an ulp between identical runs
+    monkeypatch.setenv("OMP_NUM_THREADS", "1")
+    monkeypatch.setenv("MKL_NUM_THREADS", "1")
     data, tok = tmp_path / "data", tmp_path / "tok"
     data.mkdir()
     _data(data)

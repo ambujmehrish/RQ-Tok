@@ -55,9 +55,12 @@ def test_train_resume_and_freeze(tiny_vlm, tmp_path):  # noqa: F811
     assert all(np.isfinite(r.get("heldout_mse", 0.0)) for r in recs)
 
 
-def test_seeded_and_independent_of_evals(tiny_vlm, tmp_path):  # noqa: F811
+def test_seeded_and_independent_of_evals(tiny_vlm, tmp_path, monkeypatch):  # noqa: F811
     """--seed fixes the initial weights (upstream's mask token, position embedding and head
     are random), and held-out evals do not change training: three runs, bit-identical."""
+    # one CPU thread: multithreaded reductions can differ by an ulp between identical runs
+    monkeypatch.setenv("OMP_NUM_THREADS", "1")
+    monkeypatch.setenv("MKL_NUM_THREADS", "1")
     data = tmp_path / "data"
     data.mkdir()
     _data(data)
