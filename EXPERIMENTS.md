@@ -257,6 +257,10 @@ ImageNet-256 reference batch (FID, sFID, IS).
   full depth on the train split (20k steps x 64 images). The halting threshold is chosen on
   the validation slice for a **mean depth of 2.0** — a rate choice fixed here, not tuned for
   quality. Codes are prefix-nested, so the threshold only truncates them.
+  **Result (vhpc01):** tau 0.76055 gives validation mean depth 2.000 (patches at depth
+  1/2/3/4: 132355 / 46359 / 22217 / 55069), mean relative residual 0.699, residual RMS
+  1.4013. Files: `codes_train.npy`, `tokenizer.pt`, `tokenizer.json` in
+  `$LEVELB_ROOT/adarq_tok`; `train_adarq.sbatch` reuses them.
 - **Heads on upstream's hidden states** (`branch_hidden` reproduces upstream's training forward
   exactly; upstream's MSE loss is recovered bit for bit): a depth-autoregressive code head,
   `W_k LN(h + P(zhat^(k)) + e_k)` over K + 1 symbols, no halt at level 1; a flow-matching residual
