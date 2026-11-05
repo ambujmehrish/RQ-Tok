@@ -126,3 +126,18 @@ def test_train_and_resume(tiny_flux, transformer, tmp_path):
     recs = [json.loads(line) for line in (out / "metrics.jsonl").read_text().splitlines()]
     vals = [r["heldout_flow_loss"] for r in recs if "heldout_flow_loss" in r]
     assert vals and all(np.isfinite(vals))
+
+
+def test_heldout_eval_does_not_touch_training_rng(tiny_flux, tmp_path):
+    """heldout_loss reseeds for fixed noise; training with and without it is bit-identical."""
+    data = tmp_path / "data"
+    data.mkdir()
+    _data(data, tiny_flux)
+    states = []
+    for every in ("1", "1000"):
+        out = tmp_path / f"run{every}"
+        _run(data, out, tiny_flux, "--max-steps", "3", "--eval-every", every,
+             "--save-every", "1000")
+        states.append(torch.load(out / "ckpt.pt", weights_only=False)["controlnet"])
+    a, b = states
+    assert all(torch.equal(a[k], b[k]) for k in a)

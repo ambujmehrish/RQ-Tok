@@ -40,6 +40,23 @@ def _on_signal(signum, frame):  # noqa: ARG001
     _STOP["flag"] = True
 
 
+def isolated_rng(device: torch.device):
+    """Held-out evaluation draws from its own seeds; this keeps it from moving or reseeding
+    the training stream (CPU and CUDA), so training is the same with or without evals."""
+    return torch.random.fork_rng(devices=[device] if device.type == "cuda" else [])
+
+
+def rng_state() -> dict:
+    return {"torch_rng": torch.get_rng_state(),
+            "cuda_rng": torch.cuda.get_rng_state_all() if torch.cuda.is_available() else None}
+
+
+def set_rng_state(state: dict) -> None:
+    torch.set_rng_state(state["torch_rng"])
+    if state.get("cuda_rng") is not None and torch.cuda.is_available():
+        torch.cuda.set_rng_state_all(state["cuda_rng"])
+
+
 class LatentData:
     """Precomputed latents + class prompts, read by index from the memmapped arrays."""
 
@@ -75,13 +92,19 @@ def _save(out: pathlib.Path, model, opt, sched, step: int, rng: np.random.Genera
     tmp = out / "ckpt.tmp"
     torch.save({"step": step, "epoch": epoch, "pos": pos, "trainable": trainable,
                 "opt": opt.state_dict(), "sched": sched.state_dict(),
-                "rng": rng.bit_generator.state, "torch_rng": torch.get_rng_state()}, tmp)
+                "rng": rng.bit_generator.state, **rng_state()}, tmp)
     tmp.replace(out / "ckpt.pt")
 
 
 @torch.no_grad()
 def evaluate(model, conv, data: LatentData, n: int, batch: int, device) -> float:
-    """MSE on a FIXED subset of the held-out slice with FIXED masks (comparable over time)."""
+    """MSE on a FIXED subset of the held-out slice with FIXED masks (comparable over time).
+    ``batch`` is the micro-batch: no-grad memory, not the training batch, sets it."""
+    with isolated_rng(device):
+        return _evaluate(model, conv, data, n, batch, device)
+
+
+def _evaluate(model, conv, data: LatentData, n: int, batch: int, device) -> float:
     model.eval()
     rng = np.random.default_rng(1234)
     idx = data.heldout[:n]
@@ -137,6 +160,9 @@ def main() -> None:
     data = LatentData(args.data)
     steps_per_epoch = len(data.train) // args.batch
     total = int(math.ceil(args.epochs * steps_per_epoch))
+    # seed BEFORE building: upstream initialises the mask token, position embedding and
+    # linear head randomly (and AdaRQ its heads), so --seed must fix the initial weights
+    torch.manual_seed(args.seed)
     model = bb.build_model(args.vlm, inner_dim=data.width).to(device)
     if device.type == "cpu":          # tests only: CPU has no bf16 autocast for these ops
         model = model.float()
@@ -147,7 +173,6 @@ def main() -> None:
     sched = torch.optim.lr_scheduler.LambdaLR(opt, lambda s: lr_lambda(s, args.warmup, total))
 
     rng = np.random.default_rng(args.seed)
-    torch.manual_seed(args.seed)
     step, epoch, pos = 0, 0, 0
     ckpt = out / "ckpt.pt"
     if ckpt.exists():
@@ -158,7 +183,7 @@ def main() -> None:
         opt.load_state_dict(state["opt"])
         sched.load_state_dict(state["sched"])
         rng.bit_generator.state = state["rng"]
-        torch.set_rng_state(state["torch_rng"])
+        set_rng_state(state)
         step, epoch, pos = state["step"], state["epoch"], state["pos"]
         print(f"[resume] step {step} (epoch {epoch}, pos {pos})", flush=True)
     (out / "config.json").write_text(json.dumps(
@@ -207,7 +232,8 @@ def main() -> None:
             print(f"  step {step}/{total} loss {float(loss):.5f} |g| {float(gnorm):.3f} "
                   f"lr {rec['lr']:.2e} {rate:.2f} it/s", flush=True)
         if step % args.eval_every == 0 or step == total:
-            val = evaluate(model, conv, data, args.eval_n, args.batch, device)
+            val = evaluate(model, conv, data, args.eval_n, args.micro_batch or args.batch,
+                           device)
             log.write(json.dumps({"step": step, "heldout_mse": val}) + "\n")
             log.flush()
             print(f"  [heldout] step {step} mse {val:.5f}", flush=True)

@@ -43,3 +43,33 @@ def test_adarq_train_resume(tiny_vlm, tmp_path):  # noqa: F811
     assert cfg["adarq_heads"] > 0 and 0 < cfg["tau"] < 1
     recs = [json.loads(line) for line in (out / "metrics.jsonl").read_text().splitlines()]
     assert any("heldout_code_ce" in r for r in recs)
+
+
+def test_heldout_eval_does_not_touch_training_rng(tiny_vlm, tmp_path):  # noqa: F811
+    """--seed fixes the initial weights and evals reseed their own stream only: two runs
+    without evals and one with an eval every step are bit-identical (the flow loss draws t
+    and noise from the global torch RNG)."""
+    data, tok = tmp_path / "data", tmp_path / "tok"
+    data.mkdir()
+    _data(data)
+    import numpy as np
+    np.save(data / "latents_train.npy", bf16_bits(_latents(n=24, width=HIDDEN)))
+    subprocess.run([sys.executable, "-m", "levelb.adarq_tokenizer", "--data", str(data),
+                    "--out", str(tok), "--codebook-size", "16", "--steps", "20",
+                    "--images-per-step", "8", "--val-images", "4", "--target-mean-depth", "2.5",
+                    "--device", "cpu"],
+                   check=True, capture_output=True, text=True)
+    states = []
+    for name, every in (("a", "1000"), ("b", "1000"), ("c", "1")):
+        out = tmp_path / name
+        subprocess.run([sys.executable, "-m", "levelb.train_adarq", "--data", str(data),
+                        "--tok", str(tok), "--out", str(out), "--vlm", tiny_vlm, "--batch", "4",
+                        "--warmup", "2", "--epochs", "1", "--save-every", "1000",
+                        "--eval-every", every, "--eval-n", "4", "--flow-width", "32",
+                        "--flow-depth", "2", "--micro-batch", "2", "--device", "cpu",
+                        "--max-steps", "3"], check=True, capture_output=True, text=True)
+        states.append(torch.load(out / "ckpt.pt", weights_only=False))
+    for other in states[1:]:
+        for part in ("heads", "trainable"):
+            a, b = states[0][part], other[part]
+            assert a.keys() == b.keys() and all(torch.equal(a[k], b[k]) for k in a), part

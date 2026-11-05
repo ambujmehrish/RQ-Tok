@@ -26,7 +26,8 @@ import torch
 from . import bifrost_build as bb
 from .adarq_model import AdaRQHeads, branch_hidden, set_trainable_adarq
 from .adarq_tokenizer import load_books
-from .train_branch import _STOP, LatentData, _on_signal, lr_lambda
+from .train_branch import (_STOP, LatentData, _on_signal, isolated_rng, lr_lambda, rng_state,
+                           set_rng_state)
 from .upstream import require_official_model
 
 
@@ -54,10 +55,17 @@ def _step_loss(model, heads, conv, prompts, lat, codes, mask, device, totals=Non
 
 @torch.no_grad()
 def evaluate(model, heads, conv, data, n, batch, device):
+    """Held-out losses on a FIXED subset with FIXED masks and flow noise; ``batch`` is the
+    micro-batch. Runs on its own RNG stream, so the training stream is untouched."""
+    with isolated_rng(device):
+        torch.manual_seed(1234)
+        return _evaluate(model, heads, conv, data, n, batch, device)
+
+
+def _evaluate(model, heads, conv, data, n, batch, device):
     model.eval()
     heads.eval()
     rng = np.random.default_rng(1234)
-    torch.manual_seed(1234)
     tot = {"loss": 0.0, "code_ce": 0.0, "flow": 0.0}
     cnt = 0
     for s in range(0, n, batch):
@@ -109,6 +117,9 @@ def main() -> None:
     books, res_rms, tau, _ = load_books(str(pathlib.Path(args.tok) / "tokenizer.pt"))
     steps_per_epoch = len(data.train) // args.batch
     total = int(math.ceil(args.epochs * steps_per_epoch))
+    # seed BEFORE building: upstream initialises the mask token, position embedding and
+    # linear head randomly (and AdaRQ its heads), so --seed must fix the initial weights
+    torch.manual_seed(args.seed)
     model = bb.build_model(args.vlm, inner_dim=data.width).to(device)
     heads = AdaRQHeads(data.width, books, res_rms, args.flow_width, args.flow_depth).to(device)
     if device.type == "cpu":
@@ -120,7 +131,6 @@ def main() -> None:
     sched = torch.optim.lr_scheduler.LambdaLR(opt, lambda s: lr_lambda(s, args.warmup, total))
 
     rng = np.random.default_rng(args.seed)
-    torch.manual_seed(args.seed)
     step, epoch, pos = 0, 0, 0
     ckpt = out / "ckpt.pt"
     if ckpt.exists():
@@ -132,7 +142,7 @@ def main() -> None:
         opt.load_state_dict(st["opt"])
         sched.load_state_dict(st["sched"])
         rng.bit_generator.state = st["rng"]
-        torch.set_rng_state(st["torch_rng"])
+        set_rng_state(st)
         step, epoch, pos = st["step"], st["epoch"], st["pos"]
         print(f"[resume] step {step} (epoch {epoch}, pos {pos})", flush=True)
 
@@ -143,7 +153,7 @@ def main() -> None:
                                   if p.requires_grad},
                     "heads": heads.state_dict(), "opt": opt.state_dict(),
                     "sched": sched.state_dict(), "rng": rng.bit_generator.state,
-                    "torch_rng": torch.get_rng_state()}, tmp)
+                    **rng_state()}, tmp)
         tmp.replace(ckpt)
 
     (out / "config.json").write_text(json.dumps(
@@ -195,7 +205,8 @@ def main() -> None:
             print(f"  step {step}/{total} loss {float(loss):.4f} (ce {rec['code_ce']:.4f} "
                   f"flow {rec['flow']:.4f}) {rate:.2f} it/s", flush=True)
         if step % args.eval_every == 0 or step == total:
-            val = evaluate(model, heads, conv, data, args.eval_n, args.batch, device)
+            val = evaluate(model, heads, conv, data, args.eval_n, args.micro_batch or args.batch,
+                           device)
             log.write(json.dumps({"step": step, **val}) + "\n")
             log.flush()
             print(f"  [heldout] step {step} {val}", flush=True)

@@ -163,6 +163,13 @@ def _save(out, cn, opt, sched, step, epoch, pos):
 
 @torch.no_grad()
 def heldout_loss(flux, cn, data: ControlData, n: int, batch: int) -> float:
+    """Fixed noise, timesteps and VAE samples, on its own RNG stream: the reseeding below
+    must not touch the training stream (diffusers draws training noise from it)."""
+    with torch.random.fork_rng(devices=[flux.device] if flux.device.type == "cuda" else []):
+        return _heldout_loss(flux, cn, data, n, batch)
+
+
+def _heldout_loss(flux, cn, data: ControlData, n: int, batch: int) -> float:
     cn.eval()
     g = torch.Generator().manual_seed(1234)
     tot, cnt = 0.0, 0

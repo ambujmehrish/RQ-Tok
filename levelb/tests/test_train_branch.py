@@ -53,3 +53,18 @@ def test_train_resume_and_freeze(tiny_vlm, tmp_path):  # noqa: F811
     recs = [json.loads(line) for line in (out / "metrics.jsonl").read_text().splitlines()]
     assert any("heldout_mse" in r for r in recs)
     assert all(np.isfinite(r.get("heldout_mse", 0.0)) for r in recs)
+
+
+def test_seeded_and_independent_of_evals(tiny_vlm, tmp_path):  # noqa: F811
+    """--seed fixes the initial weights (upstream's mask token, position embedding and head
+    are random), and held-out evals do not change training: three runs, bit-identical."""
+    data = tmp_path / "data"
+    data.mkdir()
+    _data(data)
+    states = []
+    for name, every in (("a", "1000"), ("b", "1000"), ("c", "1")):
+        _run(data, tmp_path / name, tiny_vlm, "--max-steps", "3", "--eval-every", every,
+             "--save-every", "1000")
+        states.append(torch.load(tmp_path / name / "ckpt.pt", weights_only=False)["trainable"])
+    for other in states[1:]:
+        assert all(torch.equal(states[0][k], other[k]) for k in states[0])
