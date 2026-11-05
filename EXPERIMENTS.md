@@ -64,6 +64,12 @@ Released checkpoint, official script, calibrated scorer. By task: single object 
 two object 0.922, counting 0.713, colors 0.838, position 0.718, color attribution 0.638
 (the paper reports only the overall score).
 
+**Level A result — DPG-Bench (job 1506473): Bifrost-1 reproduced, 77.88 vs paper 77.67.**
+Scorer calibration first (job 1506472): SD v1.5 61.42 vs ELLA's published 63.18 (band
+±2.0) — PASSED. Both over ELLA's 1064 scorable prompts (D2). **Level A is complete:** the
+released Bifrost-1 checkpoint with its official script reproduces both published
+benchmark numbers (GenEval 0.804 / 0.81, DPG-Bench 77.88 / 77.67) on our scorers.
+
 ### Level A — reference reproduction (released checkpoint, official script)
 
 `scripts/bifrost1/setup.sbatch` then `scripts/bifrost1/generate.sbatch` (one H200 each).
