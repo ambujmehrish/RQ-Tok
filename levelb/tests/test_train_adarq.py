@@ -30,7 +30,7 @@ def test_adarq_train_resume(tiny_vlm, tmp_path):  # noqa: F811
     base = [sys.executable, "-m", "levelb.train_adarq", "--data", str(data), "--tok", str(tok),
             "--out", str(out), "--vlm", tiny_vlm, "--batch", "4", "--warmup", "2",
             "--epochs", "1", "--save-every", "2", "--eval-every", "2", "--eval-n", "4",
-            "--flow-width", "32", "--flow-depth", "2", "--device", "cpu"]
+            "--flow-width", "32", "--flow-depth", "2", "--micro-batch", "2", "--device", "cpu"]
     r = subprocess.run(base + ["--max-steps", "3"], check=True, capture_output=True, text=True)
     assert "stopped at step 3/5" in r.stdout
     r = subprocess.run(base, check=True, capture_output=True, text=True)

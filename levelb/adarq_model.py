@@ -112,9 +112,21 @@ class AdaRQHeads(nn.Module):
         return logits
 
     # -- losses -----------------------------------------------------------------------
+    def counts(self, codes: torch.Tensor, masked: torch.Tensor, flow_reps: int = 4,
+               ) -> tuple[int, int]:
+        """(code targets, flow elements) in a batch: the denominators of its mean losses,
+        so a batch split into micro-batches optimises exactly the full-batch objective."""
+        depth = (codes[masked] != self.K).sum(-1)
+        n_ce = int(torch.clamp(depth + 1, max=self.D).sum())
+        n_flow = int(masked.sum()) * flow_reps * self.books.shape[-1]
+        return n_ce, n_flow
+
     def loss(self, h: torch.Tensor, z: torch.Tensor, codes: torch.Tensor,
-             masked: torch.Tensor, flow_reps: int = 4) -> dict[str, torch.Tensor]:
-        """h, z: [B, N, d]; codes: [B, N, D]; masked: [B, N] bool (positions to learn)."""
+             masked: torch.Tensor, flow_reps: int = 4,
+             totals: tuple[int, int] | None = None) -> dict[str, torch.Tensor]:
+        """h, z: [B, N, d]; codes: [B, N, D]; masked: [B, N] bool (positions to learn).
+        ``totals`` (from ``counts`` on the whole batch) normalises the sums when this is one
+        micro-batch of a larger batch; without it the means are over this call only."""
         h, z, codes = h[masked], z[masked].float(), codes[masked].long()
         pre = self.prefixes(codes)                                   # [M, D+1, d]
         depth = (codes != self.K).sum(-1)                            # [M]
@@ -127,7 +139,7 @@ class AdaRQHeads(nn.Module):
             logit = self.code_logits(h[valid], pre[valid, lvl], lvl)
             ce = ce + F.cross_entropy(logit, codes[valid, lvl], reduction="sum")
             n_ce += int(valid.sum())
-        l_code = ce / max(n_ce, 1)
+        l_code = ce / (totals[0] if totals else max(n_ce, 1))
 
         zhat = pre[torch.arange(len(codes), device=codes.device), depth]
         rho = (z - zhat) / self.res_rms
@@ -137,7 +149,8 @@ class AdaRQHeads(nn.Module):
         eps = torch.randn_like(rho)
         x_t = (1 - t[:, None]) * eps + t[:, None] * rho
         v = self.flow(x_t.to(h.dtype), t, cond).float()
-        l_flow = F.mse_loss(v, rho - eps)
+        sq = (v - (rho - eps)).pow(2).sum()
+        l_flow = sq / (totals[1] if totals else (v.numel()))
         return {"loss": l_code + l_flow, "code_ce": l_code.detach(), "flow": l_flow.detach()}
 
     # -- sampling ---------------------------------------------------------------------

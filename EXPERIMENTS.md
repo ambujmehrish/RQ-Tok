@@ -207,7 +207,10 @@ q/k/v/o, MLP, both RMSNorms and the final norm, **initialised from the MLLM's we
 the paper]`; plus mask token, learnable position embedding and linear head. Mask ratio ~
 truncated N(1.0, 0.25) on [0.7, 1.0], random order `[paper §3.2]`; MSE over all 64
 positions `[upstream forward]`. lr 5e-4, 5k warmup `[upstream path name]`, batch
-128 `[upstream path name t2i128]`, 16 epochs `[paper §5.1]`; optimiser and schedule are
+128 `[upstream path name t2i128]` — on one H200 as 4 accumulated micro-batches of 32
+(exact: one sort and one mask draw per batch, each part weighted by its share; for
+AdaRQ-Flow the sums are divided by the whole batch's target counts), since 128 in one pass
+does not fit 141 GB — 16 epochs `[paper §5.1]`; optimiser and schedule are
 the HF `Trainer` defaults implied by upstream's `TrainingArguments`: AdamW (0.9, 0.999),
 eps 1e-8, no weight decay, linear decay after warmup, grad-norm clip 1.0, bf16 autocast
 `[upstream uses transformers.TrainingArguments]`. The held-out slice is evaluated (fixed

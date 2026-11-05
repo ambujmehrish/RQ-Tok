@@ -111,6 +111,11 @@ def main() -> None:
     ap.add_argument("--warmup", type=int, default=5000)
     ap.add_argument("--epochs", type=float, default=16)
     ap.add_argument("--max-grad-norm", type=float, default=1.0)
+    ap.add_argument("--micro-batch", type=int, default=None,
+                    help="gradient accumulation: split each batch into micro-batches of this "
+                         "size. The batch is sorted and its masks drawn ONCE, then split, and "
+                         "each part's mean loss is weighted by its share, so the update is the "
+                         "full-batch update whatever the split")
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--save-every", type=int, default=2000)
     ap.add_argument("--eval-every", type=int, default=5000)
@@ -170,18 +175,25 @@ def main() -> None:
         if pos + args.batch > len(perm):
             epoch, pos = epoch + 1, 0
             perm = np.random.default_rng(args.seed + epoch).permutation(data.train)
-        part = perm[pos:pos + args.batch]
+        part = np.sort(perm[pos:pos + args.batch])
         pos += args.batch
-        prompts, lat = data.batch(part)
         mask = bb.sample_mar_mask(len(part), bb.NUM_TOKENS, rng)
-        flow = {k: v.to(device, non_blocking=True) if torch.is_tensor(v) else v
-                for k, v in bb.t2i_flow(conv, prompts, lat, mask).items()}
-        with torch.autocast(device.type, dtype=torch.bfloat16, enabled=device.type == "cuda"):
-            loss = model(t2i_flow=flow, **bb.forward_kwargs(len(part)))["loss"]
-        if not torch.isfinite(loss):
-            raise FloatingPointError(f"non-finite loss {loss.item()} at step {step}")
+        micro = args.micro_batch or len(part)
         opt.zero_grad(set_to_none=True)
-        loss.backward()
+        loss_sum = 0.0
+        for s in range(0, len(part), micro):
+            sub_idx, sub_mask = part[s:s + micro], mask[s:s + micro]
+            prompts, lat = data.batch(sub_idx)
+            flow = {k: v.to(device, non_blocking=True) if torch.is_tensor(v) else v
+                    for k, v in bb.t2i_flow(conv, prompts, lat, sub_mask).items()}
+            with torch.autocast(device.type, dtype=torch.bfloat16,
+                                enabled=device.type == "cuda"):
+                sub_loss = model(t2i_flow=flow, **bb.forward_kwargs(len(sub_idx)))["loss"]
+            if not torch.isfinite(sub_loss):
+                raise FloatingPointError(f"non-finite loss {sub_loss.item()} at step {step}")
+            (sub_loss * (len(sub_idx) / len(part))).backward()
+            loss_sum += float(sub_loss) * len(sub_idx) / len(part)
+        loss = torch.tensor(loss_sum)
         gnorm = torch.nn.utils.clip_grad_norm_(params, args.max_grad_norm)
         opt.step()
         sched.step()

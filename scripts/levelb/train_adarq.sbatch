@@ -47,7 +47,10 @@ if [ ! -f "$TOK/tokenizer.pt" ]; then
   echo "### Stage 0: fitting the adaptive RVQ tokenizer on the train split"
   python -m levelb.adarq_tokenizer --data "$DATA" --out "$TOK"
 fi
-python -m levelb.train_adarq --data "$DATA" --tok "$TOK" --out "$OUT" &
+# batch 128 does not fit 141 GB in one pass (3B frozen + 2.8B trainable branch);
+# accumulate micro-batches of MICRO (default 32): the update equals the full-batch one
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+python -m levelb.train_adarq --data "$DATA" --tok "$TOK" --out "$OUT" --micro-batch "${MICRO:-32}" &
 PID=$!
 trap 'echo "### USR1: asking trainer to checkpoint"; kill -USR1 "$PID"' USR1
 set +e

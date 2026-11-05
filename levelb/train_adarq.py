@@ -43,12 +43,13 @@ class CodedData(LatentData):
         return prompts, lat, torch.from_numpy(np.asarray(self.codes[idx], dtype=np.int64))
 
 
-def _step_loss(model, heads, conv, prompts, lat, codes, mask, device):
+def _step_loss(model, heads, conv, prompts, lat, codes, mask, device, totals=None):
     flow = {k: v.to(device, non_blocking=True) if torch.is_tensor(v) else v
             for k, v in bb.t2i_flow(conv, prompts, lat, mask).items()}
     with torch.autocast(device.type, dtype=torch.bfloat16, enabled=device.type == "cuda"):
         h = branch_hidden(model, flow, len(prompts))
-        return heads.loss(h, lat.to(device), codes.to(device), mask.to(device).bool())
+        return heads.loss(h, lat.to(device), codes.to(device), mask.to(device).bool(),
+                          totals=totals)
 
 
 @torch.no_grad()
@@ -84,6 +85,9 @@ def main() -> None:
     ap.add_argument("--warmup", type=int, default=5000)
     ap.add_argument("--epochs", type=float, default=16)
     ap.add_argument("--max-grad-norm", type=float, default=1.0)
+    ap.add_argument("--micro-batch", type=int, default=None,
+                    help="gradient accumulation; the loss is normalised by the WHOLE batch's "
+                         "target counts, so the update equals the full-batch update")
     ap.add_argument("--flow-width", type=int, default=1024)
     ap.add_argument("--flow-depth", type=int, default=3)
     ap.add_argument("--seed", type=int, default=0)
@@ -158,16 +162,25 @@ def main() -> None:
         if pos + args.batch > len(perm):
             epoch, pos = epoch + 1, 0
             perm = np.random.default_rng(args.seed + epoch).permutation(data.train)
-        part = perm[pos:pos + args.batch]
+        part = np.sort(perm[pos:pos + args.batch])
         pos += args.batch
-        prompts, lat, codes = data.batch(part)
         mask = bb.sample_mar_mask(len(part), bb.NUM_TOKENS, rng)
-        res = _step_loss(model, heads, conv, prompts, lat, codes, mask, device)
-        loss = res["loss"]
-        if not torch.isfinite(loss):
-            raise FloatingPointError(f"non-finite loss at step {step}")
+        all_codes = torch.from_numpy(np.asarray(data.codes[part], dtype=np.int64))
+        totals = heads.counts(all_codes, mask.bool())
+        micro = args.micro_batch or len(part)
         opt.zero_grad(set_to_none=True)
-        loss.backward()
+        acc = {"loss": 0.0, "code_ce": 0.0, "flow": 0.0}
+        for s in range(0, len(part), micro):
+            prompts, lat, codes = data.batch(part[s:s + micro])
+            sub_res = _step_loss(model, heads, conv, prompts, lat, codes, mask[s:s + micro],
+                                 device, totals=totals)
+            if not torch.isfinite(sub_res["loss"]):
+                raise FloatingPointError(f"non-finite loss at step {step}")
+            sub_res["loss"].backward()
+            for k in acc:
+                acc[k] += float(sub_res[k])
+        res = {k: torch.tensor(v) for k, v in acc.items()}
+        loss = res["loss"]
         gnorm = torch.nn.utils.clip_grad_norm_(params, args.max_grad_norm)
         opt.step()
         sched.step()

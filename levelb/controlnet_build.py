@@ -47,13 +47,13 @@ def verify_init(cn, transformer, num_double: int, num_single: int) -> None:
         for (k, a), (_, b) in zip(cn.transformer_blocks[i].state_dict().items(),
                                   transformer.transformer_blocks[i].state_dict().items(),
                                   strict=True):
-            if not torch.equal(a, b.to(a.dtype)):
+            if not torch.equal(a, b.to(a.device, a.dtype)):
                 raise RuntimeError(f"double block {i}.{k} not copied from FLUX")
     for i in range(num_single):
         for (k, a), (_, b) in zip(cn.single_transformer_blocks[i].state_dict().items(),
                                   transformer.single_transformer_blocks[i].state_dict().items(),
                                   strict=True):
-            if not torch.equal(a, b.to(a.dtype)):
+            if not torch.equal(a, b.to(a.device, a.dtype)):
                 raise RuntimeError(f"single block {i}.{k} not copied from FLUX")
     zeros = [cn.controlnet_x_embedder, *cn.controlnet_blocks, *cn.controlnet_single_blocks]
     for m in zeros:

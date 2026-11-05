@@ -28,7 +28,7 @@ def _data(root, n=24, width=HIDDEN):
 def _run(data, out, vlm, *extra):
     cmd = [sys.executable, "-m", "levelb.train_branch", "--data", str(data), "--out", str(out),
            "--vlm", vlm, "--batch", "4", "--warmup", "2", "--epochs", "1", "--save-every", "2",
-           "--eval-every", "2", "--eval-n", "4", "--device", "cpu", *extra]
+           "--eval-every", "2", "--eval-n", "4", "--micro-batch", "2", "--device", "cpu", *extra]
     return subprocess.run(cmd, check=True, capture_output=True, text=True)
 
 
