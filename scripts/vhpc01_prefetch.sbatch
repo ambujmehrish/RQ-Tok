@@ -17,6 +17,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
+#SBATCH --partition=gpus
 #SBATCH --gres=gpu:h200:1
 # project rule: jobs run on H200 nodes only (the download itself needs no GPU)
 #SBATCH --mem=16G

@@ -18,6 +18,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
+#SBATCH --partition=gpus
 #SBATCH --gres=gpu:h200:1
 # (plain gpu:1 could land on the A40/Tesla nodes and "verify" a GPU we never train on)
 #SBATCH --mem=32G

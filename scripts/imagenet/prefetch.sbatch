@@ -15,6 +15,7 @@
 #SBATCH --job-name=imagenet-prefetch
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
+#SBATCH --partition=gpus
 #SBATCH --gres=gpu:h200:1
 # project rule: jobs run on H200 nodes only (the download itself needs no GPU)
 #SBATCH --cpus-per-task=4

@@ -11,6 +11,7 @@
 #SBATCH --job-name=levelb-branch
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
+#SBATCH --partition=gpus
 #SBATCH --gres=gpu:h200:1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=128G

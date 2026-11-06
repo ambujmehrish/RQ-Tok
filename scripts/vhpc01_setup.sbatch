@@ -20,6 +20,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
+#SBATCH --partition=gpus
 #SBATCH --gres=gpu:h200:1
 # H200s are vhpc13/14/15, ONE per node; the gpus partition also holds RTX6000/A40/Tesla
 #SBATCH --mem=8G

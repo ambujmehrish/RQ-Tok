@@ -20,6 +20,7 @@
 # result, and calibration and scoring run on the same kind of node.
 # =====================================================================================
 #SBATCH --job-name=adm-score
+#SBATCH --partition=vhpc
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8

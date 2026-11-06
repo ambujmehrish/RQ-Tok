@@ -9,6 +9,7 @@
 # then replays its FID under several OpenBLAS thread/kernel settings. Diagnostic only.
 # =====================================================================================
 #SBATCH --job-name=adm-diag
+#SBATCH --partition=vhpc
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8

@@ -12,6 +12,7 @@
 #SBATCH --job-name=levelb-precompute
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
+#SBATCH --partition=gpus
 #SBATCH --gres=gpu:h200:1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=64G

@@ -31,6 +31,7 @@
 #SBATCH --job-name=adarq-e0
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
+#SBATCH --partition=gpus
 #SBATCH --gres=gpu:h200:1
 # one H200 only; plain gpu:1 could land on an RTX6000/A40 node
 #SBATCH --cpus-per-task=4

@@ -17,6 +17,7 @@
 #SBATCH --job-name=adm-setup
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
+#SBATCH --partition=gpus
 #SBATCH --gres=gpu:h200:1
 # project rule: jobs run on H200 nodes only (the evaluator runs on CPU, deterministically)
 #SBATCH --cpus-per-task=4
