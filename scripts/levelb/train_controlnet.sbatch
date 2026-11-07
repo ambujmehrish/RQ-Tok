@@ -48,6 +48,16 @@ gpu=$(nvidia-smi --query-gpu=name --format=csv,noheader 2>/dev/null | head -1 ||
 [[ "$gpu" == *H200* ]] || die "expected an H200, got '${gpu:-no GPU}'"
 export PYTHONPATH="$REPO${PYTHONPATH:+:$PYTHONPATH}"
 
+# one job per output folder: a second copy of the same run would corrupt its checkpoint
+mkdir -p "$OUT"
+if [ -f "$OUT/RUNNING_JOB" ]; then
+  other=$(cat "$OUT/RUNNING_JOB")
+  if [ "$other" != "${SLURM_JOB_ID:-}" ] && squeue -h -t R -j "$other" 2>/dev/null | grep -q .; then
+    die "job $other is already training into $OUT"
+  fi
+fi
+echo "${SLURM_JOB_ID:-local}" > "$OUT/RUNNING_JOB"
+
 if [ ! -f "$DATA/flux_t5.npy" ]; then
   echo "### encoding the 1000 class prompts with FLUX's text encoders"
   python -m levelb.flux_text --data "$DATA"
