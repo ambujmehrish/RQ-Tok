@@ -172,6 +172,19 @@ evaluator is tensorflow-cpu) with BLAS threads pinned to the allocated CPUs, the
 CPU are recorded with every result, and the full five-number calibration is rerun on that
 setup before any model is scored.
 
+**ADM calibration result (vhpc01 CPU partition): PASSED.**
+
+| metric | published (ADM-G + ADM-U) | ours | tolerance |
+|---|---|---|---|
+| IS | 215.837 | 215.8371 | ±1.0 |
+| FID | 3.9426 | 3.9426 | ±0.05 |
+| sFID | 6.1404 | 6.1404 | ±0.10 |
+| Precision | 0.8265 | 0.8256 | ±0.005 |
+| Recall | 0.5309 | 0.5288 | ±0.005 |
+
+FID, sFID and IS — the Bifrost-1 §5.1 metrics — match to the reported precision.
+Precision/recall (not part of the protocol) are within tolerance.
+
 ### Level B — controlled head-to-head (paper §5.1, ImageNet 256 x 256)
 
 The protocol the paper ran on a single GH200, which a single H200 matches. Both arms use
