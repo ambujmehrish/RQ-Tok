@@ -297,6 +297,28 @@ ImageNet-256 reference batch (FID, sFID, IS).
   32 Euler steps of the guided velocity; guidance weight 1.0 as in the Bifrost-1 arm. The same
   ControlNet renders both arms.
 
+**Training observation (held-out slice; monitoring only) and the second AdaRQ-Flow run —
+declared before any test-set number exists.** The Bifrost-1 branch finished its 158,880
+steps with held-out MSE falling throughout (2.047 at 5k → 1.717 at the end). The
+AdaRQ-Flow code head overfits: held-out code cross-entropy reaches its minimum 2.365 at
+step 75,000 (~7.5 epochs) and rises to 2.501 by 135,000, while training cross-entropy keeps
+falling (1.944 at 137k); from ~70k the held-out value worsens right after each epoch
+boundary (steps ≈ 9,930·n) and recovers mid-epoch, the signature of memorising training
+images. The flow (continuous residual) loss keeps improving (1.211 → 1.129). Only the
+latest checkpoint is kept, so no step-75k weights exist.
+
+Decision (user, 2026-11-10), fixed now:
+1. **Primary, as pre-registered:** both arms tested at the final checkpoint of the 16-epoch
+   budget. Unchanged.
+2. **Second, validation-tuned AdaRQ-Flow run:** identical in everything (seed, data order,
+   masks, optimiser, 5k warmup, linear decay, micro-batching, held-out monitoring) except
+   the budget, `--total-steps 75000` — the held-out code-CE minimum of run 1 — so the
+   schedule decays to zero there and the step-75,000 final checkpoint is tested.
+   Selected from the held-out slice only (the user's rule: validation for
+   hyperparameter tuning). Output `branch_adarq_tuned`, samples `adarq_tuned_seed{0,1,2}`.
+   The Bifrost-1 arm needs no such run: its held-out loss improved to the end of its
+   budget. Both AdaRQ-Flow results are reported, each against the same Bifrost-1 result.
+
 **Faithfulness gate.** Our retrained Bifrost-1 must reach FID <= 30.9 (within 20% of
 25.77). If it does not, the baseline is not faithful and no comparison is reported until
 it is fixed.

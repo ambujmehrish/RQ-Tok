@@ -76,3 +76,28 @@ def test_heldout_eval_does_not_touch_training_rng(tiny_vlm, tmp_path, monkeypatc
         for part in ("heads", "trainable"):
             a, b = states[0][part], other[part]
             assert a.keys() == b.keys() and all(torch.equal(a[k], b[k]) for k in a), part
+
+
+def test_total_steps_sets_the_budget(tiny_vlm, tmp_path):  # noqa: F811
+    """--total-steps overrides --epochs: the schedule ends and the final checkpoint is written
+    at that step (the validation-tuned AdaRQ-Flow run)."""
+    data, tok, out = tmp_path / "data", tmp_path / "tok", tmp_path / "run"
+    data.mkdir()
+    _data(data)
+    import numpy as np
+    np.save(data / "latents_train.npy", bf16_bits(_latents(n=24, width=HIDDEN)))
+    subprocess.run([sys.executable, "-m", "levelb.adarq_tokenizer", "--data", str(data),
+                    "--out", str(tok), "--codebook-size", "16", "--steps", "20",
+                    "--images-per-step", "8", "--val-images", "4", "--target-mean-depth", "2.5",
+                    "--device", "cpu"],
+                   check=True, capture_output=True, text=True)
+    r = subprocess.run([sys.executable, "-m", "levelb.train_adarq", "--data", str(data),
+                        "--tok", str(tok), "--out", str(out), "--vlm", tiny_vlm, "--batch", "4",
+                        "--warmup", "2", "--epochs", "16", "--total-steps", "3",
+                        "--save-every", "1000", "--eval-every", "1000", "--eval-n", "4",
+                        "--flow-width", "32", "--flow-depth", "2", "--micro-batch", "2",
+                        "--device", "cpu"], check=True, capture_output=True, text=True)
+    assert "finished 3 steps" in r.stdout and (out / "final_heads.pt").exists()
+    assert json.loads((out / "config.json").read_text())["steps_total"] == 3
+    st = torch.load(out / "ckpt.pt", weights_only=False)
+    assert st["step"] == 3 and st["sched"]["last_epoch"] == 3

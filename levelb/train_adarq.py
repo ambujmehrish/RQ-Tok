@@ -104,6 +104,9 @@ def main() -> None:
     ap.add_argument("--eval-n", type=int, default=2048)
     ap.add_argument("--device", default="cuda")
     ap.add_argument("--max-steps", type=int, default=None)
+    ap.add_argument("--total-steps", type=int, default=None,
+                    help="the training budget in steps (overrides --epochs): warmup, linear "
+                         "decay to zero and the final checkpoint all fall at this step")
     args = ap.parse_args()
     require_official_model(args.vlm)
     require_official_model(args.processor)
@@ -116,7 +119,10 @@ def main() -> None:
     data = CodedData(args.data, args.tok)
     books, res_rms, tau, _ = load_books(str(pathlib.Path(args.tok) / "tokenizer.pt"))
     steps_per_epoch = len(data.train) // args.batch
-    total = int(math.ceil(args.epochs * steps_per_epoch))
+    total = (args.total_steps if args.total_steps is not None
+             else int(math.ceil(args.epochs * steps_per_epoch)))
+    if total <= args.warmup:
+        raise SystemExit(f"budget {total} steps does not exceed the {args.warmup}-step warmup")
     # seed BEFORE building: upstream initialises the mask token, position embedding and
     # linear head randomly (and AdaRQ its heads), so --seed must fix the initial weights
     torch.manual_seed(args.seed)

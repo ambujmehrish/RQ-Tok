@@ -33,9 +33,11 @@ SEED="${SEED:?set SEED (0, 1, 2)}"
 SHARD="${SHARD:-0}"; NSHARDS="${NSHARDS:-1}"
 LEVELB_ROOT="${LEVELB_ROOT:-$HOME/work/levelb}"
 BIFROST_ROOT="${BIFROST_ROOT:-$HOME/work/bifrost1}"
-BRANCH="${BRANCH:-$LEVELB_ROOT/branch_${ARM}/final_trainable.pt}"
+RUN="${RUN:-branch_${ARM}}"   # Stage-1 run folder, e.g. RUN=branch_adarq_tuned
+TAG="${TAG:-$ARM}"            # sample folder name, e.g. TAG=adarq_tuned
+BRANCH="${BRANCH:-$LEVELB_ROOT/$RUN/final_trainable.pt}"
 CN="${CN:-$LEVELB_ROOT/controlnet/final_controlnet.pt}"
-OUT="${OUT:-$LEVELB_ROOT/samples/${ARM}_seed${SEED}}"
+OUT="${OUT:-$LEVELB_ROOT/samples/${TAG}_seed${SEED}}"
 [ -f "$BRANCH" ] || die "$BRANCH missing: Stage 1 has not finished"
 [ -f "$CN" ] || die "$CN missing: Stage 2 has not finished"
 
@@ -53,7 +55,7 @@ export PYTHONPATH="$REPO${PYTHONPATH:+:$PYTHONPATH}"
 
 EXTRA=()
 if [ "$ARM" = "adarq" ]; then
-  HEADS="$LEVELB_ROOT/branch_adarq/final_heads.pt"
+  HEADS="$LEVELB_ROOT/$RUN/final_heads.pt"
   [ -f "$HEADS" ] || die "$HEADS missing: AdaRQ-Flow Stage 1 has not finished"
   EXTRA=(--heads "$HEADS" --tok "$LEVELB_ROOT/adarq_tok")
 fi
