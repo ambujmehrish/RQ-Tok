@@ -91,6 +91,9 @@ class AdaRQHeads(nn.Module):
         self.code_out = nn.ModuleList(nn.Linear(dim, k + 1) for _ in range(depth))
         self.res_cond = nn.Linear(dim, dim)
         self.flow = FlowHead(dim, flow_width, flow_depth)
+        # per-level temperatures for distance-based soft code targets (None = hard targets);
+        # a training choice only: sampling is unchanged
+        self.soft_temps: list[float] | None = None
 
     # -- codes ------------------------------------------------------------------------
     def prefixes(self, codes: torch.Tensor) -> torch.Tensor:
@@ -110,6 +113,21 @@ class AdaRQHeads(nn.Module):
         if lvl == 0 and forbid_halt:
             logits[..., self.K] = float("-inf")          # level 1 never halts
         return logits
+
+    @torch.no_grad()
+    def sq_distances(self, z: torch.Tensor, prefix: torch.Tensor, lvl: int) -> torch.Tensor:
+        """Squared distances [M, K] from the residual before level ``lvl`` to its codewords,
+        in fp32 outside autocast (near-ties are a few % apart; bf16 would blur them)."""
+        with torch.autocast(z.device.type, enabled=False):
+            r = z.float() - prefix.float()
+            c = self.books[lvl].float()
+            return (r.pow(2).sum(-1, keepdim=True) - 2 * r @ c.t() + c.pow(2).sum(-1)).clamp_min(0)
+
+    @torch.no_grad()
+    def soft_targets(self, z: torch.Tensor, prefix: torch.Tensor, lvl: int) -> torch.Tensor:
+        """q(j) = softmax_j(-||r - c_j||^2 / T_lvl) over the K codewords (no <halt> mass)."""
+        d2 = self.sq_distances(z, prefix, lvl)
+        return torch.softmax(-(d2 - d2.min(-1, keepdim=True).values) / self.soft_temps[lvl], -1)
 
     # -- losses -----------------------------------------------------------------------
     def counts(self, codes: torch.Tensor, masked: torch.Tensor, flow_reps: int = 4,
@@ -131,15 +149,31 @@ class AdaRQHeads(nn.Module):
         pre = self.prefixes(codes)                                   # [M, D+1, d]
         depth = (codes != self.K).sum(-1)                            # [M]
         ce, n_ce = h.new_zeros((), dtype=torch.float32), 0
+        ce_hard = h.new_zeros((), dtype=torch.float32)
         for lvl in range(self.D):
             valid = lvl <= depth                    # codes 1..D_i, then the first <halt>
             valid = valid & (lvl < self.D)
             if not valid.any():
                 continue
             logit = self.code_logits(h[valid], pre[valid, lvl], lvl)
-            ce = ce + F.cross_entropy(logit, codes[valid, lvl], reduction="sum")
+            y = codes[valid, lvl]
+            hard = F.cross_entropy(logit, y, reduction="sum")
+            ce_hard = ce_hard + hard.detach()
+            if self.soft_temps is None:
+                ce = ce + hard
+            else:
+                # code targets -> distance-based soft target over the K codewords;
+                # <halt> targets (the depth rule) stay hard
+                code = y != self.K
+                if (~code).any():
+                    ce = ce + F.cross_entropy(logit[~code], y[~code], reduction="sum")
+                if code.any():
+                    q = self.soft_targets(z[valid][code], pre[valid, lvl][code], lvl)
+                    logp = torch.log_softmax(logit[code], dim=-1)[:, :self.K]
+                    ce = ce - (q * logp).sum()
             n_ce += int(valid.sum())
-        l_code = ce / (totals[0] if totals else max(n_ce, 1))
+        denom = totals[0] if totals else max(n_ce, 1)
+        l_code = ce / denom
 
         zhat = pre[torch.arange(len(codes), device=codes.device), depth]
         rho = (z - zhat) / self.res_rms
@@ -151,7 +185,8 @@ class AdaRQHeads(nn.Module):
         v = self.flow(x_t.to(h.dtype), t, cond).float()
         sq = (v - (rho - eps)).pow(2).sum()
         l_flow = sq / (totals[1] if totals else (v.numel()))
-        return {"loss": l_code + l_flow, "code_ce": l_code.detach(), "flow": l_flow.detach()}
+        return {"loss": l_code + l_flow, "code_ce": l_code.detach(), "flow": l_flow.detach(),
+                "code_ce_hard": (ce_hard / denom).detach()}
 
     # -- sampling ---------------------------------------------------------------------
     @torch.no_grad()

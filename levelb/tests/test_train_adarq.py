@@ -101,3 +101,30 @@ def test_total_steps_sets_the_budget(tiny_vlm, tmp_path):  # noqa: F811
     assert json.loads((out / "config.json").read_text())["steps_total"] == 3
     st = torch.load(out / "ckpt.pt", weights_only=False)
     assert st["step"] == 3 and st["sched"]["last_epoch"] == 3
+
+
+def test_soft_targets_train_end_to_end(tiny_vlm, tmp_path):  # noqa: F811
+    """--soft-targets: temperatures measured on the train split, recorded, training runs and
+    logs both the soft and the hard held-out code CE."""
+    data, tok, out = tmp_path / "data", tmp_path / "tok", tmp_path / "run"
+    data.mkdir()
+    _data(data)
+    import numpy as np
+    np.save(data / "latents_train.npy", bf16_bits(_latents(n=24, width=HIDDEN)))
+    subprocess.run([sys.executable, "-m", "levelb.adarq_tokenizer", "--data", str(data),
+                    "--out", str(tok), "--codebook-size", "16", "--steps", "20",
+                    "--images-per-step", "8", "--val-images", "4", "--target-mean-depth", "2.5",
+                    "--device", "cpu"],
+                   check=True, capture_output=True, text=True)
+    r = subprocess.run([sys.executable, "-m", "levelb.train_adarq", "--data", str(data),
+                        "--tok", str(tok), "--out", str(out), "--vlm", tiny_vlm, "--batch", "4",
+                        "--warmup", "2", "--total-steps", "3", "--soft-targets",
+                        "--save-every", "1000", "--eval-every", "1", "--eval-n", "4",
+                        "--flow-width", "32", "--flow-depth", "2", "--micro-batch", "2",
+                        "--device", "cpu"], check=True, capture_output=True, text=True)
+    assert "soft code targets" in r.stdout and "finished 3 steps" in r.stdout
+    cfg = json.loads((out / "config.json").read_text())
+    assert cfg["soft_temps"] and all(t > 0 for t in cfg["soft_temps"])
+    recs = [json.loads(line) for line in (out / "metrics.jsonl").read_text().splitlines()]
+    held = [r for r in recs if "heldout_code_ce_hard" in r]
+    assert held and all(np.isfinite(r["heldout_code_ce"]) for r in held)

@@ -63,8 +63,9 @@ fi
 # no PYTORCH_CUDA_ALLOC_CONF=expandable_segments: the vhpc H200 nodes reject it
 # ("CUDA driver error: operation not supported", jobs 1506492/1506493)
 # TOTAL_STEPS: training budget in steps (default: 16 epochs, the pre-registered run)
+# SOFT=1: distance-based soft code targets (the declared soft-target variant)
 python -m levelb.train_adarq --data "$DATA" --tok "$TOK" --out "$OUT" --micro-batch "${MICRO:-32}" \
-    ${TOTAL_STEPS:+--total-steps "$TOTAL_STEPS"} &
+    ${TOTAL_STEPS:+--total-steps "$TOTAL_STEPS"} ${SOFT:+--soft-targets} &
 PID=$!
 trap 'echo "### USR1: asking trainer to checkpoint"; kill -USR1 "$PID"' USR1
 set +e

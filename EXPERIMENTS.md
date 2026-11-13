@@ -319,6 +319,39 @@ Decision (user, 2026-11-10), fixed now:
    The Bifrost-1 arm needs no such run: its held-out loss improved to the end of its
    budget. Both AdaRQ-Flow results are reported, each against the same Bifrost-1 result.
 
+**Overfitting diagnostic (job 1507688, `levelb/adarq_diag.py`; final 16-epoch weights;
+2,048 held-out + 2,048 train images; reproduces the stored codes 1.0000).**
+
+H1 — memorisation through the visible tokens. Code CE (all targets), train vs held-out:
+
+| masked | train | held-out | gap |
+|---|---|---|---|
+| 0.70 | 1.4582 | 2.4280 | +0.970 |
+| 0.80 | 1.5429 | 2.4808 | +0.938 |
+| 0.90 | 1.7193 | 2.5434 | +0.824 |
+| 1.00 | 3.1491 | 3.1963 | +0.047 |
+
+The gap vanishes when nothing is visible: the head recognises training images from the
+visible latents and recalls their codes. Confirmed.
+
+H2 — the hard code labels are arbitrary near ties (held-out, mask 0.90): the tokenizer's
+own choice is a near-tie at 74.1% of positions (2nd-nearest within 5% of the nearest
+distance; 87.9% within 10%); 50.5% of the head's wrong top-1 predictions are within 10% of
+the true code's distance (median ratio 1.098); the head already puts 51.7% of its
+probability on codewords within 10%; top-1 accuracy 0.236. In 2048-d, distances to the 1,024
+codewords crowd together, so cross-entropy on the index rewards recalling an arbitrary
+per-image tie-break. Confirmed. Median d2²−d1² per level on train: 214.5, 61.4, 27.5, 18.2.
+
+3. **Third AdaRQ-Flow run, soft code targets (declared now, before any test number):**
+   identical to run 1 (16 epochs, final checkpoint) except the code loss: each code target
+   becomes q(j) = softmax_j(−‖r − c_j‖² / T_k) over the K codewords, r the residual before
+   level k; `<halt>` targets stay hard; the flow loss, sampling and everything else are
+   unchanged. T_k = median(d2² − d1²) at level k over 1,024 train images (fixed seed),
+   measured by the trainer and recorded in its config — a rule fixed here from the train
+   split, not tuned on held-out or test. Output `branch_adarq_soft`, samples
+   `adarq_soft_seed{0,1,2}`. Both soft and hard held-out code CE are logged; the diagnostic
+   is rerun on its final weights. All three AdaRQ-Flow results are reported.
+
 **Faithfulness gate.** Our retrained Bifrost-1 must reach FID <= 30.9 (within 20% of
 25.77). If it does not, the baseline is not faithful and no comparison is reported until
 it is fixed.

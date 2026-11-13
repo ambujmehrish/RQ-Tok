@@ -19,7 +19,9 @@ RUNS = [("ControlNet", "controlnet", ["heldout_flow_loss"]),
         ("Bifrost-1 branch", "branch_bifrost", ["heldout_mse"]),
         ("AdaRQ-Flow branch", "branch_adarq", ["heldout_loss", "heldout_code_ce", "heldout_flow"]),
         ("AdaRQ-Flow branch, validation-tuned budget", "branch_adarq_tuned",
-         ["heldout_loss", "heldout_code_ce", "heldout_flow"])]
+         ["heldout_loss", "heldout_code_ce", "heldout_flow"]),
+        ("AdaRQ-Flow branch, soft code targets", "branch_adarq_soft",
+         ["heldout_loss", "heldout_code_ce", "heldout_code_ce_hard", "heldout_flow"])]
 JOB_HOURS = 23.8          # usable hours of a 24 h job (load + checkpoint at the end)
 
 

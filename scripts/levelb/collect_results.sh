@@ -19,7 +19,7 @@ copy() {   # $1 = source file, $2 = destination dir; skip missing files
 }
 
 echo "== Level B runs"
-for run in controlnet branch_bifrost branch_adarq branch_adarq_tuned; do
+for run in controlnet branch_bifrost branch_adarq branch_adarq_tuned branch_adarq_soft; do
   for f in config.json metrics.jsonl; do copy "$LEVELB_ROOT/$run/$f" "$D/levelb/$run"; done
   copy "$LEVELB_ROOT/$run/diag/overfit_diag.json" "$D/levelb/$run"
 done

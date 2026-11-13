@@ -66,7 +66,7 @@ def _evaluate(model, heads, conv, data, n, batch, device):
     model.eval()
     heads.eval()
     rng = np.random.default_rng(1234)
-    tot = {"loss": 0.0, "code_ce": 0.0, "flow": 0.0}
+    tot = {"loss": 0.0, "code_ce": 0.0, "code_ce_hard": 0.0, "flow": 0.0}
     cnt = 0
     for s in range(0, n, batch):
         part = data.heldout[s:min(s + batch, n)]
@@ -79,6 +79,29 @@ def _evaluate(model, heads, conv, data, n, batch, device):
     model.train()
     heads.train()
     return {f"heldout_{k}": v / cnt for k, v in tot.items()}
+
+
+@torch.no_grad()
+def soft_temperatures(heads, data, n: int, device, seed: int = 11) -> list[float]:
+    """T_k = median over train patches of d2^2 - d1^2 at level k (the two nearest
+    codewords to the residual): the 2nd-nearest codeword then gets weight e^-1 relative to
+    the nearest at a typical position. From the train split only; no tuning."""
+    idx = np.sort(np.random.default_rng(seed).choice(data.train, n, replace=False))
+    gaps: list[list[torch.Tensor]] = [[] for _ in range(heads.D)]
+    for s in range(0, n, 64):
+        _, lat, codes = data.batch(idx[s:s + 64])
+        z = lat.to(device).float().reshape(-1, lat.shape[-1])
+        cd = codes.to(device).reshape(-1, heads.D)
+        pre = heads.prefixes(cd)
+        for lvl in range(heads.D):
+            sel = cd[:, lvl] != heads.K
+            if sel.any():
+                two = heads.sq_distances(z[sel], pre[sel, lvl], lvl).topk(2, largest=False).values
+                gaps[lvl].append(two[:, 1] - two[:, 0])
+    temps = [float(torch.cat(g).median()) if g else float("nan") for g in gaps]
+    if not all(t > 0 for t in temps):
+        raise RuntimeError(f"soft-target temperatures must be positive, got {temps}")
+    return temps
 
 
 def main() -> None:
@@ -104,6 +127,11 @@ def main() -> None:
     ap.add_argument("--eval-n", type=int, default=2048)
     ap.add_argument("--device", default="cuda")
     ap.add_argument("--max-steps", type=int, default=None)
+    ap.add_argument("--soft-targets", action="store_true",
+                    help="distance-based soft code targets, q(j) = softmax(-||r - c_j||^2 / T_k), "
+                         "T_k = median (d2^2 - d1^2) at level k over train patches")
+    ap.add_argument("--soft-temp-images", type=int, default=1024,
+                    help="train images used to measure T_k (fixed seed)")
     ap.add_argument("--total-steps", type=int, default=None,
                     help="the training budget in steps (overrides --epochs): warmup, linear "
                          "decay to zero and the final checkpoint all fall at this step")
@@ -128,6 +156,13 @@ def main() -> None:
     torch.manual_seed(args.seed)
     model = bb.build_model(args.vlm, inner_dim=data.width).to(device)
     heads = AdaRQHeads(data.width, books, res_rms, args.flow_width, args.flow_depth).to(device)
+    soft_temps = None
+    if args.soft_targets:
+        soft_temps = soft_temperatures(heads, data, min(args.soft_temp_images, len(data.train)),
+                                       device)
+        heads.soft_temps = soft_temps
+        print(f"[adarq] soft code targets, T per level {[round(t, 3) for t in soft_temps]}",
+              flush=True)
     if device.type == "cpu":
         model, heads = model.float(), heads.float()
     counts = set_trainable_adarq(model, heads)
@@ -164,7 +199,7 @@ def main() -> None:
 
     (out / "config.json").write_text(json.dumps(
         {**vars(args), "steps_total": total, "steps_per_epoch": steps_per_epoch,
-         "tau": tau, "res_rms": res_rms, **counts}, indent=2))
+         "tau": tau, "res_rms": res_rms, "soft_temps": soft_temps, **counts}, indent=2))
     print(f"[adarq] {counts['trainable']:,} trainable (heads {counts['adarq_heads']:,} vs "
           f"Bifrost-1 linear head {counts['bifrost_linear_head']:,}) | {total} steps",
           flush=True)
@@ -185,7 +220,7 @@ def main() -> None:
         totals = heads.counts(all_codes, mask.bool())
         micro = args.micro_batch or len(part)
         opt.zero_grad(set_to_none=True)
-        acc = {"loss": 0.0, "code_ce": 0.0, "flow": 0.0}
+        acc = {"loss": 0.0, "code_ce": 0.0, "code_ce_hard": 0.0, "flow": 0.0}
         for s in range(0, len(part), micro):
             prompts, lat, codes = data.batch(part[s:s + micro])
             sub_res = _step_loss(model, heads, conv, prompts, lat, codes, mask[s:s + micro],
@@ -205,6 +240,7 @@ def main() -> None:
             rate = (step - started) / (time.time() - t0)
             rec = {"step": step, "epoch": epoch, "loss": float(loss),
                    "code_ce": float(res["code_ce"]), "flow": float(res["flow"]),
+                   "code_ce_hard": float(res["code_ce_hard"]),
                    "grad_norm": float(gnorm), "lr": sched.get_last_lr()[0], "steps_per_s": rate}
             log.write(json.dumps(rec) + "\n")
             log.flush()

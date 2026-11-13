@@ -59,3 +59,41 @@ def test_adarq_normalisation_matches_full_batch():
                            totals=totals)["code_ce"] for s in (0, 2))
     assert torch.allclose(full, split, rtol=1e-6)
     assert isinstance(am.AdaRQHeads, type)
+
+
+def _greedy_codes(heads, z, depth):
+    """Codes consistent with the heads' codebooks: greedy RVQ, then a <halt> suffix."""
+    flat = z.reshape(-1, z.shape[-1]).float()
+    codes = torch.full((flat.shape[0], heads.D), heads.K, dtype=torch.long)
+    zhat = torch.zeros_like(flat)
+    for k in range(heads.D):
+        d2 = heads.sq_distances(flat, zhat, k)
+        codes[:, k] = d2.argmin(-1)
+        zhat = zhat + heads.books[k][codes[:, k]]
+    codes = codes.reshape(*z.shape[:-1], heads.D)
+    for k in range(heads.D):
+        codes[..., k][depth <= k] = heads.K
+    return codes
+
+
+def test_soft_targets_reduce_to_hard_and_accumulate_exactly():
+    heads = _heads()
+    torch.manual_seed(1)
+    h, z = torch.randn(4, 64, HIDDEN), torch.randn(4, 64, HIDDEN)
+    depth = torch.randint(1, D + 1, (4, 64))
+    codes = _greedy_codes(heads, z, depth)
+    masked = torch.rand(4, 64) < 0.8
+    # T -> 0: the soft target is the one-hot of the stored (nearest) code
+    heads.soft_temps = [1e-8] * D
+    out = heads.loss(h, z, codes, masked)
+    assert torch.allclose(out["code_ce"], out["code_ce_hard"], rtol=1e-5)
+    # a real temperature: a different, finite loss with gradients, and exact accumulation
+    heads.soft_temps = [float(t) for t in torch.linspace(5.0, 1.0, D)]
+    full = heads.loss(h, z, codes, masked)
+    assert torch.isfinite(full["loss"]) and not torch.allclose(full["code_ce"], full["code_ce_hard"])
+    full["loss"].backward()
+    assert all(p.grad is None or torch.isfinite(p.grad).all() for p in heads.parameters())
+    totals = heads.counts(codes, masked)
+    split = sum(heads.loss(h[s:s + 2], z[s:s + 2], codes[s:s + 2], masked[s:s + 2],
+                           totals=totals)["code_ce"] for s in (0, 2))
+    assert torch.allclose(full["code_ce"], split, rtol=1e-6)
