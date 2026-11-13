@@ -57,8 +57,33 @@ if [ "$CALIBRATE" = "1" ]; then
   SAMPLES="$ADM_DIR/admnet_guided_upsampled_imagenet256.npz"; REF="adm"
 else
   [ -f "$BENCH_ROOT/ADM_CALIBRATED" ] || die "evaluator not calibrated yet; run with CALIBRATE=1 first"
-  SAMPLES="${SAMPLES:?set SAMPLES=<npz with arr_0 uint8 [N,256,256,3]>}"
+  SAMPLES="${SAMPLES:?set SAMPLES=<npz with arr_0 uint8 [N,256,256,3]> or a levelb sample folder}"
   REF="${REF:-adm}"
+  if [ -d "$SAMPLES" ]; then
+    # a levelb.sample folder: merge its shards (all of them, in order) into samples_10000.npz
+    python - "$SAMPLES" <<'PY'
+import pathlib, re, sys
+import numpy as np
+d = pathlib.Path(sys.argv[1])
+out = d / "samples_10000.npz"
+if out.exists():
+    sys.exit(0)
+shards = sorted(d.glob("shard*of*.npz"))
+if not shards:
+    sys.exit(f"{d}: no shard files; has sampling finished?")
+totals = {int(re.match(r"shard(\d+)of(\d+)\.npz", p.name).group(2)) for p in shards}
+if len(totals) != 1 or len(shards) != totals.pop():
+    sys.exit(f"{d}: incomplete or mixed shard sets: {[p.name for p in shards]}")
+parts = [np.load(p) for p in shards]
+arr = np.concatenate([p["arr_0"] for p in parts])
+labels = np.concatenate([p["labels"] for p in parts])
+if arr.shape[0] != 10000 or labels.shape != (10000,):
+    sys.exit(f"{d}: merged {arr.shape[0]} images, expected 10000")
+np.savez(out, arr_0=arr, labels=labels)
+print(f"  merged {len(shards)} shard(s) -> {out}")
+PY
+    SAMPLES="$SAMPLES/samples_10000.npz"
+  fi
 fi
 case "$REF" in
   adm) REF_NPZ="$ADM_DIR/VIRTUAL_imagenet256_labeled.npz" ;;
