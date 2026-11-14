@@ -391,6 +391,25 @@ reproduces 51/157, our protocol matches and the gap is in training; if ours is f
 too, the difference is in the protocol (prompt to FLUX, resolution, evaluation), to be
 found by reproducing that row before the baseline is rerun under it.
 
+**Result (FLUX-only, seed 0, ADM reference): FID 24.8120, sFID 52.1073, IS 156.5616,
+Precision 0.8710, Recall 0.1838** (paper: FID 51.20, sFID 224.82, IS 157.46).
+- Generation matches: IS needs no reference and depends only on the samples; ours is
+  within 0.6% of the paper's. Prompt, resolution and FLUX settings reproduce theirs.
+- Scoring does not: for the same sample distribution the paper's FID is ~2.1× ours and
+  its sFID ~4.3×. The paper's FID/sFID pipeline (reference set or implementation; not
+  stated) is on a different scale from the calibrated ADM evaluator, so absolute FID/sFID
+  cannot be compared with the paper.
+- Normalised by the FLUX anchor, our Bifrost-1 is not "too good": FID ratio
+  Bifrost/FLUX is 0.685 ours vs 0.503 paper (sFID 0.543 vs 0.239).
+- IS is a real difference, from training: both FLUX anchors ≈ 157; the paper's Bifrost-1
+  lowers IS (98.6), ours raises it (270.2, precision 0.94, recall 0.24): our trained
+  bridge drives FLUX toward prototypical class images.
+- The pre-registered gate (FID ≤ 30.9) assumed the paper's scale and cannot be applied as
+  written. An anchor-normalised version (FID ratio within 20% of 0.503, i.e. ≤ 0.604) is
+  not met (0.685). Decision on the gate: pending (user). The head-to-head is unaffected
+  (same generation, same scorer); AdaRQ-Flow seed 0 (FID 28.07, IS 56.4) is below the
+  FLUX-only anchor on both.
+
 **Faithfulness gate.** Our retrained Bifrost-1 must reach FID <= 30.9 (within 20% of
 25.77). If it does not, the baseline is not faithful and no comparison is reported until
 it is fixed.
