@@ -15,10 +15,11 @@ DPG-Bench). Could you share the following?
    224.82, so we believe the reference or implementation differs.
 2. **Prompt to FLUX.** What text is given to FLUX (and to the MLLM) for a class: the class
    name, a template such as "a photo of a {class}", or none?
-3. **Table 1 vs Table 4.** Bifrost-1 with 64 decoding steps is FID 25.77 / sFID 53.67 /
-   IS 98.57 in Table 1 and FID 18.64 / sFID 43.64 / IS 156.01 in Table 4 ("64 (default)").
-   What differs between the two settings (checkpoint, sampling, number of samples,
-   evaluation)?
+3. **Table 1 vs Table 4.** Table 1 reports Bifrost-1 at FID 25.77 / sFID 53.67 / IS 98.57
+   (16 + 2 epochs), and Table 4 reports FID 18.64 / sFID 43.64 / IS 156.01 for
+   "64 (default)" decoding steps. Are these the same setting? If not, what does Table 4 use
+   (checkpoint / training budget, number of samples, evaluation)? And how many decoding
+   steps does the Table 1 row use?
 4. **Model and sampling details for Sec. 5.1.** Qwen2.5-VL 3B or 7B; number of tokens and
    input resolution of the CLIP latents; batch size and learning-rate schedule of the
    vision branch; MAR guidance scale and temperature at sampling.
