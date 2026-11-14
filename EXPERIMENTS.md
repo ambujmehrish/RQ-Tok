@@ -352,6 +352,31 @@ per-image tie-break. Confirmed. Median d2²−d1² per level on train: 214.5, 61
    `adarq_soft_seed{0,1,2}`. Both soft and hard held-out code CE are logged; the diagnostic
    is rerun on its final weights. All three AdaRQ-Flow results are reported.
 
+**Test results — seed 0 of 3 (10,000 samples, classes uniform; calibrated ADM evaluator).**
+
+| arm | reference | FID | sFID | IS | Precision | Recall |
+|---|---|---|---|---|---|---|
+| Bifrost-1 (retrained) | ADM (primary) | 16.9908 | 28.2704 | 270.2169 | 0.9388 | 0.2424 |
+| AdaRQ-Flow, 16 epochs | ADM (primary) | 28.0659 | 28.5093 | 56.4303 | 0.6163 | 0.6422 |
+| Bifrost-1 (retrained) | ImageNet val (secondary) | 19.2532 | 31.5077 | 270.2169 | 0.9026 | 0.2395 |
+| AdaRQ-Flow, 16 epochs | ImageNet val (secondary) | 24.6369 | 31.7164 | 56.4303 | 0.5618 | 0.6469 |
+
+- Faithfulness gate: passed (16.99 ≤ 30.9). Our baseline is better than the paper on every
+  metric (paper: FID 25.77, sFID 53.67, IS 98.57), most of all IS; some unstated protocol
+  detail differs (prompt template, evaluation details). The head-to-head is unaffected: both
+  arms share everything but the bridge.
+- AdaRQ-Flow (16 epochs, as pre-registered) is worse on the primary FID by 65% (+28% on
+  the secondary reference); sFID is equal within 1%. It has far higher recall (0.64 vs
+  0.24) and far lower precision and IS: more diverse, less class-faithful samples. The
+  regression bridge outputs the conditional mean latent (prototypical, low-diversity
+  images); the sampled bridge draws codes and a flow residual. Consistent with the code
+  head's overfitting (diagnostic above).
+- Not yet decisive: seeds 1–2 and the two declared variants (75k steps; soft code
+  targets) are pending. Both arms sample with guidance 1.0 and temperature 1.0 (upstream's
+  inference); for a sampled bridge these set the quality/diversity trade-off. Any tuning
+  of them would use a validation FID on the held-out slice, for both arms, never a test
+  reference — not done.
+
 **Faithfulness gate.** Our retrained Bifrost-1 must reach FID <= 30.9 (within 20% of
 25.77). If it does not, the baseline is not faithful and no comparison is reported until
 it is fixed.
