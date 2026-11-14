@@ -85,10 +85,18 @@ PY
     SAMPLES="$SAMPLES/samples_10000.npz"
   fi
 fi
+# adm (primary) and val (secondary) are the test references; the others exist only to
+# locate the Bifrost-1 paper's FID pipeline (scripts/bench/eval_search_report.py)
+REFS="$LEVELB_ROOT/imagenet256/refs"
 case "$REF" in
   adm) REF_NPZ="$ADM_DIR/VIRTUAL_imagenet256_labeled.npz" ;;
   val) REF_NPZ="$LEVELB_ROOT/imagenet256/val_ref_50000.npz" ;;
-  *) die "REF must be adm or val" ;;
+  adm64) REF_NPZ="$ADM_DIR/VIRTUAL_imagenet64_labeled.npz" ;;
+  adm128) REF_NPZ="$ADM_DIR/VIRTUAL_imagenet128_labeled.npz" ;;
+  adm512) REF_NPZ="$ADM_DIR/VIRTUAL_imagenet512.npz" ;;
+  valsquash) REF_NPZ="$REFS/val_squash_50000.npz" ;;
+  heldout) REF_NPZ="$REFS/heldout_10000.npz" ;;
+  *) die "REF must be adm, val, adm64, adm128, adm512, valsquash or heldout" ;;
 esac
 [ -f "$REF_NPZ" ] || die "$REF_NPZ missing"
 [ -f "$SAMPLES" ] || die "$SAMPLES missing"

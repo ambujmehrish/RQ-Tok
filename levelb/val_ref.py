@@ -30,12 +30,23 @@ def _crop(blob: bytes) -> np.ndarray:
         return np.asarray(inet.center_crop(im), dtype=np.uint8)
 
 
+def _squash(blob: bytes) -> np.ndarray:
+    """Whole image resized to 256 x 256 ignoring aspect ratio (no crop) — an evaluation
+    variant only, for locating the paper's FID pipeline."""
+    with Image.open(io.BytesIO(blob)) as im:
+        im = im.convert("RGB").resize((inet.VAE_RES, inet.VAE_RES), Image.BILINEAR)
+        return np.asarray(im, dtype=np.uint8)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--imagenet", required=True)
     ap.add_argument("--out", required=True)
     ap.add_argument("--workers", type=int, default=int(os.environ.get("SLURM_CPUS_PER_TASK", 4)))
     ap.add_argument("--expect", type=int, default=inet.NUM_VAL)
+    ap.add_argument("--mode", choices=["crop", "squash"], default="crop",
+                    help="crop: the training crop (secondary test reference); squash: "
+                         "evaluation-search variant")
     args = ap.parse_args()
     import pyarrow.parquet as pq
 
@@ -53,7 +64,8 @@ def main() -> None:
         for f in files:
             blobs = [r["bytes"] for r in pq.read_table(f, columns=["image"]).column(
                 "image").to_pylist()]
-            arr[pos:pos + len(blobs)] = np.stack(list(pool.map(_crop, blobs, chunksize=64)))
+            fn = _crop if args.mode == "crop" else _squash
+            arr[pos:pos + len(blobs)] = np.stack(list(pool.map(fn, blobs, chunksize=64)))
             pos += len(blobs)
             print(f"  {pos}/{total}", flush=True)
     arr.flush()
