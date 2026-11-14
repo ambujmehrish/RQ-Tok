@@ -28,7 +28,7 @@ cd "$REPO"
 mkdir -p logs
 die() { echo "FAILED: $*" >&2; exit 1; }
 
-ARM="${ARM:?set ARM=bifrost or ARM=adarq}"
+ARM="${ARM:?set ARM=bifrost, adarq or flux}"
 SEED="${SEED:?set SEED (0, 1, 2)}"
 SHARD="${SHARD:-0}"; NSHARDS="${NSHARDS:-1}"
 LEVELB_ROOT="${LEVELB_ROOT:-$HOME/work/levelb}"
@@ -38,8 +38,10 @@ TAG="${TAG:-$ARM}"            # sample folder name, e.g. TAG=adarq_tuned
 BRANCH="${BRANCH:-$LEVELB_ROOT/$RUN/final_trainable.pt}"
 CN="${CN:-$LEVELB_ROOT/controlnet/final_controlnet.pt}"
 OUT="${OUT:-$LEVELB_ROOT/samples/${TAG}_seed${SEED}}"
-[ -f "$BRANCH" ] || die "$BRANCH missing: Stage 1 has not finished"
-[ -f "$CN" ] || die "$CN missing: Stage 2 has not finished"
+if [ "$ARM" != "flux" ]; then   # flux: the backbone alone, no trained parts
+  [ -f "$BRANCH" ] || die "$BRANCH missing: Stage 1 has not finished"
+  [ -f "$CN" ] || die "$CN missing: Stage 2 has not finished"
+fi
 
 # shellcheck disable=SC1091
 source "$BIFROST_ROOT/bifrost1_env.sh"
@@ -59,7 +61,8 @@ if [ "$ARM" = "adarq" ]; then
   [ -f "$HEADS" ] || die "$HEADS missing: AdaRQ-Flow Stage 1 has not finished"
   EXTRA=(--heads "$HEADS" --tok "$LEVELB_ROOT/adarq_tok")
 fi
-python -m levelb.sample --arm "$ARM" --branch "$BRANCH" --controlnet "$CN" "${EXTRA[@]+"${EXTRA[@]}"}" \
+if [ "$ARM" != "flux" ]; then EXTRA+=(--branch "$BRANCH" --controlnet "$CN"); fi
+python -m levelb.sample --arm "$ARM" "${EXTRA[@]+"${EXTRA[@]}"}" \
     --data "$LEVELB_ROOT/imagenet256" --seed "$SEED" --n 10000 \
     --shard "$SHARD" --nshards "$NSHARDS" --out "$OUT"
 echo "=== shard $SHARD/$NSHARDS of $ARM seed $SEED done: $OUT ==="

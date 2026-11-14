@@ -377,6 +377,20 @@ per-image tie-break. Confirmed. Median d2²−d1² per level on train: 214.5, 61
   of them would use a validation FID on the held-out slice, for both arms, never a test
   reference — not done.
 
+**Reproduction concern (open).** The baseline is far *better* than the paper (FID 16.99 vs
+25.77, sFID 28.27 vs 53.67, IS 270 vs 98.6). The one-sided gate passes, but a baseline that
+beats the published number by this much means our setup is not the paper's, so the
+comparison would not be against Bifrost-1 as published. Checked: no real data reaches the
+sampler (both arms start from mask tokens; dataset latents are never read); upstream's own
+code gives FLUX the text prompt in ControlNet training and in inference, as we do.
+Calibration point that needs no training: the paper's Table 1 row "FLUX.1-dev" (the
+backbone alone) is FID 51.20, sFID 224.82, IS 157.46, and the paper states that Bifrost-1
+lowers IS relative to it. `levelb.sample --arm flux` generates that row under our protocol
+(same class draw, class prompt, 256 px, 28 steps, guidance 3.5, same scorer). If it
+reproduces 51/157, our protocol matches and the gap is in training; if ours is far better
+too, the difference is in the protocol (prompt to FLUX, resolution, evaluation), to be
+found by reproducing that row before the baseline is rerun under it.
+
 **Faithfulness gate.** Our retrained Bifrost-1 must reach FID <= 30.9 (within 20% of
 25.77). If it does not, the baseline is not faithful and no comparison is reported until
 it is fixed.

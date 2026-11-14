@@ -181,6 +181,17 @@ def load_bifrost_branch(vlm: str, width: int, ckpt: str, device):
     return model.to(device).eval()
 
 
+def load_flux_only(flux_id: str, device, dtype):
+    """The backbone alone: diffusers' FluxPipeline. Text encoders are not loaded — the
+    same precomputed class-prompt embeddings as the other arms are passed in."""
+    from diffusers import FluxPipeline
+
+    pipe = FluxPipeline.from_pretrained(flux_id, text_encoder=None, text_encoder_2=None,
+                                        tokenizer=None, tokenizer_2=None, torch_dtype=dtype)
+    pipe.set_progress_bar_config(disable=True)
+    return pipe.to(device)
+
+
 def load_pipeline(flux_id: str, controlnet_ckpt: str, width: int, device, dtype):
     add_upstream_to_path()
     from bifrost.models.flux_cnet.pipeline_flux_controlnet import FluxControlNetPipeline
@@ -201,12 +212,14 @@ def load_pipeline(flux_id: str, controlnet_ckpt: str, width: int, device, dtype)
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--arm", choices=["bifrost", "adarq"], required=True)
+    ap.add_argument("--arm", choices=["bifrost", "adarq", "flux"], required=True,
+                    help="flux: the backbone alone (paper Table 1, row 1): class prompt -> "
+                         "FLUX.1-dev, no MLLM, no ControlNet; a training-free protocol anchor")
     ap.add_argument("--heads", default=None, help="adarq: final_heads.pt")
     ap.add_argument("--tok", default=None, help="adarq: Stage-0 dir (tokenizer.pt)")
     ap.add_argument("--flow-steps", type=int, default=32)
-    ap.add_argument("--branch", required=True, help="final_trainable.pt of Stage 1")
-    ap.add_argument("--controlnet", required=True, help="final_controlnet.pt of Stage 2")
+    ap.add_argument("--branch", default=None, help="final_trainable.pt of Stage 1")
+    ap.add_argument("--controlnet", default=None, help="final_controlnet.pt of Stage 2")
     ap.add_argument("--data", required=True, help="imagenet256 dir (class names, FLUX text)")
     ap.add_argument("--vlm", default="Qwen/Qwen2.5-VL-3B-Instruct")
     ap.add_argument("--processor", default="Qwen/Qwen2.5-VL-3B-Instruct")
@@ -246,8 +259,12 @@ def main() -> None:
         print(f"{part} exists; nothing to do")
         return
 
-    heads = None
-    if args.arm == "adarq":
+    heads = model = conv = None
+    if args.arm != "flux" and not (args.branch and args.controlnet):
+        raise SystemExit(f"--arm {args.arm} needs --branch and --controlnet")
+    if args.arm == "flux":
+        pipe = load_flux_only(args.flux, dev, dtype)
+    elif args.arm == "adarq":
         if not (args.heads and args.tok):
             raise SystemExit("--arm adarq needs --heads and --tok")
         trained = json.loads((pathlib.Path(args.heads).parent / "config.json").read_text())
@@ -255,11 +272,12 @@ def main() -> None:
                                   int(trained["flow_width"]), int(trained["flow_depth"]))
     else:
         model = load_bifrost_branch(args.vlm, width, args.branch, dev)
-    # upstream inference casts the whole model to bf16; CPU (tests only) runs in fp32.
-    # The AdaRQ heads stay fp32 (they are small; sampling precision for the flow ODE).
-    model = model.to(torch.bfloat16) if dev.type == "cuda" else model.float()
-    conv = bb.make_conversation(args.processor)
-    pipe = load_pipeline(args.flux, args.controlnet, width, dev, dtype)
+    if model is not None:
+        # upstream inference casts the whole model to bf16; CPU (tests only) runs in fp32.
+        # The AdaRQ heads stay fp32 (they are small; sampling precision for the flow ODE).
+        model = model.to(torch.bfloat16) if dev.type == "cuda" else model.float()
+        conv = bb.make_conversation(args.processor)
+        pipe = load_pipeline(args.flux, args.controlnet, width, dev, dtype)
 
     imgs = np.zeros((hi - lo, args.res, args.res, 3), dtype=np.uint8)
     depth_sum, depth_n = 0, 0
@@ -268,6 +286,16 @@ def main() -> None:
         lab = classes[s:e]
         bseed = args.seed * 1_000_003 + s
         names_b = [names[int(c)] for c in lab]
+        idx = torch.from_numpy(lab.astype(np.int64))
+        g = torch.Generator(device=dev).manual_seed(bseed)
+        if args.arm == "flux":
+            res = pipe(prompt_embeds=t5[idx].to(dev, dtype),
+                       pooled_prompt_embeds=pooled[idx].to(dev, dtype),
+                       num_inference_steps=args.steps, guidance_scale=args.guidance,
+                       generator=g, height=args.res, width=args.res, output_type="np").images
+            imgs[s - lo:e - lo] = (np.clip(res, 0, 1) * 255).round().astype(np.uint8)
+            print(f"  {e - lo}/{hi - lo} images", flush=True)
+            continue
         if heads is None:
             tokens, revealed = mar_decode(model, conv, names_b, cfg_weight=args.cfg_weight,
                                           np_seed=bseed)
@@ -281,8 +309,6 @@ def main() -> None:
         if set(revealed) != {1}:
             raise RuntimeError(f"MAR revealed {sorted(set(revealed))} tokens per step; "
                                "upstream's guidance slicing needs exactly 1")
-        idx = torch.from_numpy(lab.astype(np.int64))
-        g = torch.Generator(device=dev).manual_seed(bseed)
         res = pipe(prompt_embeds=t5[idx].to(dev, dtype),
                    pooled_prompt_embeds=pooled[idx].to(dev, dtype),
                    control_image=tokens.to(dtype), num_inference_steps=args.steps,

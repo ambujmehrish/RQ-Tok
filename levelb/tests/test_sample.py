@@ -108,3 +108,27 @@ def test_adarq_sample_end_to_end(tiny_vlm, tiny_flux, transformer, tmp_path):  #
     meta = json.loads((out / "shard00of01.json").read_text())
     assert z["arr_0"].shape == (3, 32, 32, 3)
     assert 1.0 <= meta["mean_depth"] <= 4.0
+
+
+def test_flux_only_arm(tiny_flux, tmp_path):  # noqa: F811
+    """--arm flux: the backbone alone with the same class prompts, seeds and class draw;
+    no MLLM or ControlNet is needed or loaded."""
+    data = tmp_path / "data"
+    data.mkdir()
+    names = [f"class {i}" for i in range(1000)]
+    (data / "class_names.json").write_text(json.dumps(names))
+    t5, pooled = encode(tiny_flux, names, device="cpu", batch=250)
+    np.save(data / "flux_t5.npy", bf16_bits(t5))
+    np.save(data / "flux_pooled.npy", bf16_bits(pooled))
+    (data / "meta.json").write_text(json.dumps({"rows": 1, "latent_width": HIDDEN}))
+    outs = []
+    for name in ("a", "b"):
+        out = tmp_path / name
+        subprocess.run([sys.executable, "-m", "levelb.sample", "--arm", "flux", "--data", str(data),
+                        "--flux", tiny_flux, "--n", "3", "--seed", "0", "--batch", "2",
+                        "--steps", "2", "--res", "32", "--device", "cpu", "--out", str(out)],
+                       check=True, capture_output=True, text=True)
+        outs.append(np.load(out / "shard00of01.npz"))
+    assert outs[0]["arr_0"].shape == (3, 32, 32, 3)
+    assert np.array_equal(outs[0]["arr_0"], outs[1]["arr_0"])
+    assert outs[0]["labels"].tolist() == np.random.default_rng(0).integers(0, 1000, 3).tolist()
