@@ -1,0 +1,109 @@
+{
+  "stats": {
+    "IS": 215.8371124267578,
+    "mu_sum": 484.3245848044753,
+    "trace": 159.40083414164027
+  },
+  "replay": {
+    "default threads": {
+      "FID": {
+        "prod_finite": true,
+        "sqrtm_finite": true,
+        "complex": false,
+        "max_imag": 0.0,
+        "sqrtm_err": 3.748880570377607e-28,
+        "prod_sum": 142402.55187492914,
+        "value": 3.942567012487075
+      },
+      "sFID": {
+        "prod_finite": true,
+        "sqrtm_finite": true,
+        "complex": false,
+        "max_imag": 0.0,
+        "sqrtm_err": 1.2852602448805151e-26,
+        "prod_sum": 41910.876815756994,
+        "value": 6.140425599924356
+      }
+    },
+    "1 thread": {
+      "FID": {
+        "prod_finite": true,
+        "sqrtm_finite": true,
+        "complex": false,
+        "max_imag": 0.0,
+        "sqrtm_err": 3.4583622033379184e-28,
+        "prod_sum": 142402.55187492914,
+        "value": 3.942567012486734
+      },
+      "sFID": {
+        "prod_finite": true,
+        "sqrtm_finite": true,
+        "complex": false,
+        "max_imag": 0.0,
+        "sqrtm_err": 9.18049418056773e-27,
+        "prod_sum": 41910.876815756994,
+        "value": 6.140425599924811
+      }
+    },
+    "8 threads": {
+      "FID": {
+        "prod_finite": true,
+        "sqrtm_finite": true,
+        "complex": false,
+        "max_imag": 0.0,
+        "sqrtm_err": 3.748880570377607e-28,
+        "prod_sum": 142402.55187492914,
+        "value": 3.942567012487075
+      },
+      "sFID": {
+        "prod_finite": true,
+        "sqrtm_finite": true,
+        "complex": false,
+        "max_imag": 0.0,
+        "sqrtm_err": 1.2852602448805151e-26,
+        "prod_sum": 41910.876815756994,
+        "value": 6.140425599924356
+      }
+    },
+    "Haswell kernels": {
+      "FID": {
+        "prod_finite": true,
+        "sqrtm_finite": true,
+        "complex": false,
+        "max_imag": 0.0,
+        "sqrtm_err": 3.748880570377607e-28,
+        "prod_sum": 142402.55187492914,
+        "value": 3.942567012487075
+      },
+      "sFID": {
+        "prod_finite": true,
+        "sqrtm_finite": true,
+        "complex": false,
+        "max_imag": 0.0,
+        "sqrtm_err": 1.2852602448805151e-26,
+        "prod_sum": 41910.876815756994,
+        "value": 6.140425599924356
+      }
+    },
+    "Haswell, 1 thread": {
+      "FID": {
+        "prod_finite": true,
+        "sqrtm_finite": true,
+        "complex": false,
+        "max_imag": 0.0,
+        "sqrtm_err": 3.4583622033379184e-28,
+        "prod_sum": 142402.55187492914,
+        "value": 3.942567012486734
+      },
+      "sFID": {
+        "prod_finite": true,
+        "sqrtm_finite": true,
+        "complex": false,
+        "max_imag": 0.0,
+        "sqrtm_err": 9.18049418056773e-27,
+        "prod_sum": 41910.876815756994,
+        "value": 6.140425599924811
+      }
+    }
+  }
+}

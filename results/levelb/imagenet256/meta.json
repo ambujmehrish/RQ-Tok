@@ -1,0 +1,9 @@
+{
+  "rows": 1281167,
+  "vlm": "Qwen/Qwen2.5-VL-3B-Instruct",
+  "latent_width": 2048,
+  "latent_tokens": 64,
+  "latent_dtype": "bfloat16 stored as uint16 bits",
+  "crop": "resize short side 256 (bilinear) + centre crop 256",
+  "qwen_view": "same crop resized to 224 (bicubic) -> Qwen image processor"
+}

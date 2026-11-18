@@ -1,0 +1,29 @@
+{
+  "arm": "bifrost",
+  "heads": null,
+  "tok": null,
+  "flow_steps": 32,
+  "branch": "/home/ambuj.mehrish/work/levelb/branch_bifrost/final_trainable.pt",
+  "controlnet": "/home/ambuj.mehrish/work/levelb/controlnet/final_controlnet.pt",
+  "data": "/home/ambuj.mehrish/work/levelb/imagenet256",
+  "vlm": "Qwen/Qwen2.5-VL-3B-Instruct",
+  "processor": "Qwen/Qwen2.5-VL-3B-Instruct",
+  "flux": "black-forest-labs/FLUX.1-dev",
+  "n": 10000,
+  "seed": 1,
+  "shard": 0,
+  "nshards": 1,
+  "batch": 16,
+  "cfg_weight": 1.0,
+  "steps": 28,
+  "cn_scale": 0.7,
+  "guidance": 3.5,
+  "res": 256,
+  "device": "cuda",
+  "out": "/home/ambuj.mehrish/work/levelb/samples/bifrost_seed1",
+  "range": [
+    0,
+    10000
+  ],
+  "mean_depth": null
+}

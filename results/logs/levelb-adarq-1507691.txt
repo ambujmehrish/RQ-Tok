@@ -1,0 +1,137 @@
+/home/ambuj.mehrish/miniforge3/envs/bifrost1/lib/python3.11/site-packages/google/api_core/_python_version_support.py:273: FutureWarning: You are using a Python version (3.11.18) which Google will stop supporting in new releases of google.api_core once it reaches its end of life (2027-10-24). Please upgrade to the latest Python version, or at least Python 3.12, to continue receiving updates for google.api_core past that date.
+  warnings.warn(message, FutureWarning)
+2026-11-15 22:16:41 PID=1595340 __init__.py:49 setup_logging() INFO → 'standard' logger initialized.
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:01<00:01,  1.41s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:02<00:00,  1.14s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:02<00:00,  1.18s/it]
+Using a slow image processor as `use_fast` is unset and a slow processor was saved with this model. `use_fast=True` will be the default behavior in v4.48, even if the model was saved with a slow processor. This will result in minor differences in outputs. You'll still be able to use a slow processor with `use_fast=False`.
+vision_denoising_type:  mar
+[resume] step 68843 (epoch 6, pos 1185664)
+[adarq] 2,815,065,092 trainable (heads 40,158,212 vs Bifrost-1 linear head 4,196,352) | 75000 steps
+  step 68850/75000 loss 3.3195 (ce 2.2005 flow 1.1190) 0.44 it/s
+  step 68900/75000 loss 3.3514 (ce 2.2271 flow 1.1243) 0.51 it/s
+  step 68950/75000 loss 3.3141 (ce 2.1866 flow 1.1276) 0.51 it/s
+  step 69000/75000 loss 3.4421 (ce 2.3366 flow 1.1055) 0.52 it/s
+  step 69050/75000 loss 3.3466 (ce 2.2122 flow 1.1344) 0.52 it/s
+  step 69100/75000 loss 3.3692 (ce 2.2365 flow 1.1327) 0.52 it/s
+  step 69150/75000 loss 3.4113 (ce 2.3026 flow 1.1087) 0.52 it/s
+  step 69200/75000 loss 3.3028 (ce 2.1975 flow 1.1054) 0.52 it/s
+  step 69250/75000 loss 3.3787 (ce 2.2344 flow 1.1443) 0.52 it/s
+  step 69300/75000 loss 3.3240 (ce 2.1979 flow 1.1261) 0.52 it/s
+  step 69350/75000 loss 3.4350 (ce 2.3152 flow 1.1198) 0.52 it/s
+  step 69400/75000 loss 3.3787 (ce 2.2310 flow 1.1477) 0.52 it/s
+  step 69450/75000 loss 3.3155 (ce 2.2072 flow 1.1083) 0.52 it/s
+  step 69500/75000 loss 3.3353 (ce 2.2042 flow 1.1312) 0.52 it/s
+  step 69550/75000 loss 3.3168 (ce 2.1938 flow 1.1230) 0.52 it/s
+  step 69600/75000 loss 3.4195 (ce 2.2613 flow 1.1583) 0.52 it/s
+  step 69650/75000 loss 3.3935 (ce 2.2849 flow 1.1086) 0.52 it/s
+  step 69700/75000 loss 3.2845 (ce 2.1617 flow 1.1228) 0.52 it/s
+  step 69750/75000 loss 3.3299 (ce 2.2094 flow 1.1205) 0.52 it/s
+  step 69800/75000 loss 3.2424 (ce 2.1243 flow 1.1180) 0.51 it/s
+  step 69850/75000 loss 3.3250 (ce 2.1927 flow 1.1323) 0.50 it/s
+  step 69900/75000 loss 3.3926 (ce 2.2487 flow 1.1439) 0.50 it/s
+  step 69950/75000 loss 3.3119 (ce 2.1907 flow 1.1212) 0.49 it/s
+  step 70000/75000 loss 3.3614 (ce 2.2390 flow 1.1225) 0.49 it/s
+  [heldout] step 70000 {'heldout_loss': 3.483194999396801, 'heldout_code_ce': 2.348834089934826, 'heldout_code_ce_hard': 2.348834089934826, 'heldout_flow': 1.134360909461975}
+  step 70050/75000 loss 3.3023 (ce 2.1726 flow 1.1296) 0.46 it/s
+  step 70100/75000 loss 3.3293 (ce 2.2036 flow 1.1257) 0.46 it/s
+  step 70150/75000 loss 3.3504 (ce 2.2279 flow 1.1225) 0.46 it/s
+  step 70200/75000 loss 3.4019 (ce 2.2669 flow 1.1350) 0.46 it/s
+  step 70250/75000 loss 3.3278 (ce 2.1994 flow 1.1284) 0.46 it/s
+  step 70300/75000 loss 3.2885 (ce 2.1777 flow 1.1109) 0.46 it/s
+  step 70350/75000 loss 3.3489 (ce 2.2286 flow 1.1203) 0.46 it/s
+  step 70400/75000 loss 3.3396 (ce 2.2167 flow 1.1230) 0.45 it/s
+  step 70450/75000 loss 3.4666 (ce 2.3229 flow 1.1437) 0.45 it/s
+  step 70500/75000 loss 3.3333 (ce 2.1746 flow 1.1587) 0.45 it/s
+  step 70550/75000 loss 3.3295 (ce 2.1981 flow 1.1313) 0.45 it/s
+  step 70600/75000 loss 3.3587 (ce 2.2271 flow 1.1315) 0.45 it/s
+  step 70650/75000 loss 3.2805 (ce 2.1645 flow 1.1160) 0.45 it/s
+  step 70700/75000 loss 3.2322 (ce 2.1171 flow 1.1151) 0.45 it/s
+  step 70750/75000 loss 3.3090 (ce 2.1868 flow 1.1221) 0.45 it/s
+  step 70800/75000 loss 3.4034 (ce 2.2924 flow 1.1110) 0.45 it/s
+  step 70850/75000 loss 3.2619 (ce 2.1377 flow 1.1242) 0.45 it/s
+  step 70900/75000 loss 3.3492 (ce 2.2140 flow 1.1352) 0.45 it/s
+  step 70950/75000 loss 3.3690 (ce 2.2556 flow 1.1135) 0.44 it/s
+  step 71000/75000 loss 3.2815 (ce 2.1490 flow 1.1324) 0.44 it/s
+  step 71050/75000 loss 3.2652 (ce 2.1511 flow 1.1141) 0.44 it/s
+  step 71100/75000 loss 3.3440 (ce 2.2392 flow 1.1048) 0.44 it/s
+  step 71150/75000 loss 3.3695 (ce 2.2238 flow 1.1457) 0.44 it/s
+  step 71200/75000 loss 3.3480 (ce 2.2189 flow 1.1291) 0.44 it/s
+  step 71250/75000 loss 3.2706 (ce 2.1198 flow 1.1508) 0.44 it/s
+  step 71300/75000 loss 3.3740 (ce 2.2612 flow 1.1128) 0.44 it/s
+  step 71350/75000 loss 3.3789 (ce 2.2453 flow 1.1336) 0.44 it/s
+  step 71400/75000 loss 3.2769 (ce 2.1612 flow 1.1157) 0.44 it/s
+  step 71450/75000 loss 3.4180 (ce 2.2724 flow 1.1457) 0.44 it/s
+  step 71500/75000 loss 3.3079 (ce 2.1897 flow 1.1181) 0.44 it/s
+  step 71550/75000 loss 3.2951 (ce 2.1729 flow 1.1222) 0.44 it/s
+  step 71600/75000 loss 3.3086 (ce 2.1935 flow 1.1152) 0.44 it/s
+  step 71650/75000 loss 3.2583 (ce 2.1438 flow 1.1145) 0.44 it/s
+  step 71700/75000 loss 3.2807 (ce 2.1685 flow 1.1123) 0.44 it/s
+  step 71750/75000 loss 3.2320 (ce 2.1122 flow 1.1197) 0.44 it/s
+  step 71800/75000 loss 3.3609 (ce 2.2408 flow 1.1201) 0.44 it/s
+  step 71850/75000 loss 3.3795 (ce 2.2284 flow 1.1511) 0.44 it/s
+  step 71900/75000 loss 3.3815 (ce 2.2599 flow 1.1215) 0.44 it/s
+  step 71950/75000 loss 3.3659 (ce 2.2409 flow 1.1250) 0.44 it/s
+  step 72000/75000 loss 3.3200 (ce 2.2169 flow 1.1031) 0.44 it/s
+  step 72050/75000 loss 3.4002 (ce 2.2735 flow 1.1266) 0.43 it/s
+  step 72100/75000 loss 3.3450 (ce 2.2460 flow 1.0990) 0.43 it/s
+  step 72150/75000 loss 3.4148 (ce 2.2749 flow 1.1399) 0.43 it/s
+  step 72200/75000 loss 3.3089 (ce 2.1791 flow 1.1298) 0.43 it/s
+  step 72250/75000 loss 3.3664 (ce 2.2176 flow 1.1487) 0.43 it/s
+  step 72300/75000 loss 3.2953 (ce 2.1868 flow 1.1084) 0.43 it/s
+  step 72350/75000 loss 3.3334 (ce 2.1977 flow 1.1357) 0.43 it/s
+  step 72400/75000 loss 3.3442 (ce 2.2066 flow 1.1376) 0.43 it/s
+  step 72450/75000 loss 3.3529 (ce 2.2354 flow 1.1175) 0.43 it/s
+  step 72500/75000 loss 3.3876 (ce 2.2610 flow 1.1266) 0.43 it/s
+  step 72550/75000 loss 3.3570 (ce 2.2195 flow 1.1376) 0.43 it/s
+  step 72600/75000 loss 3.2544 (ce 2.1429 flow 1.1116) 0.43 it/s
+  step 72650/75000 loss 3.3084 (ce 2.2030 flow 1.1054) 0.43 it/s
+  step 72700/75000 loss 3.3306 (ce 2.2358 flow 1.0948) 0.43 it/s
+  step 72750/75000 loss 3.2959 (ce 2.1792 flow 1.1167) 0.43 it/s
+  step 72800/75000 loss 3.3556 (ce 2.2128 flow 1.1428) 0.43 it/s
+  step 72850/75000 loss 3.3568 (ce 2.2147 flow 1.1421) 0.43 it/s
+  step 72900/75000 loss 3.3087 (ce 2.1847 flow 1.1240) 0.43 it/s
+  step 72950/75000 loss 3.3224 (ce 2.2021 flow 1.1203) 0.43 it/s
+  step 73000/75000 loss 3.3274 (ce 2.2028 flow 1.1246) 0.43 it/s
+  step 73050/75000 loss 3.3154 (ce 2.2241 flow 1.0913) 0.43 it/s
+  step 73100/75000 loss 3.2630 (ce 2.1478 flow 1.1151) 0.43 it/s
+  step 73150/75000 loss 3.3253 (ce 2.2003 flow 1.1250) 0.43 it/s
+  step 73200/75000 loss 3.2802 (ce 2.1710 flow 1.1092) 0.43 it/s
+  step 73250/75000 loss 3.3303 (ce 2.2147 flow 1.1156) 0.43 it/s
+  step 73300/75000 loss 3.3553 (ce 2.2103 flow 1.1450) 0.43 it/s
+  step 73350/75000 loss 3.3462 (ce 2.2096 flow 1.1365) 0.43 it/s
+  step 73400/75000 loss 3.3177 (ce 2.1785 flow 1.1392) 0.43 it/s
+  step 73450/75000 loss 3.3214 (ce 2.2279 flow 1.0935) 0.43 it/s
+  step 73500/75000 loss 3.3358 (ce 2.1866 flow 1.1492) 0.43 it/s
+  step 73550/75000 loss 3.3534 (ce 2.2297 flow 1.1237) 0.43 it/s
+  step 73600/75000 loss 3.3428 (ce 2.2161 flow 1.1267) 0.43 it/s
+  step 73650/75000 loss 3.2785 (ce 2.1575 flow 1.1210) 0.43 it/s
+  step 73700/75000 loss 3.3034 (ce 2.1917 flow 1.1117) 0.43 it/s
+  step 73750/75000 loss 3.3161 (ce 2.1795 flow 1.1367) 0.43 it/s
+  step 73800/75000 loss 3.2674 (ce 2.1381 flow 1.1293) 0.43 it/s
+  step 73850/75000 loss 3.3696 (ce 2.2326 flow 1.1370) 0.43 it/s
+  step 73900/75000 loss 3.3820 (ce 2.2512 flow 1.1308) 0.42 it/s
+  step 73950/75000 loss 3.3828 (ce 2.2730 flow 1.1098) 0.42 it/s
+  step 74000/75000 loss 3.3534 (ce 2.2263 flow 1.1270) 0.42 it/s
+  step 74050/75000 loss 3.3216 (ce 2.1880 flow 1.1335) 0.42 it/s
+  step 74100/75000 loss 3.3774 (ce 2.2347 flow 1.1427) 0.42 it/s
+  step 74150/75000 loss 3.2870 (ce 2.1536 flow 1.1334) 0.42 it/s
+  step 74200/75000 loss 3.3283 (ce 2.1897 flow 1.1386) 0.42 it/s
+  step 74250/75000 loss 3.3320 (ce 2.1908 flow 1.1412) 0.42 it/s
+  step 74300/75000 loss 3.3205 (ce 2.1757 flow 1.1448) 0.42 it/s
+  step 74350/75000 loss 3.4464 (ce 2.2691 flow 1.1772) 0.42 it/s
+  step 74400/75000 loss 3.3248 (ce 2.2041 flow 1.1207) 0.42 it/s
+  step 74450/75000 loss 3.3814 (ce 2.2386 flow 1.1428) 0.42 it/s
+  step 74500/75000 loss 3.3031 (ce 2.1953 flow 1.1078) 0.42 it/s
+  step 74550/75000 loss 3.4037 (ce 2.2699 flow 1.1338) 0.42 it/s
+  step 74600/75000 loss 3.3747 (ce 2.2433 flow 1.1315) 0.42 it/s
+  step 74650/75000 loss 3.2958 (ce 2.1780 flow 1.1179) 0.42 it/s
+  step 74700/75000 loss 3.3511 (ce 2.2186 flow 1.1325) 0.42 it/s
+  step 74750/75000 loss 3.3014 (ce 2.1857 flow 1.1157) 0.42 it/s
+  step 74800/75000 loss 3.2576 (ce 2.1448 flow 1.1128) 0.42 it/s
+  step 74850/75000 loss 3.3993 (ce 2.2764 flow 1.1229) 0.42 it/s
+  step 74900/75000 loss 3.2418 (ce 2.1193 flow 1.1225) 0.42 it/s
+  step 74950/75000 loss 3.4242 (ce 2.2857 flow 1.1385) 0.42 it/s
+  step 75000/75000 loss 3.4113 (ce 2.2644 flow 1.1469) 0.42 it/s
+  [heldout] step 75000 {'heldout_loss': 3.4784033074975014, 'heldout_code_ce': 2.345772348344326, 'heldout_code_ce_hard': 2.345772348344326, 'heldout_flow': 1.1326309442520142}
+[adarq] finished 75000 steps -> /home/ambuj.mehrish/work/levelb/branch_adarq_tuned
+note: no held-out eval logged yet
+=== AdaRQ-Flow Stage 1 complete: /home/ambuj.mehrish/work/levelb/branch_adarq_tuned ===

@@ -1,0 +1,16 @@
+{
+  "data": "/home/ambuj.mehrish/work/levelb/imagenet256",
+  "out": "/home/ambuj.mehrish/work/levelb/adarq_tok",
+  "codebook_size": 1024,
+  "max_depth": 4,
+  "target_mean_depth": 2.0,
+  "steps": 20000,
+  "images_per_step": 64,
+  "val_images": 4000,
+  "encode_batch": 512,
+  "seed": 0,
+  "device": "cuda",
+  "tau": 0.7605478465557098,
+  "val_mean_depth": 2.0,
+  "res_rms": 1.4013199429406875
+}

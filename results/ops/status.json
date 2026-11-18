@@ -1,0 +1,328 @@
+{
+ "cancels": {},
+ "cluster": {
+  "counts": {
+   "PENDING": 22,
+   "RUNNING": 3
+  },
+  "ended_24h": [],
+  "squeue": [
+   {
+    "elapsed": "0:00",
+    "jobid": "1507926",
+    "name": "levelb-sample",
+    "nodes": "1",
+    "reason_or_nodelist": "(Resources)",
+    "start": "2026-11-19T15:48:11",
+    "state": "PENDING",
+    "time_limit": "1-00:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1507929",
+    "name": "levelb-adarq",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "2026-11-19T15:48:11",
+    "state": "PENDING",
+    "time_limit": "1-00:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1507937",
+    "name": "levelb-sample",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "1-00:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1507934",
+    "name": "levelb-sample",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "1-00:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1507931",
+    "name": "levelb-sample",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "1-00:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1507930",
+    "name": "levelb-adarq",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "1-00:00:00"
+   },
+   {
+    "elapsed": "1:26:01",
+    "jobid": "1507925",
+    "name": "levelb-sample",
+    "nodes": "1",
+    "reason_or_nodelist": "vhpc15",
+    "start": "2026-11-18T15:48:11",
+    "state": "RUNNING",
+    "time_limit": "1-00:00:00"
+   },
+   {
+    "elapsed": "1:26:02",
+    "jobid": "1507923",
+    "name": "levelb-sample",
+    "nodes": "1",
+    "reason_or_nodelist": "vhpc13",
+    "start": "2026-11-18T15:48:10",
+    "state": "RUNNING",
+    "time_limit": "1-00:00:00"
+   },
+   {
+    "elapsed": "1:26:02",
+    "jobid": "1507924",
+    "name": "levelb-sample",
+    "nodes": "1",
+    "reason_or_nodelist": "vhpc14",
+    "start": "2026-11-18T15:48:10",
+    "state": "RUNNING",
+    "time_limit": "1-00:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1507940",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Resources)",
+    "start": "2026-11-19T13:43:40",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1507942",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "2026-11-19T13:43:40",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1507944",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "2026-11-19T13:43:40",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1507946",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "2026-11-19T13:43:40",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1507947",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1507945",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1507943",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1507941",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1507939",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1507938",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1507936",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1507935",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1507933",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1507932",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1507928",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1507927",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   }
+  ]
+ },
+ "queue": [
+  "2026-11-18-watch-flux1024",
+  "2026-11-18-watch-seed12-scores",
+  "2026-11-18-watch-soft",
+  "2026-11-18-watch-tuned-samples"
+ ],
+ "requests": {
+  "2026-11-18-watch-flux1024": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1507923,1507924,1507925,1507926,1507927,1507928",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [
+    "PENDING",
+    "RUNNING"
+   ],
+   "submit_error": null,
+   "submitted": "2026-11-18T17:14:12",
+   "waiting_for": null
+  },
+  "2026-11-18-watch-seed12-scores": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1507940,1507941,1507942,1507943,1507944,1507945,1507946,1507947",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [
+    "PENDING"
+   ],
+   "submit_error": null,
+   "submitted": "2026-11-18T17:14:12",
+   "waiting_for": null
+  },
+  "2026-11-18-watch-soft": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1507929,1507930",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [
+    "PENDING"
+   ],
+   "submit_error": null,
+   "submitted": "2026-11-18T17:14:12",
+   "waiting_for": null
+  },
+  "2026-11-18-watch-tuned-samples": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1507931,1507932,1507933,1507934,1507935,1507936,1507937,1507938,1507939",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [
+    "PENDING"
+   ],
+   "submit_error": null,
+   "submitted": "2026-11-18T17:14:12",
+   "waiting_for": null
+  }
+ },
+ "updated": "2026-11-18T17:14:12"
+}

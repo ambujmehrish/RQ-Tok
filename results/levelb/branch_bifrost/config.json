@@ -1,0 +1,22 @@
+{
+  "data": "/home/ambuj.mehrish/work/levelb/imagenet256",
+  "out": "/home/ambuj.mehrish/work/levelb/branch_bifrost",
+  "vlm": "Qwen/Qwen2.5-VL-3B-Instruct",
+  "processor": "Qwen/Qwen2.5-VL-3B-Instruct",
+  "batch": 128,
+  "lr": 0.0005,
+  "warmup": 5000,
+  "epochs": 16,
+  "max_grad_norm": 1.0,
+  "micro_batch": 32,
+  "seed": 0,
+  "save_every": 2000,
+  "eval_every": 5000,
+  "eval_n": 2048,
+  "device": "cuda",
+  "max_steps": null,
+  "steps_total": 158880,
+  "steps_per_epoch": 9930,
+  "trainable": 2779103232,
+  "frozen": 3754622976
+}
