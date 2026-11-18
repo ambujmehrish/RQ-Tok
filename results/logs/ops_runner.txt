@@ -20,3 +20,13 @@ heartbeat push failed (retried next hour): TimeoutExpired: Command '['bash', 'sc
 2026-11-18T18:59:46 submitted=0 finished=0 collected=0 invalid=0 | cluster: PENDING=22 RUNNING=3
 2026-11-18T19:04:47 submitted=0 finished=0 collected=0 invalid=0 | cluster: PENDING=22 RUNNING=3
 2026-11-18T19:09:48 submitted=0 finished=0 collected=0 invalid=0 | cluster: PENDING=22 RUNNING=3
+heartbeat push failed (retried next hour): TimeoutExpired: Command '['bash', 'scripts/ops/collect.sh', 'ops heartbeat (status only)']' timed out after 900 seconds
+2026-11-18T19:14:49 submitted=0 finished=0 collected=0 invalid=0 | cluster: PENDING=22 RUNNING=3
+2026-11-18T19:34:51 submitted=0 finished=0 collected=0 invalid=0 | cluster: PENDING=18 RUNNING=7
+2026-11-18T19:39:52 submitted=0 finished=0 collected=0 invalid=0 | cluster: PENDING=14 RUNNING=7
+2026-11-18T19:44:53 submitted=0 finished=0 collected=0 invalid=0 | cluster: PENDING=14 RUNNING=7
+2026-11-18T19:49:54 submitted=0 finished=0 collected=0 invalid=0 | cluster: PENDING=14 RUNNING=7
+2026-11-18T19:54:55 submitted=0 finished=0 collected=0 invalid=0 | cluster: PENDING=14 RUNNING=7
+2026-11-18T19:59:56 submitted=0 finished=0 collected=0 invalid=0 | cluster: PENDING=14 RUNNING=7
+2026-11-18T20:04:57 submitted=0 finished=0 collected=0 invalid=0 | cluster: PENDING=14 RUNNING=7
+2026-11-18T20:09:58 submitted=0 finished=0 collected=0 invalid=0 | cluster: PENDING=14 RUNNING=7
