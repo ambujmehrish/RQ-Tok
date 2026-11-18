@@ -606,3 +606,28 @@
   2400/2500 images
   2404/2500 images
   2408/2500 images
+  2412/2500 images
+  2416/2500 images
+  2420/2500 images
+  2424/2500 images
+  2428/2500 images
+  2432/2500 images
+  2436/2500 images
+  2440/2500 images
+  2444/2500 images
+  2448/2500 images
+  2452/2500 images
+  2456/2500 images
+  2460/2500 images
+  2464/2500 images
+  2468/2500 images
+  2472/2500 images
+  2476/2500 images
+  2480/2500 images
+  2484/2500 images
+  2488/2500 images
+  2492/2500 images
+  2496/2500 images
+  2500/2500 images
+wrote /home/ambuj.mehrish/work/levelb/samples/flux1024_seed0/shard02of04.npz
+=== shard 2/4 of flux seed 0 done: /home/ambuj.mehrish/work/levelb/samples/flux1024_seed0 ===

@@ -1,0 +1,6 @@
+Loading pipeline components...:   0%|          | 0/3 [00:00<?, ?it/s]
+Loading checkpoint shards:   0%|          | 0/3 [00:00<?, ?it/s][ALoading checkpoint shards: 100%|██████████| 3/3 [00:00<00:00, 49.32it/s]
+Loading pipeline components...: 100%|██████████| 3/3 [00:00<00:00, 21.80it/s]Loading pipeline components...: 100%|██████████| 3/3 [00:00<00:00, 21.77it/s]
+  4/2500 images
+  8/2500 images
+  12/2500 images
