@@ -43,6 +43,6 @@ done
 
 echo "== status"
 mkdir -p "$D/levelb"
-LEVELB_ROOT="$LEVELB_ROOT" python "$REPO/scripts/levelb/status.py" > "$D/levelb/status.txt"
+LEVELB_ROOT="$LEVELB_ROOT" "${OPS_PYTHON:-python3}" "$REPO/scripts/levelb/status.py" > "$D/levelb/status.txt"
 echo "  $D/levelb/status.txt"
 du -sh "$D"
