@@ -5,3 +5,25 @@
 vision_denoising_type:  mar
 [adarq] soft code targets, T per level [214.697, 60.654, 28.243, 17.92]
 Using a slow image processor as `use_fast` is unset and a slow processor was saved with this model. `use_fast=True` will be the default behavior in v4.48, even if the model was saved with a slow processor. This will result in minor differences in outputs. You'll still be able to use a slow processor with `use_fast=False`.
+[resume] step 69727 (epoch 7, pos 27776)
+[adarq] 2,815,065,092 trainable (heads 40,158,212 vs Bifrost-1 linear head 4,196,352) | 158880 steps
+  step 69750/158880 loss 4.0895 (ce 2.8979 flow 1.1916) 0.37 it/s
+  step 69800/158880 loss 4.0339 (ce 2.8445 flow 1.1894) 0.38 it/s
+  step 69850/158880 loss 4.0835 (ce 2.8801 flow 1.2033) 0.38 it/s
+  step 69900/158880 loss 4.1157 (ce 2.8996 flow 1.2162) 0.38 it/s
+  step 69950/158880 loss 4.0974 (ce 2.9031 flow 1.1943) 0.38 it/s
+  step 70000/158880 loss 4.1210 (ce 2.9264 flow 1.1946) 0.39 it/s
+  [heldout] step 70000 {'heldout_loss': 4.150353141129017, 'heldout_code_ce': 2.9448725320398808, 'heldout_code_ce_hard': 2.5543060079216957, 'heldout_flow': 1.205480594187975}
+  step 70050/158880 loss 4.0877 (ce 2.8846 flow 1.2031) 0.33 it/s
+  step 70100/158880 loss 4.0764 (ce 2.8808 flow 1.1957) 0.33 it/s
+  step 70150/158880 loss 4.1391 (ce 2.9457 flow 1.1934) 0.34 it/s
+  step 70200/158880 loss 4.1120 (ce 2.9061 flow 1.2059) 0.34 it/s
+  step 70250/158880 loss 4.0981 (ce 2.8989 flow 1.1992) 0.35 it/s
+  step 70300/158880 loss 4.0603 (ce 2.8783 flow 1.1819) 0.35 it/s
+  step 70350/158880 loss 4.1164 (ce 2.9255 flow 1.1910) 0.35 it/s
+  step 70400/158880 loss 4.1429 (ce 2.9472 flow 1.1957) 0.36 it/s
+  step 70450/158880 loss 4.2410 (ce 3.0251 flow 1.2160) 0.36 it/s
+  step 70500/158880 loss 4.1339 (ce 2.8995 flow 1.2345) 0.36 it/s
+  step 70550/158880 loss 4.0914 (ce 2.8893 flow 1.2021) 0.36 it/s
+  step 70600/158880 loss 4.1084 (ce 2.9078 flow 1.2007) 0.36 it/s
+  step 70650/158880 loss 4.0464 (ce 2.8588 flow 1.1876) 0.36 it/s
