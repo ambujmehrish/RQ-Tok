@@ -29,6 +29,7 @@ mkdir -p logs
 die() { echo "FAILED: $*" >&2; exit 1; }
 
 ARM="${ARM:?set ARM=bifrost, adarq or flux}"
+# RES (default 256, the protocol) and BATCH: only the evaluation search changes RES
 SEED="${SEED:?set SEED (0, 1, 2)}"
 SHARD="${SHARD:-0}"; NSHARDS="${NSHARDS:-1}"
 LEVELB_ROOT="${LEVELB_ROOT:-$HOME/work/levelb}"
@@ -64,5 +65,6 @@ fi
 if [ "$ARM" != "flux" ]; then EXTRA+=(--branch "$BRANCH" --controlnet "$CN"); fi
 python -m levelb.sample --arm "$ARM" "${EXTRA[@]+"${EXTRA[@]}"}" \
     --data "$LEVELB_ROOT/imagenet256" --seed "$SEED" --n 10000 \
-    --shard "$SHARD" --nshards "$NSHARDS" --out "$OUT"
+    --shard "$SHARD" --nshards "$NSHARDS" --out "$OUT" \
+    --res "${RES:-256}" --batch "${BATCH:-16}"
 echo "=== shard $SHARD/$NSHARDS of $ARM seed $SEED done: $OUT ==="

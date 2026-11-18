@@ -24,7 +24,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
-#SBATCH --mem=64G
+#SBATCH --mem=96G
 #SBATCH --time=12:00:00
 #SBATCH --output=logs/%x-%j.out
 #SBATCH --error=logs/%x-%j.out
@@ -74,12 +74,36 @@ if not shards:
 totals = {int(re.match(r"shard(\d+)of(\d+)\.npz", p.name).group(2)) for p in shards}
 if len(totals) != 1 or len(shards) != totals.pop():
     sys.exit(f"{d}: incomplete or mixed shard sets: {[p.name for p in shards]}")
-parts = [np.load(p) for p in shards]
-arr = np.concatenate([p["arr_0"] for p in parts])
-labels = np.concatenate([p["labels"] for p in parts])
-if arr.shape[0] != 10000 or labels.shape != (10000,):
-    sys.exit(f"{d}: merged {arr.shape[0]} images, expected 10000")
-np.savez(out, arr_0=arr, labels=labels)
+import zipfile
+def header(path):
+    """(shape, dtype) of arr_0 without loading it."""
+    with zipfile.ZipFile(path) as z, z.open("arr_0.npy") as f:
+        ver = np.lib.format.read_magic(f)
+        rd = (np.lib.format.read_array_header_1_0 if ver == (1, 0)
+              else np.lib.format.read_array_header_2_0)
+        shape, _, dtype = rd(f)
+    return shape, dtype
+heads = [header(p) for p in shards]
+n = sum(h[0][0] for h in heads)
+if n != 10000 or len({(h[0][1:], h[1]) for h in heads}) != 1:
+    sys.exit(f"{d}: shards hold {n} images (expected 10000) or differ in shape/dtype")
+# stream shard by shard through a memmap: peak memory is one shard, not the whole set
+tmp = d / "merge.tmp.npy"
+mm = np.lib.format.open_memmap(tmp, mode="w+", dtype=heads[0][1], shape=(n,) + heads[0][0][1:])
+labels, pos = [], 0
+for p in shards:
+    with np.load(p) as z:
+        a = z["arr_0"]
+        mm[pos:pos + len(a)] = a
+        pos += len(a)
+        labels.append(z["labels"])
+mm.flush()
+labels = np.concatenate(labels)
+part = d / "samples_10000.partial.npz"
+np.savez(part, arr_0=mm, labels=labels)
+part.replace(out)
+del mm
+tmp.unlink()
 print(f"  merged {len(shards)} shard(s) -> {out}")
 PY
     SAMPLES="$SAMPLES/samples_10000.npz"
@@ -100,16 +124,43 @@ case "$REF" in
 esac
 [ -f "$REF_NPZ" ] || die "$REF_NPZ missing"
 [ -f "$SAMPLES" ] || die "$SAMPLES missing"
-python - "$SAMPLES" "$CALIBRATE" <<'PY'
+# RESIZE=<px>: score a copy of the samples resized to <px> (antialiased bicubic, TF's
+# resize, already in the pinned environment) — for the evaluation search on samples
+# generated at another size (e.g. FLUX at 1024)
+if [ -n "${RESIZE:-}" ] && [ "$CALIBRATE" != "1" ]; then
+  python - "$SAMPLES" "$RESIZE" <<'PY'
+import pathlib, sys
+import numpy as np
+import tensorflow as tf
+src, r = pathlib.Path(sys.argv[1]), int(sys.argv[2])
+out = src.with_name(f"{src.stem}.r{r}.npz")
+if not out.exists():
+    with np.load(src, mmap_mode="r") as z:
+        a, labels = z["arr_0"], np.asarray(z["labels"])
+        b = np.empty((len(a), r, r, 3), dtype=np.uint8)
+        for s in range(0, len(a), 256):
+            x = tf.image.resize(np.asarray(a[s:s + 256], dtype=np.float32), (r, r),
+                                method="bicubic", antialias=True)
+            b[s:s + 256] = np.clip(np.round(x.numpy()), 0, 255).astype(np.uint8)
+    part = out.with_name(out.stem + ".partial.npz")
+    np.savez(part, arr_0=b, labels=labels)
+    part.replace(out)
+print(f"  resized {src.name} -> {out.name}")
+PY
+  SAMPLES="${SAMPLES%.npz}.r${RESIZE}.npz"
+fi
+# SAMPLE_RES: the expected sample size (the protocol's 256 unless searching)
+python - "$SAMPLES" "$CALIBRATE" "${SAMPLE_RES:-256}" <<'PY'
 import sys
 import numpy as np
+r = int(sys.argv[3])
 with np.load(sys.argv[1], mmap_mode="r") as z:
     a = z["arr_0"]
-    if a.dtype != np.uint8 or a.shape[1:] != (256, 256, 3):
-        sys.exit(f"samples must be uint8 [N, 256, 256, 3], got {a.dtype}{a.shape}")
+    if a.dtype != np.uint8 or a.shape[1:] != (r, r, 3):
+        sys.exit(f"samples must be uint8 [N, {r}, {r}, 3], got {a.dtype}{a.shape}")
     if sys.argv[2] != "1" and a.shape[0] != 10000:
         sys.exit(f"{a.shape[0]} samples; the Bifrost-1 protocol scores exactly 10,000")
-    print(f"  {a.shape[0]} samples")
+    print(f"  {a.shape[0]} samples at {r} px")
 PY
 
 OUT="${SAMPLES%.npz}.${REF}.metrics"

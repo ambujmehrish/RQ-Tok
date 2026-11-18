@@ -410,6 +410,17 @@ Precision 0.8710, Recall 0.1838** (paper: FID 51.20, sFID 224.82, IS 157.46).
   (same generation, same scorer); AdaRQ-Flow seed 0 (FID 28.07, IS 56.4) is below the
   FLUX-only anchor on both.
 
+**Hypothesis for the paper's FLUX row (stated before testing).** Upstream generates at
+`height = t2i_resolution × 16/14` (the bridge's token grid: 224 → 256 px, as ours), but the
+backbone-only row has no token grid, and FLUX called without a size generates at its
+default 1024×1024. Fed to the evaluator (bilinear to 299 without antialiasing) against a
+256-px reference, 1024-px images would keep IS (≈157, as observed) and inflate FID and
+especially sFID — the paper's pattern (2.1× FID, 4.3× sFID relative to ours). Test:
+`ARM=flux RES=1024` (TAG `flux1024`), scored with the same evaluator (a) directly and (b)
+after antialiased downscaling to 256 (`RESIZE=256`). If (a) reproduces 51.20 / 224.82 /
+157.46, the evaluator matches the paper, the FLUX row was generated at 1024, and the
+Bifrost-1 gap (ours vs Table 1) is a model difference to be found in training/sampling.
+
 **Faithfulness gate.** Our retrained Bifrost-1 must reach FID <= 30.9 (within 20% of
 25.77). If it does not, the baseline is not faithful and no comparison is reported until
 it is fixed.
