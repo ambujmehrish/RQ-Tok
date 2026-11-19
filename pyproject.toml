@@ -41,7 +41,7 @@ dev = [
 ]
 
 [tool.setuptools.packages.find]
-include = ["adarq_flow*"]
+include = ["adarq_flow*", "rqops*"]
 
 [tool.setuptools.package-data]
 adarq_flow = ["py.typed"]
