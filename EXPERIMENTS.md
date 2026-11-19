@@ -421,6 +421,32 @@ after antialiased downscaling to 256 (`RESIZE=256`). If (a) reproduces 51.20 / 2
 157.46, the evaluator matches the paper, the FLUX row was generated at 1024, and the
 Bifrost-1 gap (ours vs Table 1) is a model difference to be found in training/sampling.
 
+**Result: hypothesis rejected.** FLUX at 1024 px, seed 0: scored directly FID 23.170 /
+sFID 49.483 / IS 167.45; downscaled to 256 first FID 24.747 / sFID 49.291 / IS 153.32
+(256-px FLUX: 24.812 / 52.107 / 156.56). Generation size does not produce the paper's
+51.20 / 224.82. Next: the reference-set search (ADM 64/128/512, ImageNet-val squashed,
+held-out 10k) and the question to the authors.
+
+**Test results — 3 seeds (10,000 samples each; calibrated ADM evaluator).** Mean ± std:
+
+| arm | reference | FID | sFID | IS | Precision | Recall |
+|---|---|---|---|---|---|---|
+| Bifrost-1 (retrained) | ADM (primary) | 16.977 ± 0.093 | 28.301 ± 0.030 | 266.5 ± 3.2 | 0.938 | 0.246 |
+| AdaRQ-Flow, 16 epochs | ADM (primary) | 28.380 ± 0.325 | 28.611 ± 0.110 | 56.1 ± 1.0 | 0.616 | 0.649 |
+| Bifrost-1 (retrained) | ImageNet val | 19.198 ± 0.142 | 31.507 ± 0.018 | 266.5 ± 3.2 | 0.902 | 0.237 |
+| AdaRQ-Flow, 16 epochs | ImageNet val | 24.917 ± 0.299 | 31.839 ± 0.127 | 56.1 ± 1.0 | 0.560 | 0.651 |
+
+Per-seed FID (ADM): Bifrost-1 16.991 / 16.878 / 17.062; AdaRQ-Flow 28.066 / 28.716 / 28.358.
+**Decision rule (≥10% FID improvement, >2σ): not met — AdaRQ-Flow (pre-registered,
+16 epochs) is 67.2% worse on the primary FID (58σ), 29.8% worse on the secondary.** sFID is
+within 1.1%. Caveat: the baseline is not yet confirmed faithful to the paper (see above),
+so this is a result of our setup; the direction and size of the gap are not in doubt.
+
+AdaRQ-Flow, validation-tuned budget (75k steps), seed 0: FID 29.829 / sFID 28.052 /
+IS 51.79 (ADM); FID 26.223 (val) — slightly worse than the 16-epoch run's seed 0 (28.066),
+so stopping at the held-out minimum of the code CE does not close the gap. Seeds 1–2 and
+the soft-target run pending.
+
 **Faithfulness gate.** Our retrained Bifrost-1 must reach FID <= 30.9 (within 20% of
 25.77). If it does not, the baseline is not faithful and no comparison is reported until
 it is fixed.

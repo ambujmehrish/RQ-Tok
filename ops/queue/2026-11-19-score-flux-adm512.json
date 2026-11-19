@@ -1,0 +1,13 @@
+{
+ "id": "2026-11-19-score-flux-adm512",
+ "what": "plain FLUX 256 px scored against the adm512 reference (FID-pipeline search)",
+ "script": "scripts/bench/adm_score.sbatch",
+ "env": {
+  "SAMPLES": "${LEVELB_ROOT}/samples/flux_seed0",
+  "REF": "adm512"
+ },
+ "after": [
+  "2026-11-19-eval-refs"
+ ],
+ "collect": true
+}

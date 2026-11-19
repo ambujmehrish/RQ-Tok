@@ -1,0 +1,6 @@
+{
+ "id": "2026-11-19-eval-refs",
+ "what": "reference sets for the FID-pipeline search (ADM 64/128/512, val squashed, held-out 10k)",
+ "script": "scripts/bench/eval_refs.sbatch",
+ "collect": true
+}

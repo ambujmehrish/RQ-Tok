@@ -1,0 +1,13 @@
+{
+ "id": "2026-11-19-soft-p3",
+ "what": "soft-target AdaRQ-Flow training, 3rd remaining 24 h job (resumes from its checkpoint)",
+ "script": "scripts/levelb/train_adarq.sbatch",
+ "env": {
+  "SOFT": "1",
+  "OUT": "${LEVELB_ROOT}/branch_adarq_soft"
+ },
+ "after": [
+  "2026-11-18-watch-soft"
+ ],
+ "collect": true
+}

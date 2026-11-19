@@ -1,0 +1,13 @@
+{
+ "id": "2026-11-19-score-flux-valsquash",
+ "what": "plain FLUX 256 px scored against the valsquash reference (FID-pipeline search)",
+ "script": "scripts/bench/adm_score.sbatch",
+ "env": {
+  "SAMPLES": "${LEVELB_ROOT}/samples/flux_seed0",
+  "REF": "valsquash"
+ },
+ "after": [
+  "2026-11-19-eval-refs"
+ ],
+ "collect": true
+}
