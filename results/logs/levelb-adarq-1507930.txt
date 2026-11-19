@@ -40,3 +40,21 @@ Using a slow image processor as `use_fast` is unset and a slow processor was sav
   step 105100/158880 loss 4.0774 (ce 2.8966 flow 1.1808) 0.38 it/s
   step 105150/158880 loss 3.9964 (ce 2.8291 flow 1.1672) 0.38 it/s
   step 105200/158880 loss 4.0979 (ce 2.9028 flow 1.1952) 0.38 it/s
+  step 105250/158880 loss 4.0972 (ce 2.9215 flow 1.1757) 0.39 it/s
+  step 105300/158880 loss 4.0554 (ce 2.8679 flow 1.1874) 0.39 it/s
+  step 105350/158880 loss 4.0770 (ce 2.9042 flow 1.1728) 0.39 it/s
+  step 105400/158880 loss 3.9954 (ce 2.8156 flow 1.1798) 0.39 it/s
+  step 105450/158880 loss 4.0278 (ce 2.8784 flow 1.1494) 0.39 it/s
+  step 105500/158880 loss 4.0339 (ce 2.8456 flow 1.1883) 0.39 it/s
+  step 105550/158880 loss 3.9765 (ce 2.7961 flow 1.1804) 0.39 it/s
+  step 105600/158880 loss 3.9320 (ce 2.7725 flow 1.1594) 0.39 it/s
+  step 105650/158880 loss 3.9796 (ce 2.8006 flow 1.1790) 0.39 it/s
+  step 105700/158880 loss 3.9767 (ce 2.7780 flow 1.1987) 0.39 it/s
+  step 105750/158880 loss 3.9819 (ce 2.7896 flow 1.1923) 0.39 it/s
+  step 105800/158880 loss 3.8916 (ce 2.6945 flow 1.1971) 0.39 it/s
+  step 105850/158880 loss 4.0321 (ce 2.8829 flow 1.1492) 0.39 it/s
+  step 105900/158880 loss 4.0700 (ce 2.8547 flow 1.2152) 0.39 it/s
+  step 105950/158880 loss 4.1275 (ce 2.9521 flow 1.1753) 0.39 it/s
+  step 106000/158880 loss 4.0165 (ce 2.8383 flow 1.1782) 0.39 it/s
+  step 106050/158880 loss 4.0151 (ce 2.8347 flow 1.1804) 0.38 it/s
+  step 106100/158880 loss 4.0008 (ce 2.8159 flow 1.1849) 0.38 it/s
