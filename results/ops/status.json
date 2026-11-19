@@ -2,7 +2,7 @@
  "cancels": {},
  "cluster": {
   "counts": {
-   "PENDING": 2,
+   "PENDING": 1,
    "RUNNING": 2
   },
   "ended_24h": [
@@ -95,6 +95,14 @@
     "state": "COMPLETED"
    },
    {
+    "elapsed": "00:20:18",
+    "end": "2026-11-19T21:38:11",
+    "exit": "0:0",
+    "jobid": "1507938",
+    "name": "adm-score",
+    "state": "COMPLETED"
+   },
+   {
     "elapsed": "00:10:09",
     "end": "2026-11-19T12:57:28",
     "exit": "0:0",
@@ -171,7 +179,7 @@
     "time_limit": "1-00:00:00"
    },
    {
-    "elapsed": "11:46",
+    "elapsed": "1:12:16",
     "jobid": "1507930",
     "name": "levelb-adarq",
     "nodes": "1",
@@ -181,22 +189,12 @@
     "time_limit": "1-00:00:00"
    },
    {
-    "elapsed": "0:00",
+    "elapsed": "54:36",
     "jobid": "1507939",
     "name": "adm-score",
     "nodes": "1",
-    "reason_or_nodelist": "(Dependency)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "12:00:00"
-   },
-   {
-    "elapsed": "14:24",
-    "jobid": "1507938",
-    "name": "adm-score",
-    "nodes": "1",
     "reason_or_nodelist": "vhpc6",
-    "start": "2026-11-19T21:17:53",
+    "start": "2026-11-19T21:38:11",
     "state": "RUNNING",
     "time_limit": "12:00:00"
    }
@@ -270,7 +268,6 @@
    "post_output_tail": "",
    "states": [
     "COMPLETED",
-    "PENDING",
     "RUNNING"
    ],
    "submit_error": null,
@@ -404,5 +401,5 @@
    "waiting_for": null
   }
  },
- "updated": "2026-11-19T21:32:17"
+ "updated": "2026-11-19T22:32:47"
 }
