@@ -460,3 +460,5 @@ Using a slow image processor as `use_fast` is unset and a slow processor was sav
   step 92000/158880 loss 3.9570 (ce 2.7779 flow 1.1791) 0.40 it/s
   step 92050/158880 loss 4.0788 (ce 2.9093 flow 1.1695) 0.39 it/s
   step 92100/158880 loss 4.1336 (ce 2.9575 flow 1.1761) 0.39 it/s
+  step 92150/158880 loss 3.9713 (ce 2.7924 flow 1.1789) 0.39 it/s
+  step 92200/158880 loss 4.0992 (ce 2.9352 flow 1.1640) 0.39 it/s
