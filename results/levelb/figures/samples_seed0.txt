@@ -1,0 +1,17 @@
+column 0: class 850 teddy
+column 1: class 636 mailbag
+column 2: class 511 convertible
+column 3: class 269 timber wolf
+column 4: class 307 weevil
+column 5: class 40 American chameleon
+column 6: class 75 black widow
+column 7: class 16 bulbul
+column 8: class 175 otterhound
+column 9: class 813 spatula
+column 10: class 649 megalith
+column 11: class 912 worm fence
+column 12: class 503 cocktail shaker
+column 13: class 606 iron
+column 14: class 970 alp
+column 15: class 729 plate rack
+rows: real (held-out train image of the class), flux, bifrost, adarq, adarq_tuned (seed 0, first 16 samples)
