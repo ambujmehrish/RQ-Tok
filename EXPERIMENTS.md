@@ -427,6 +427,23 @@ sFID 49.483 / IS 167.45; downscaled to 256 first FID 24.747 / sFID 49.291 / IS 1
 51.20 / 224.82. Next: the reference-set search (ADM 64/128/512, ImageNet-val squashed,
 held-out 10k) and the question to the authors.
 
+**Reference-set search (plain FLUX 256 px, seed 0; IS 156.56 under every reference):**
+
+| reference | FID | sFID | Precision | Recall |
+|---|---|---|---|---|
+| ADM 256 (ours) | 24.812 | 52.107 | 0.871 | 0.184 |
+| ADM 512 | 25.098 | 52.548 | 0.857 | 0.189 |
+| ADM 128 | 29.057 | 64.723 | 0.873 | 0.143 |
+| ADM 64 | 76.348 | 110.571 | 0.665 | 0.030 |
+| ImageNet val, centre crop | 25.406 | 54.498 | 0.815 | 0.190 |
+| ImageNet val, squashed | 26.003 | 49.606 | 0.821 | 0.187 |
+| held-out train 10k | 27.803 | 66.862 | 0.872 | 0.191 |
+| paper (Table 1) | 51.20 | 224.82 | — | — |
+
+No reference set reproduces the paper's FLUX row; with the 1024-px test, generation size and
+reference choice are both ruled out. The paper's FID/sFID pipeline remains unknown (question
+to the authors pending). Tuned AdaRQ-Flow seed 1: FID 30.174 / sFID 28.439 / IS 51.30 (ADM).
+
 **Test results — 3 seeds (10,000 samples each; calibrated ADM evaluator).** Mean ± std:
 
 | arm | reference | FID | sFID | IS | Precision | Recall |
