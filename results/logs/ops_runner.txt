@@ -106,3 +106,5 @@ heartbeat push failed (retried next hour): TimeoutExpired: Command '['bash', 'sc
 2026-11-19T03:51:02 submitted=0 finished=0 collected=0 invalid=0 | cluster: PENDING=9 RUNNING=3
 2026-11-19T03:56:03 submitted=0 finished=0 collected=0 invalid=0 | cluster: PENDING=9 RUNNING=3
 2026-11-19T04:01:04 submitted=0 finished=0 collected=0 invalid=0 | cluster: PENDING=9 RUNNING=3
+collector failed for 2026-11-18-watch-flux1024: TimeoutExpired: Command '['bash', 'scripts/ops/collect.sh', 'ops 2026-11-18-watch-flux1024: plain FLUX at 1024 px (4 parts) and its two scorings (submitted by hand) (COMPLETED)']' timed out after 900 seconds
+2026-11-19T04:06:05 submitted=0 finished=1 collected=1 invalid=0 | cluster: PENDING=9 RUNNING=2
