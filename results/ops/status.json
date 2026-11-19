@@ -2,7 +2,7 @@
  "cancels": {},
  "cluster": {
   "counts": {
-   "PENDING": 5,
+   "PENDING": 4,
    "RUNNING": 2
   },
   "ended_24h": [
@@ -91,6 +91,14 @@
     "end": "2026-11-19T14:38:02",
     "exit": "0:0",
     "jobid": "1507935",
+    "name": "adm-score",
+    "state": "COMPLETED"
+   },
+   {
+    "elapsed": "01:31:24",
+    "end": "2026-11-19T16:09:26",
+    "exit": "0:0",
+    "jobid": "1507936",
     "name": "adm-score",
     "state": "COMPLETED"
    },
@@ -226,16 +234,6 @@
   "squeue": [
    {
     "elapsed": "0:00",
-    "jobid": "1507937",
-    "name": "levelb-sample",
-    "nodes": "1",
-    "reason_or_nodelist": "(Resources)",
-    "start": "2026-11-19T21:23:06",
-    "state": "PENDING",
-    "time_limit": "1-00:00:00"
-   },
-   {
-    "elapsed": "0:00",
     "jobid": "1508048",
     "name": "levelb-adarq",
     "nodes": "1",
@@ -255,7 +253,17 @@
     "time_limit": "1-00:00:00"
    },
    {
-    "elapsed": "18:01:02",
+    "elapsed": "49:08",
+    "jobid": "1507937",
+    "name": "levelb-sample",
+    "nodes": "1",
+    "reason_or_nodelist": "vhpc15",
+    "start": "2026-11-19T15:40:40",
+    "state": "RUNNING",
+    "time_limit": "1-00:00:00"
+   },
+   {
+    "elapsed": "19:01:31",
     "jobid": "1507929",
     "name": "levelb-adarq",
     "nodes": "1",
@@ -282,16 +290,6 @@
     "reason_or_nodelist": "(Dependency)",
     "start": "N/A",
     "state": "PENDING",
-    "time_limit": "12:00:00"
-   },
-   {
-    "elapsed": "51:17",
-    "jobid": "1507936",
-    "name": "adm-score",
-    "nodes": "1",
-    "reason_or_nodelist": "vhpc6",
-    "start": "2026-11-19T14:38:02",
-    "state": "RUNNING",
     "time_limit": "12:00:00"
    }
   ]
@@ -498,5 +496,5 @@
    "waiting_for": null
   }
  },
- "updated": "2026-11-19T15:29:19"
+ "updated": "2026-11-19T16:29:48"
 }
