@@ -1,0 +1,12 @@
+{
+  "IS": 167.44735717773438,
+  "FID": 23.169508317654504,
+  "sFID": 49.483178649082106,
+  "Precision": 0.864,
+  "Recall": 0.1761,
+  "node": {
+    "host": "vhpc05",
+    "cpu": "AMD EPYC 7413 24-Core Processor",
+    "threads": 8
+  }
+}

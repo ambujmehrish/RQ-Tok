@@ -2,8 +2,8 @@
  "cancels": {},
  "cluster": {
   "counts": {
-   "PENDING": 10,
-   "RUNNING": 3
+   "PENDING": 9,
+   "RUNNING": 2
   },
   "ended_24h": [
    {
@@ -36,6 +36,22 @@
     "exit": "0:0",
     "jobid": "1507926",
     "name": "levelb-sample",
+    "state": "COMPLETED"
+   },
+   {
+    "elapsed": "00:34:01",
+    "end": "2026-11-19T03:38:40",
+    "exit": "0:0",
+    "jobid": "1507927",
+    "name": "adm-score",
+    "state": "COMPLETED"
+   },
+   {
+    "elapsed": "00:26:45",
+    "end": "2026-11-19T04:05:25",
+    "exit": "0:0",
+    "jobid": "1507928",
+    "name": "adm-score",
     "state": "COMPLETED"
    },
    {
@@ -135,7 +151,7 @@
     "time_limit": "1-00:00:00"
    },
    {
-    "elapsed": "11:19",
+    "elapsed": "1:01:26",
     "jobid": "1507931",
     "name": "levelb-sample",
     "nodes": "1",
@@ -145,7 +161,7 @@
     "time_limit": "1-00:00:00"
    },
    {
-    "elapsed": "5:47:41",
+    "elapsed": "6:37:48",
     "jobid": "1507929",
     "name": "levelb-adarq",
     "nodes": "1",
@@ -213,26 +229,6 @@
     "start": "N/A",
     "state": "PENDING",
     "time_limit": "12:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1507928",
-    "name": "adm-score",
-    "nodes": "1",
-    "reason_or_nodelist": "(Dependency)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "12:00:00"
-   },
-   {
-    "elapsed": "11:19",
-    "jobid": "1507927",
-    "name": "adm-score",
-    "nodes": "1",
-    "reason_or_nodelist": "vhpc5",
-    "start": "2026-11-19T03:04:39",
-    "state": "RUNNING",
-    "time_limit": "12:00:00"
    }
   ]
  },
@@ -244,16 +240,14 @@
  ],
  "requests": {
   "2026-11-18-watch-flux1024": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-19T04:06:05",
+   "finished": "2026-11-19T04:06:05",
    "invalid": null,
    "jobid": "1507923,1507924,1507925,1507926,1507927,1507928",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "COMPLETED",
-    "PENDING",
-    "RUNNING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-18T17:14:12",
@@ -304,5 +298,5 @@
    "waiting_for": null
   }
  },
- "updated": "2026-11-19T03:15:58"
+ "updated": "2026-11-19T04:06:05"
 }
