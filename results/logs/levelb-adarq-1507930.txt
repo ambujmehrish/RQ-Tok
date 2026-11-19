@@ -1,0 +1,13 @@
+/home/ambuj.mehrish/miniforge3/envs/bifrost1/lib/python3.11/site-packages/google/api_core/_python_version_support.py:273: FutureWarning: You are using a Python version (3.11.18) which Google will stop supporting in new releases of google.api_core once it reaches its end of life (2027-10-24). Please upgrade to the latest Python version, or at least Python 3.12, to continue receiving updates for google.api_core past that date.
+  warnings.warn(message, FutureWarning)
+2026-11-19 21:20:52 PID=2078039 __init__.py:49 setup_logging() INFO → 'standard' logger initialized.
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:01<00:01,  1.44s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:02<00:00,  1.13s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:02<00:00,  1.17s/it]
+vision_denoising_type:  mar
+[adarq] soft code targets, T per level [214.697, 60.654, 28.243, 17.92]
+Using a slow image processor as `use_fast` is unset and a slow processor was saved with this model. `use_fast=True` will be the default behavior in v4.48, even if the model was saved with a slow processor. This will result in minor differences in outputs. You'll still be able to use a slow processor with `use_fast=False`.
+[resume] step 103626 (epoch 10, pos 553728)
+[adarq] 2,815,065,092 trainable (heads 40,158,212 vs Bifrost-1 linear head 4,196,352) | 158880 steps
+  step 103650/158880 loss 4.0402 (ce 2.8718 flow 1.1685) 0.38 it/s
+  step 103700/158880 loss 3.9934 (ce 2.7845 flow 1.2089) 0.39 it/s
+  step 103750/158880 loss 4.0038 (ce 2.8095 flow 1.1943) 0.39 it/s
+  step 103800/158880 loss 4.0231 (ce 2.8153 flow 1.2078) 0.39 it/s
