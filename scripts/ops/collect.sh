@@ -21,6 +21,10 @@ COMMIT_ONLY=""
 if [ "${1:-}" = --commit-only ]; then COMMIT_ONLY=1; shift; fi
 MSG=${1:?usage: collect.sh [--commit-only] "<message>"}
 BRANCH=${OPS_BRANCH:-claude/great-volta-KaJdU}
+# never wait for a typed password: fail at once and say so (a push that prompts for
+# credentials hangs until the queue's 900 s timeout and nothing reaches git)
+export GIT_TERMINAL_PROMPT=0
+export GIT_SSH_COMMAND="${GIT_SSH_COMMAND:-ssh -o BatchMode=yes}"
 OPS_BASE=${OPS_BASE:-$HOME/work/ops}
 mkdir -p results/logs results/ops
 
@@ -47,5 +51,6 @@ if git fetch -q origin "$BRANCH" && git rebase -q FETCH_HEAD && git push -q orig
     echo "collector: pushed ($MSG)"
 else
     git rebase --abort 2>/dev/null
-    echo "collector: push failed; the commit stays local and goes out with the next push"; exit 1
+    echo "collector: push failed (non-interactive git needs stored credentials: SSH key or token,"
+    echo "  see ops/README.md); the commit stays local and goes out with the next push"; exit 1
 fi

@@ -24,6 +24,27 @@ git status --short | grep -v '^??'      # must print nothing
 git checkout claude/great-volta-KaJdU && git pull origin claude/great-volta-KaJdU
 git push --dry-run origin HEAD:claude/great-volta-KaJdU   # must not ask for a password
 ```
+**Push credentials (required).** The runner pushes without a terminal, so git must never
+ask for a password (`GIT_TERMINAL_PROMPT=0` makes it fail at once instead of hanging). Use a
+deploy key, an SSH key that can push to this one repository only:
+```bash
+ssh-keygen -t ed25519 -N "" -f ~/.ssh/rqtok_deploy -C "rq-tok runner vhpc01"
+cat ~/.ssh/rqtok_deploy.pub
+#   GitHub -> ambujmehrish/rq-tok -> Settings -> Deploy keys -> Add deploy key:
+#   paste it, tick "Allow write access", save
+cat >> ~/.ssh/config <<'EOF'
+Host github-rqtok
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/rqtok_deploy
+  IdentitiesOnly yes
+EOF
+chmod 600 ~/.ssh/config
+ssh -T github-rqtok              # expect: "Hi ambujmehrish/rq-tok! You've successfully authenticated"
+git remote set-url origin github-rqtok:ambujmehrish/rq-tok.git
+```
+If port 22 is blocked, use `HostName ssh.github.com` and `Port 443` in that block.
+
 Start:
 ```bash
 tmux new -s rqtok_runner

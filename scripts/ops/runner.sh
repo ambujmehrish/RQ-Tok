@@ -13,6 +13,10 @@ set -uo pipefail
 cd "$(dirname "$0")/../.."
 REPO=$(pwd)
 BRANCH=${OPS_BRANCH:-claude/great-volta-KaJdU}
+# never wait for a typed password: fail at once and say so (a push that prompts for
+# credentials hangs until the queue's 900 s timeout and nothing reaches git)
+export GIT_TERMINAL_PROMPT=0
+export GIT_SSH_COMMAND="${GIT_SSH_COMMAND:-ssh -o BatchMode=yes}"
 INTERVAL=${INTERVAL:-300}
 export OPS_PYTHON=${OPS_PYTHON:-python3}
 export OPS_BRANCH=$BRANCH
