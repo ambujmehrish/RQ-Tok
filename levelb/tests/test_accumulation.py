@@ -32,8 +32,10 @@ def test_bifrost_accumulation_equals_full_batch(tiny_vlm):  # noqa: F811
 
     model.zero_grad()
     for s in (0, 2):
-        part = model(t2i_flow=bb.t2i_flow(conv, prompts[s:s + 2], z[s:s + 2], mask[s:s + 2]),
-                     **bb.forward_kwargs(2))["loss"]
+        part = model(
+            t2i_flow=bb.t2i_flow(conv, prompts[s : s + 2], z[s : s + 2], mask[s : s + 2]),
+            **bb.forward_kwargs(2),
+        )["loss"]
         (part * 0.5).backward()
     g_acc = _grads(model)
     assert g_full.keys() == g_acc.keys()
@@ -49,14 +51,18 @@ def test_adarq_normalisation_matches_full_batch():
     codes = torch.randint(1, K, (4, 64, D))
     depth = torch.randint(1, D + 1, (4, 64))
     for k in range(D):
-        codes[..., k][depth <= k] = K                       # halt suffix
+        codes[..., k][depth <= k] = K  # halt suffix
     masked = torch.rand(4, 64) < 0.8
     totals = heads.counts(codes, masked)
-    parts = [heads.counts(codes[s:s + 2], masked[s:s + 2]) for s in (0, 2)]
+    parts = [heads.counts(codes[s : s + 2], masked[s : s + 2]) for s in (0, 2)]
     assert totals == (parts[0][0] + parts[1][0], parts[0][1] + parts[1][1])
     full = heads.loss(h, z, codes, masked)["code_ce"]
-    split = sum(heads.loss(h[s:s + 2], z[s:s + 2], codes[s:s + 2], masked[s:s + 2],
-                           totals=totals)["code_ce"] for s in (0, 2))
+    split = sum(
+        heads.loss(h[s : s + 2], z[s : s + 2], codes[s : s + 2], masked[s : s + 2], totals=totals)[
+            "code_ce"
+        ]
+        for s in (0, 2)
+    )
     assert torch.allclose(full, split, rtol=1e-6)
     assert isinstance(am.AdaRQHeads, type)
 
@@ -90,10 +96,16 @@ def test_soft_targets_reduce_to_hard_and_accumulate_exactly():
     # a real temperature: a different, finite loss with gradients, and exact accumulation
     heads.soft_temps = [float(t) for t in torch.linspace(5.0, 1.0, D)]
     full = heads.loss(h, z, codes, masked)
-    assert torch.isfinite(full["loss"]) and not torch.allclose(full["code_ce"], full["code_ce_hard"])
+    assert torch.isfinite(full["loss"]) and not torch.allclose(
+        full["code_ce"], full["code_ce_hard"]
+    )
     full["loss"].backward()
     assert all(p.grad is None or torch.isfinite(p.grad).all() for p in heads.parameters())
     totals = heads.counts(codes, masked)
-    split = sum(heads.loss(h[s:s + 2], z[s:s + 2], codes[s:s + 2], masked[s:s + 2],
-                           totals=totals)["code_ce"] for s in (0, 2))
+    split = sum(
+        heads.loss(h[s : s + 2], z[s : s + 2], codes[s : s + 2], masked[s : s + 2], totals=totals)[
+            "code_ce"
+        ]
+        for s in (0, 2)
+    )
     assert torch.allclose(full["code_ce"], split, rtol=1e-6)

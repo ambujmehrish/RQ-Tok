@@ -82,13 +82,13 @@ class Acc:
     def __init__(self, depth: int) -> None:
         self.ce = np.zeros(depth)
         self.n = np.zeros(depth)
-        self.ce_codes = 0.0          # code levels only (no <halt> targets)
+        self.ce_codes = 0.0  # code levels only (no <halt> targets)
         self.n_codes = 0
         self.top1 = 0
-        self.wrong_ratio: list[np.ndarray] = []   # d(pred)/d(true) for wrong predictions
-        self.pred_halt = 0                         # wrong predictions that were <halt>
-        self.tie: list[np.ndarray] = []            # d2/d1 of the tokenizer's choice
-        self.near_mass: list[np.ndarray] = []      # prob. on codewords within 10% of true
+        self.wrong_ratio: list[np.ndarray] = []  # d(pred)/d(true) for wrong predictions
+        self.pred_halt = 0  # wrong predictions that were <halt>
+        self.tie: list[np.ndarray] = []  # d2/d1 of the tokenizer's choice
+        self.near_mass: list[np.ndarray] = []  # prob. on codewords within 10% of true
         self.gap_sq: dict[int, list[np.ndarray]] = {}
         self.argmin_ok = 0
 
@@ -113,8 +113,9 @@ class Acc:
             "tokenizer_near_tie_10pct": float((tie < 1.10).mean()) if len(tie) else None,
             "prob_mass_within_10pct": float(nm.mean()) if len(nm) else None,
             "argmin_matches_stored_code": self.argmin_ok / max(self.n_codes, 1),
-            "median_gap_sq_per_level": {str(k): float(np.median(np.concatenate(v)))
-                                        for k, v in sorted(self.gap_sq.items())},
+            "median_gap_sq_per_level": {
+                str(k): float(np.median(np.concatenate(v))) for k, v in sorted(self.gap_sq.items())
+            },
         }
 
 
@@ -123,42 +124,48 @@ def measure(model, heads, conv, data, idx, ratio, batch, device, seed) -> dict:
     rng = np.random.default_rng(seed)
     acc = Acc(heads.D)
     books = heads.books.float()
-    c_sq = books.pow(2).sum(-1)                                     # [D, K]
+    c_sq = books.pow(2).sum(-1)  # [D, K]
     for s in range(0, len(idx), batch):
-        part = np.sort(idx[s:s + batch])
+        part = np.sort(idx[s : s + batch])
         prompts, lat, codes = data.batch(part)
         mask = fixed_ratio_mask(len(part), ratio, rng)
-        flow = {k: v.to(device) if torch.is_tensor(v) else v
-                for k, v in bb.t2i_flow(conv, prompts, lat, mask).items()}
+        flow = {
+            k: v.to(device) if torch.is_tensor(v) else v
+            for k, v in bb.t2i_flow(conv, prompts, lat, mask).items()
+        }
         with torch.autocast(device.type, dtype=torch.bfloat16, enabled=device.type == "cuda"):
             h = branch_hidden(model, flow, len(part))
         m = mask.bool().to(device)
         h, z = h[m].float(), lat.to(device)[m].float()
         cd = codes.to(device)[m].long()
-        pre = heads.prefixes(cd)                                    # [M, D+1, d]
+        pre = heads.prefixes(cd)  # [M, D+1, d]
         depth = (cd != heads.K).sum(-1)
         for lvl in range(heads.D):
             valid = lvl <= depth
             if not valid.any():
                 continue
-            logits = heads.code_logits(h[valid], pre[valid, lvl], lvl)    # [V, K+1] fp32
+            logits = heads.code_logits(h[valid], pre[valid, lvl], lvl)  # [V, K+1] fp32
             y = cd[valid, lvl]
             ce = F.cross_entropy(logits, y, reduction="none")
             acc.ce[lvl] += float(ce.sum())
             acc.n[lvl] += int(valid.sum())
-            code = y != heads.K                                     # levels with a real code
+            code = y != heads.K  # levels with a real code
             if not code.any():
                 continue
             lg, yc = logits[code], y[code]
             acc.ce_codes += float(ce[code].sum())
             acc.n_codes += int(code.sum())
-            r = (z[valid] - pre[valid, lvl])[code]                  # residual before this level
+            r = (z[valid] - pre[valid, lvl])[code]  # residual before this level
             d2 = (r.pow(2).sum(-1, keepdim=True) - 2 * r @ books[lvl].t() + c_sq[lvl]).clamp_min(0)
             two = d2.topk(2, dim=-1, largest=False)
             acc.argmin_ok += int((two.indices[:, 0] == yc).sum())
             d_true = d2.gather(1, yc[:, None]).squeeze(1)
-            acc.tie.append((two.values[:, 1] / two.values[:, 0].clamp_min(1e-12)).sqrt().cpu().numpy())
-            acc.gap_sq.setdefault(lvl, []).append((two.values[:, 1] - two.values[:, 0]).cpu().numpy())
+            acc.tie.append(
+                (two.values[:, 1] / two.values[:, 0].clamp_min(1e-12)).sqrt().cpu().numpy()
+            )
+            acc.gap_sq.setdefault(lvl, []).append(
+                (two.values[:, 1] - two.values[:, 0]).cpu().numpy()
+            )
             pred = lg.argmax(-1)
             acc.top1 += int((pred == yc).sum())
             wrong = pred != yc
@@ -168,8 +175,8 @@ def measure(model, heads, conv, data, idx, ratio, batch, device, seed) -> dict:
             if wc.any():
                 d_pred = d2[wc].gather(1, pred[wc][:, None]).squeeze(1)
                 acc.wrong_ratio.append((d_pred / d_true[wc].clamp_min(1e-12)).sqrt().cpu().numpy())
-            near = d2 <= (1.10 ** 2) * d_true[:, None]               # includes the true code
-            prob = torch.softmax(lg, -1)[:, :heads.K]
+            near = d2 <= (1.10**2) * d_true[:, None]  # includes the true code
+            prob = torch.softmax(lg, -1)[:, : heads.K]
             acc.near_mass.append((prob * near).sum(-1).cpu().numpy())
     return acc.summary()
 
@@ -198,44 +205,67 @@ def main() -> None:
         model, heads = model.float(), heads.float()
     conv = bb.make_conversation(args.processor)
     n = min(args.n, len(data.heldout))
-    splits = {"heldout": np.asarray(data.heldout[:n]),
-              "train": np.random.default_rng(7).choice(data.train, n, replace=False)}
+    splits = {
+        "heldout": np.asarray(data.heldout[:n]),
+        "train": np.random.default_rng(7).choice(data.train, n, replace=False),
+    }
     print(f"[diag] {run} at step {step} ({which}); {n} images per split", flush=True)
 
-    res = {"run": str(run), "step": step, "weights": which, "images_per_split": n,
-           "ratios": list(RATIOS), "cells": {}}
+    res = {
+        "run": str(run),
+        "step": step,
+        "weights": which,
+        "images_per_split": n,
+        "ratios": list(RATIOS),
+        "cells": {},
+    }
     for ratio in RATIOS:
         for split, idx in splits.items():
             # the same mask draw for both splits at a given ratio
-            cell = measure(model, heads, conv, data, idx, ratio, args.batch, device,
-                           seed=int(ratio * 1000))
+            cell = measure(
+                model, heads, conv, data, idx, ratio, args.batch, device, seed=int(ratio * 1000)
+            )
             res["cells"][f"{split}@{ratio:.2f}"] = cell
-            print(f"  {split:8s} mask {ratio:.2f}: CE all {cell['ce_all']:.4f} "
-                  f"codes {cell['ce_code_levels']:.4f} top1 {cell['top1_acc_code_levels']:.3f}",
-                  flush=True)
+            print(
+                f"  {split:8s} mask {ratio:.2f}: CE all {cell['ce_all']:.4f} "
+                f"codes {cell['ce_code_levels']:.4f} top1 {cell['top1_acc_code_levels']:.3f}",
+                flush=True,
+            )
             if cell["argmin_matches_stored_code"] < 0.99:
-                raise RuntimeError(f"residual reconstruction disagrees with the stored codes "
-                                   f"({cell['argmin_matches_stored_code']:.4f}); the near-miss "
-                                   "numbers would be wrong")
+                raise RuntimeError(
+                    f"residual reconstruction disagrees with the stored codes "
+                    f"({cell['argmin_matches_stored_code']:.4f}); the near-miss "
+                    "numbers would be wrong"
+                )
 
     print("\nH1  train/held-out gap in code CE (nats), by mask ratio:")
     for ratio in RATIOS:
         tr, ho = res["cells"][f"train@{ratio:.2f}"], res["cells"][f"heldout@{ratio:.2f}"]
         gap = ho["ce_all"] - tr["ce_all"]
         res["cells"][f"gap@{ratio:.2f}"] = gap
-        print(f"  mask {ratio:.2f}: train {tr['ce_all']:.4f}  held-out {ho['ce_all']:.4f}  "
-              f"gap {gap:+.4f}")
+        print(
+            f"  mask {ratio:.2f}: train {tr['ce_all']:.4f}  held-out {ho['ce_all']:.4f}  "
+            f"gap {gap:+.4f}"
+        )
     h = res["cells"]["heldout@0.90"]
     print("\nH2  held-out, mask 0.90:")
     print(f"  top-1 accuracy on code levels       {f3(h['top1_acc_code_levels'])}")
-    print(f"  wrong predictions within 5/10/20% of the true code's distance: "
-          f"{f3(h['wrong_within_5pct'])} / {f3(h['wrong_within_10pct'])} / "
-          f"{f3(h['wrong_within_20pct'])} (median ratio {f3(h['wrong_ratio_median'])})")
-    print(f"  tokenizer near-ties (2nd/1st < 1.05 / 1.10): {f3(h['tokenizer_near_tie_5pct'])} / "
-          f"{f3(h['tokenizer_near_tie_10pct'])}")
-    print(f"  head's probability on codewords within 10% of true: {f3(h['prob_mass_within_10pct'])}")
-    print(f"  median d2^2 - d1^2 per level (train): "
-          f"{res['cells']['train@0.90']['median_gap_sq_per_level']}")
+    print(
+        f"  wrong predictions within 5/10/20% of the true code's distance: "
+        f"{f3(h['wrong_within_5pct'])} / {f3(h['wrong_within_10pct'])} / "
+        f"{f3(h['wrong_within_20pct'])} (median ratio {f3(h['wrong_ratio_median'])})"
+    )
+    print(
+        f"  tokenizer near-ties (2nd/1st < 1.05 / 1.10): {f3(h['tokenizer_near_tie_5pct'])} / "
+        f"{f3(h['tokenizer_near_tie_10pct'])}"
+    )
+    print(
+        f"  head's probability on codewords within 10% of true: {f3(h['prob_mass_within_10pct'])}"
+    )
+    print(
+        f"  median d2^2 - d1^2 per level (train): "
+        f"{res['cells']['train@0.90']['median_gap_sq_per_level']}"
+    )
     print(f"  stored codes reproduced: {h['argmin_matches_stored_code']:.4f}")
 
     out = pathlib.Path(args.out) if args.out else run / "diag" / "overfit_diag.json"

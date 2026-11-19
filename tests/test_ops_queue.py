@@ -10,8 +10,13 @@ import pytest
 
 from rqops import queue as q
 
-ENV = {"LEVELB_ROOT": "/work/levelb", "BENCH_ROOT": "/work/bench", "BIFROST_ROOT": "/work/b1",
-       "OPS_BASE": "/work/ops", "PATH": "/usr/bin"}
+ENV = {
+    "LEVELB_ROOT": "/work/levelb",
+    "BENCH_ROOT": "/work/bench",
+    "BIFROST_ROOT": "/work/b1",
+    "OPS_BASE": "/work/ops",
+    "PATH": "/usr/bin",
+}
 
 
 class FakeSlurm:
@@ -79,8 +84,11 @@ class FakeSlurm:
 
     def posts(self):
         # Locate post-step commands, skipping sbatch/sacct/squeue calls.
-        return [c for c in self.calls
-                if c["cmd"][0] not in ("sbatch", "sacct", "squeue") and c["cmd"][0] == sys.executable]
+        return [
+            c
+            for c in self.calls
+            if c["cmd"][0] not in ("sbatch", "sacct", "squeue") and c["cmd"][0] == sys.executable
+        ]
 
 
 @pytest.fixture
@@ -110,8 +118,14 @@ class Clock:
 
 
 def do_tick(repo, fake, clock=None, environ=ENV):
-    return q.tick(repo, repo.parent / "state" / "state.json", repo.parent / "status.json",
-                  run=fake, environ=environ, clock=clock or Clock())
+    return q.tick(
+        repo,
+        repo.parent / "state" / "state.json",
+        repo.parent / "status.json",
+        run=fake,
+        environ=environ,
+        clock=clock or Clock(),
+    )
 
 
 def status(repo):
@@ -123,58 +137,67 @@ def status(repo):
 GOOD = {"id": "r1", "what": "x", "script": "scripts/levelb/eval_baselines.sbatch"}
 
 
-@pytest.mark.parametrize("patch, needle", [
-    ({"script": "../scripts/levelb/eval_baselines.sbatch"}, "script"),
-    ({"script": "eval_baselines.sbatch"}, "script"),
-    ({"script": "scripts/bifrost1/generate.sbatch"}, "script"),
-    ({"script": "scripts/levelb/../bench/x.sbatch"}, "script"),
-    ({"script": "scripts/levelb/missing.sbatch"}, "does not exist"),
-    ({"env": {"OUT": "a; rm -rf /"}}, "env.OUT"),
-    ({"env": {"OUT": "a|b"}}, "env.OUT"),
-    ({"env": {"OUT": "`id`"}}, "env.OUT"),
-    ({"env": {"OUT": "a\nb"}}, "env.OUT"),
-    ({"env": {"OUT": "'q'"}}, "env.OUT"),
-    ({"env": {"OUT": "${HOME}/x"}}, "env.OUT"),
-    ({"env": {"OUT": "$HOME/x"}}, "env.OUT"),
-    ({"env": {"OUT": "${LEVELB_ROOT/x"}}, "env.OUT"),
-    ({"env": {"OUT": "$LEVELB_ROOTX/x"}}, "env.OUT"),
-    ({"env": {"OUT": "{x}"}}, "env.OUT"),
-    ({"env": {"lower": "x"}}, "env"),
-    ({"sbatch": {"partition": "gpus"}}, "sbatch"),
-    ({"sbatch": {"account": "OTHER"}}, "sbatch"),
-    ({"sbatch": {"time": "1 day"}}, "sbatch.time"),
-    ({"sbatch": {"array": "0-3;id"}}, "sbatch.array"),
-    ({"post": {"module": "os.system", "args": []}}, "post.module"),
-    ({"post": {"module": "adarq_flow.training", "args": []}}, "post.module"),
-    ({"post": {"module": "levelb.status_x", "args": ["$(id)"]}}, "post.args"),
-    ({"after": ["r1"]}, "itself"),
-    ({"after": ["nope"]}, "unknown request id"),
-    ({"nonsense": 1}, "keys"),
-    ({"id": "other"}, "file stem"),
-    ({"collect": "yes"}, "collect"),
-    ({"what": "x" * 201}, "what"),
-    ({"after_mode": "afterany"}, "after_mode"),
-    ({"after": [], "after_mode": "afterany"}, "after_mode"),
-    ({"after": ["r0"], "after_mode": "singleton"}, "after_mode"),
-])
+@pytest.mark.parametrize(
+    "patch, needle",
+    [
+        ({"script": "../scripts/levelb/eval_baselines.sbatch"}, "script"),
+        ({"script": "eval_baselines.sbatch"}, "script"),
+        ({"script": "scripts/bifrost1/generate.sbatch"}, "script"),
+        ({"script": "scripts/levelb/../bench/x.sbatch"}, "script"),
+        ({"script": "scripts/levelb/missing.sbatch"}, "does not exist"),
+        ({"env": {"OUT": "a; rm -rf /"}}, "env.OUT"),
+        ({"env": {"OUT": "a|b"}}, "env.OUT"),
+        ({"env": {"OUT": "`id`"}}, "env.OUT"),
+        ({"env": {"OUT": "a\nb"}}, "env.OUT"),
+        ({"env": {"OUT": "'q'"}}, "env.OUT"),
+        ({"env": {"OUT": "${HOME}/x"}}, "env.OUT"),
+        ({"env": {"OUT": "$HOME/x"}}, "env.OUT"),
+        ({"env": {"OUT": "${LEVELB_ROOT/x"}}, "env.OUT"),
+        ({"env": {"OUT": "$LEVELB_ROOTX/x"}}, "env.OUT"),
+        ({"env": {"OUT": "{x}"}}, "env.OUT"),
+        ({"env": {"lower": "x"}}, "env"),
+        ({"sbatch": {"partition": "gpus"}}, "sbatch"),
+        ({"sbatch": {"account": "OTHER"}}, "sbatch"),
+        ({"sbatch": {"time": "1 day"}}, "sbatch.time"),
+        ({"sbatch": {"array": "0-3;id"}}, "sbatch.array"),
+        ({"post": {"module": "os.system", "args": []}}, "post.module"),
+        ({"post": {"module": "adarq_flow.training", "args": []}}, "post.module"),
+        ({"post": {"module": "levelb.status_x", "args": ["$(id)"]}}, "post.args"),
+        ({"after": ["r1"]}, "itself"),
+        ({"after": ["nope"]}, "unknown request id"),
+        ({"nonsense": 1}, "keys"),
+        ({"id": "other"}, "file stem"),
+        ({"collect": "yes"}, "collect"),
+        ({"what": "x" * 201}, "what"),
+        ({"after_mode": "afterany"}, "after_mode"),
+        ({"after": [], "after_mode": "afterany"}, "after_mode"),
+        ({"after": ["r0"], "after_mode": "singleton"}, "after_mode"),
+    ],
+)
 def test_validation_refuses(repo, patch, needle):
     errs = q.validate(GOOD | patch, "r1", repo, known_ids={"r0", "r1"})
     assert errs and any(needle in e for e in errs), errs
 
 
-@pytest.mark.parametrize("name", sorted(q.ENV_DENIED) + ["LD_PRELOAD", "DYLD_X", "BASH_FUNC_x",
-                                                          "SLURM_JOB_ID", "PYTHONWARNINGS"])
+@pytest.mark.parametrize(
+    "name",
+    sorted(q.ENV_DENIED)
+    + ["LD_PRELOAD", "DYLD_X", "BASH_FUNC_x", "SLURM_JOB_ID", "PYTHONWARNINGS"],
+)
 def test_validation_refuses_denied_env_names(repo, name):
     errs = q.validate(GOOD | {"env": {name: "x"}}, "r1", repo, {"r1"})
     assert any("denied" in e or "must match" in e for e in errs), errs
 
 
-@pytest.mark.parametrize("patch, needle", [
-    ({"after_jobs": ["12a"]}, "after_jobs"),
-    ({"after_jobs": []}, "after_jobs"),
-    ({"after_jobs": ["123"], "env": {"A": "b"}}, "env: not allowed"),
-    ({"after_jobs": ["123"], "sbatch": {"time": "01:00:00"}}, "sbatch: not allowed"),
-])
+@pytest.mark.parametrize(
+    "patch, needle",
+    [
+        ({"after_jobs": ["12a"]}, "after_jobs"),
+        ({"after_jobs": []}, "after_jobs"),
+        ({"after_jobs": ["123"], "env": {"A": "b"}}, "env: not allowed"),
+        ({"after_jobs": ["123"], "sbatch": {"time": "01:00:00"}}, "sbatch: not allowed"),
+    ],
+)
 def test_validation_watch_only_rules(repo, patch, needle):
     req = {"id": "w1", "what": "watch"} | patch
     errs = q.validate(req, "w1", repo, {"w1"})
@@ -182,12 +205,16 @@ def test_validation_watch_only_rules(repo, patch, needle):
 
 
 def test_validation_accepts_placeholders_and_typical_values(repo):
-    req = GOOD | {"env": {"BASELINES": "x:ckpt=${BIFROST_ROOT}/r/step_0100000.pt:label=a@1_T0.5",
-                          "EXTRA": "--wer-model large-v3 --utmos --partner-subset",
-                          "OUT": "$LEVELB_ROOT/results/x"},
-                  "sbatch": {"time": "12:00:00", "qos": "normal", "array": "0-3%4"},
-                  "post": {"module": "levelb.status_x", "args": ["--out", "${LEVELB_ROOT}/x"]},
-                  "collect": True}
+    req = GOOD | {
+        "env": {
+            "BASELINES": "x:ckpt=${BIFROST_ROOT}/r/step_0100000.pt:label=a@1_T0.5",
+            "EXTRA": "--wer-model large-v3 --utmos --partner-subset",
+            "OUT": "$LEVELB_ROOT/results/x",
+        },
+        "sbatch": {"time": "12:00:00", "qos": "normal", "array": "0-3%4"},
+        "post": {"module": "levelb.status_x", "args": ["--out", "${LEVELB_ROOT}/x"]},
+        "collect": True,
+    }
     assert q.validate(req, "r1", repo, {"r1"}) == []
 
 
@@ -206,13 +233,18 @@ def test_parse_job_id():
 
 # ------------------------------------------------------------------------ tick
 
+
 def test_tick_full_lifecycle(repo):
     fake = FakeSlurm()
-    put(repo, "a", script="scripts/levelb/eval_baselines.sbatch",
+    put(
+        repo,
+        "a",
+        script="scripts/levelb/eval_baselines.sbatch",
         env={"OUT": "${LEVELB_ROOT}/results/x", "CKPT": "$BIFROST_ROOT/m/step.pt"},
         sbatch={"time": "02:00:00"},
         post={"module": "levelb.status_x", "args": ["--out", "${LEVELB_ROOT}/results/x/s.json"]},
-        collect=True)
+        collect=True,
+    )
     put(repo, "b", script="scripts/bench/tripwires.sbatch", after=["a"], collect=True)
     put(repo, "bad", script="../evil.sbatch")
     put(repo, "c", script="scripts/bench/tripwires.sbatch", after=["bad"])
@@ -224,7 +256,10 @@ def test_tick_full_lifecycle(repo):
     assert a_cmd[:3] == ["sbatch", "--parsable", f"--qos={q.DEFAULT_QOS}"]
     assert "--time=02:00:00" in a_cmd and a_cmd[-1] == "scripts/levelb/eval_baselines.sbatch"
     # env through the process environment, placeholders expanded; no shell string.
-    assert sb[0]["env"]["OUT"] == "/work/levelb/results/x" and sb[0]["env"]["CKPT"] == "/work/b1/m/step.pt"
+    assert (
+        sb[0]["env"]["OUT"] == "/work/levelb/results/x"
+        and sb[0]["env"]["CKPT"] == "/work/b1/m/step.pt"
+    )
     assert sb[0]["env"]["PATH"] == "/usr/bin" and sb[0]["cwd"] == str(repo)
     assert "--dependency=afterok:1001" in b_cmd
     st = status(repo)["requests"]
@@ -244,7 +279,12 @@ def test_tick_full_lifecycle(repo):
     assert s["finished"] == 2 and s["collected"] == 2
     posts = fake.posts()
     assert len(posts) == 1
-    assert posts[0]["cmd"][1:] == ["-m", "levelb.status_x", "--out", "/work/levelb/results/x/s.json"]
+    assert posts[0]["cmd"][1:] == [
+        "-m",
+        "levelb.status_x",
+        "--out",
+        "/work/levelb/results/x/s.json",
+    ]
     assert fake.collects() == ["ops 2 requests: a, b"]
     st = status(repo)["requests"]
     assert st["a"]["states"] == ["COMPLETED"] and st["a"]["collected"]
@@ -270,6 +310,7 @@ def test_array_tasks_map_to_base_id(repo):
             fake.calls.append({"cmd": list(cmd), "env": {}, "cwd": cwd})
             return q.Result(0, f"1001_0|{tasks[0]}\n1001_1|{tasks[1]}\n1001_1.batch|FAILED\n", "")
         return real(cmd, env, cwd, timeout)
+
     tasks = ["COMPLETED", "RUNNING"]
     assert do_tick(repo, run)["finished"] == 0
     tasks = ["COMPLETED", "FAILED"]
@@ -300,6 +341,7 @@ def test_unparseable_sbatch_output_is_an_error(repo):
         if cmd[0] == "sbatch":
             return q.Result(0, "Submitted batch job 77\n", "")
         return real(cmd, env, cwd, timeout)
+
     put(repo, "a", script="scripts/levelb/eval_baselines.sbatch")
     do_tick(repo, run)
     assert "unparseable" in status(repo)["requests"]["a"]["submit_error"]
@@ -325,8 +367,13 @@ def test_max_new_bounds_one_tick(repo, monkeypatch):
 
 def test_watch_only(repo):
     fake = FakeSlurm()
-    put(repo, "w", after_jobs=["555", "556"],
-        post={"module": "levelb.status_x", "args": ["${LEVELB_ROOT}/r"]}, collect=True)
+    put(
+        repo,
+        "w",
+        after_jobs=["555", "556"],
+        post={"module": "levelb.status_x", "args": ["${LEVELB_ROOT}/r"]},
+        collect=True,
+    )
     do_tick(repo, fake)
     assert not fake.sbatch()
     assert status(repo)["requests"]["w"]["jobid"] == "555,556"
@@ -349,6 +396,7 @@ def test_post_failure_recorded_without_crash(repo):
         if cmd[0] == sys.executable:
             raise TimeoutError("post took too long")
         return real(cmd, env, cwd, timeout)
+
     put(repo, "w", after_jobs=["9"], post={"module": "levelb.status_x", "args": []})
     fake.states = {"9": "COMPLETED"}
     do_tick(repo, run)
@@ -371,12 +419,16 @@ def test_heartbeat_hourly(repo):
 
 def test_cluster_snapshot_lists_all_jobs(repo):
     fake = FakeSlurm()
-    fake.squeue_out = ("61816481|fact-nc8rd05|RUNNING|8:47:08|1-00:00:00|2|lrdn[2166,2449]|2026-10-24T01:00:00\n"
-                       "61967096|paperA_s|PENDING|0:00|4:00:00|1|(Priority)|N/A\n"
-                       "61816485|fact-nc8rd05|PENDING|0:00|1-00:00:00|2|(Dependency)|N/A\n")
-    fake.sacct24_out = ("61816479|fact-nc8rd05|FAILED|04:01:00|1:0|2026-10-24T01:00:00\n"
-                        "61816481|fact-nc8rd05|RUNNING|08:47:08|0:0|Unknown\n"
-                        "62095097|fact-tripwires-ft|COMPLETED|00:20:00|0:0|2026-10-24T09:00:00\n")
+    fake.squeue_out = (
+        "61816481|fact-nc8rd05|RUNNING|8:47:08|1-00:00:00|2|lrdn[2166,2449]|2026-10-24T01:00:00\n"
+        "61967096|paperA_s|PENDING|0:00|4:00:00|1|(Priority)|N/A\n"
+        "61816485|fact-nc8rd05|PENDING|0:00|1-00:00:00|2|(Dependency)|N/A\n"
+    )
+    fake.sacct24_out = (
+        "61816479|fact-nc8rd05|FAILED|04:01:00|1:0|2026-10-24T01:00:00\n"
+        "61816481|fact-nc8rd05|RUNNING|08:47:08|0:0|Unknown\n"
+        "62095097|fact-tripwires-ft|COMPLETED|00:20:00|0:0|2026-10-24T09:00:00\n"
+    )
     do_tick(repo, fake)
     snap = status(repo)["cluster"]
     hand = [r for r in snap["squeue"] if r["jobid"] == "61967096"][0]
@@ -415,7 +467,13 @@ def test_second_runner_holding_the_lock_does_nothing(repo, capsys):
 def test_after_mode_afterany_for_training_chains(repo):
     fake = FakeSlurm()
     put(repo, "p1", script="scripts/levelb/eval_baselines.sbatch")
-    put(repo, "p2", script="scripts/levelb/eval_baselines.sbatch", after=["p1"], after_mode="afterany")
+    put(
+        repo,
+        "p2",
+        script="scripts/levelb/eval_baselines.sbatch",
+        after=["p1"],
+        after_mode="afterany",
+    )
     put(repo, "w2", after_jobs=["5"], after_mode="afterany")
     do_tick(repo, fake)
     sb = fake.sbatch()
@@ -424,6 +482,7 @@ def test_after_mode_afterany_for_training_chains(repo):
 
 
 # ------------------------------------------------------------------ cancel
+
 
 def put_cancel(repo, cid, **fields):
     c = {"id": cid, "what": f"cancel {cid}"} | fields
@@ -445,7 +504,10 @@ def test_cancel_reaches_only_this_queues_open_jobs_once(repo):
     sc = fake.of("scancel")
     assert [c["cmd"] for c in sc] == [["scancel", "1001", "1002"]] and s["cancelled"] == 2
     res = status(repo)["cancels"]["c1"]
-    assert res["skipped"] == {"done": "already finished", "w": "watch-only (not submitted by this queue)"}
+    assert res["skipped"] == {
+        "done": "already finished",
+        "w": "watch-only (not submitted by this queue)",
+    }
     # Acts once; the cancelled requests then finish normally.
     s = do_tick(repo, fake)
     assert len(fake.of("scancel")) == 1 and s["cancelled"] == 0
@@ -486,12 +548,20 @@ def test_dependency_on_long_finished_job_is_checked_by_the_queue(repo):
     do_tick(repo, fake)
     put(repo, "ok_after", script="scripts/bench/tripwires.sbatch", after=["prep"])
     put(repo, "blocked", script="scripts/bench/tripwires.sbatch", after=["bad"])
-    put(repo, "any_after", script="scripts/bench/tripwires.sbatch", after=["bad"], after_mode="afterany")
+    put(
+        repo,
+        "any_after",
+        script="scripts/bench/tripwires.sbatch",
+        after=["bad"],
+        after_mode="afterany",
+    )
     put(repo, "chain", script="scripts/bench/tripwires.sbatch", after=["ok_after"])
     do_tick(repo, fake)
     st = status(repo)["requests"]
     by_jid = {str(1001 + i): c["cmd"] for i, c in enumerate(fake.sbatch())}
-    assert st["blocked"]["jobid"] is None and all(st[r]["jobid"] for r in ("ok_after", "any_after", "chain"))
+    assert st["blocked"]["jobid"] is None and all(
+        st[r]["jobid"] for r in ("ok_after", "any_after", "chain")
+    )
     sb = {r: by_jid[st[r]["jobid"]] for r in ("ok_after", "any_after", "chain")}
     assert "dependency did not complete" in st["blocked"]["submit_error"]
     assert not any(a.startswith("--dependency") for r in ("ok_after", "any_after") for a in sb[r])
@@ -512,4 +582,3 @@ def test_holds_are_not_supported(repo):
     put(repo, "a", script="scripts/levelb/eval_baselines.sbatch", hold=True)
     valid, invalid = q.load_requests(repo)
     assert "a" in invalid and "keys" in invalid["a"]
-

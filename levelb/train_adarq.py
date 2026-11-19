@@ -26,8 +26,15 @@ import torch
 from . import bifrost_build as bb
 from .adarq_model import AdaRQHeads, branch_hidden, set_trainable_adarq
 from .adarq_tokenizer import load_books
-from .train_branch import (_STOP, LatentData, _on_signal, isolated_rng, lr_lambda, rng_state,
-                           set_rng_state)
+from .train_branch import (
+    _STOP,
+    LatentData,
+    _on_signal,
+    isolated_rng,
+    lr_lambda,
+    rng_state,
+    set_rng_state,
+)
 from .upstream import require_official_model
 
 

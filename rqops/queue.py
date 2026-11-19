@@ -31,34 +31,67 @@ import re
 import subprocess
 import sys
 import time
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Callable, Optional
 
-DEFAULT_QOS = "gpulongjobs"         # vhpc01 has no accounts; QOS is the only knob
+DEFAULT_QOS = "gpulongjobs"  # vhpc01 has no accounts; QOS is the only knob
 QUEUE_DIR = "ops/queue"
-CANCEL_DIR = "ops/cancel"           # {"id", "what", "requests": [request ids]} -> scancel
+CANCEL_DIR = "ops/cancel"  # {"id", "what", "requests": [request ids]} -> scancel
 # (no hold/release: vhpc01 refuses `scontrol hold` for users)
 COLLECTOR = ["bash", "scripts/ops/collect.sh"]
-MAX_NEW = 40                         # sbatch calls per tick
+MAX_NEW = 40  # sbatch calls per tick
 POST_TIMEOUT = 30 * 60
 HEARTBEAT_EVERY = 3600
-TERMINAL = {"COMPLETED", "FAILED", "CANCELLED", "TIMEOUT", "OUT_OF_MEMORY", "NODE_FAIL",
-            "PREEMPTED", "BOOT_FAIL", "DEADLINE"}
+TERMINAL = {
+    "COMPLETED",
+    "FAILED",
+    "CANCELLED",
+    "TIMEOUT",
+    "OUT_OF_MEMORY",
+    "NODE_FAIL",
+    "PREEMPTED",
+    "BOOT_FAIL",
+    "DEADLINE",
+}
 
 # Placeholders a request may use; expanded from the runner's environment.
 PLACEHOLDERS = ("LEVELB_ROOT", "BENCH_ROOT", "BIFROST_ROOT", "OPS_BASE")
 _PH = "|".join(PLACEHOLDERS)
 PLACEHOLDER_RE = re.compile(r"\$\{(" + _PH + r")\}|\$(" + _PH + r")(?![A-Za-z0-9_])")
 
-ALLOWED_KEYS = {"id", "what", "script", "env", "sbatch", "after", "after_mode", "after_jobs",
-                "post", "collect"}
+ALLOWED_KEYS = {
+    "id",
+    "what",
+    "script",
+    "env",
+    "sbatch",
+    "after",
+    "after_mode",
+    "after_jobs",
+    "post",
+    "collect",
+}
 AFTER_MODES = ("afterok", "afterany")  # afterany: training chains that resume after TIMEOUT
 ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,80}$")
 SCRIPT_RE = re.compile(r"^scripts/(levelb|bench)/[a-z0-9_]+\.sbatch$")
 ENV_NAME_RE = re.compile(r"^[A-Z][A-Z0-9_]{0,40}$")
-ENV_DENIED = {"PATH", "HOME", "SHELL", "BASH_ENV", "ENV", "IFS", "PYTHONPATH", "PYTHONHOME",
-              "PYTHONSTARTUP", "PROMPT_COMMAND", "SBATCH_ACCOUNT", "SLURM_CONF", "USER", "LOGNAME"}
+ENV_DENIED = {
+    "PATH",
+    "HOME",
+    "SHELL",
+    "BASH_ENV",
+    "ENV",
+    "IFS",
+    "PYTHONPATH",
+    "PYTHONHOME",
+    "PYTHONSTARTUP",
+    "PROMPT_COMMAND",
+    "SBATCH_ACCOUNT",
+    "SLURM_CONF",
+    "USER",
+    "LOGNAME",
+}
 ENV_DENIED_PREFIXES = ("LD_", "DYLD_", "BASH_FUNC", "SLURM_", "PYTHON")
 VALUE_RE = re.compile(r"^[A-Za-z0-9_./:+=, %@{}$-]{0,400}$")
 SBATCH_RULES = {
@@ -72,6 +105,7 @@ POST_MODULE_RE = re.compile(r"^levelb\.[a-z0-9_]+$")
 
 # --------------------------------------------------------------------- running
 
+
 @dataclass
 class Result:
     returncode: int
@@ -79,8 +113,9 @@ class Result:
     stderr: str = ""
 
 
-def default_run(cmd: list[str], env: Optional[dict] = None, cwd: Optional[str] = None,
-                timeout: Optional[float] = 300) -> Result:
+def default_run(
+    cmd: list[str], env: dict | None = None, cwd: str | None = None, timeout: float | None = 300
+) -> Result:
     """Run cmd without a shell; never raises for a non-zero exit."""
     p = subprocess.run(cmd, env=env, cwd=cwd, capture_output=True, text=True, timeout=timeout)
     return Result(p.returncode, p.stdout, p.stderr)
@@ -99,32 +134,39 @@ def _call(run: Run, cmd, env, cwd, timeout=None) -> Result:
 
 # ------------------------------------------------------------------ validation
 
-def check_value(field: str, value) -> Optional[str]:
+
+def check_value(field: str, value) -> str | None:
     """Error message for an env value / post arg, or None if allowed."""
     if not isinstance(value, str):
         return f"{field}: must be a string"
     if not VALUE_RE.match(value):
-        return (f"{field}: only letters, digits, space and _./:+=,%@-{{}}$ are allowed "
-                f"(max 400 chars; no ; | & ` < > quotes backslash newline)")
+        return (
+            f"{field}: only letters, digits, space and _./:+=,%@-{{}}$ are allowed "
+            f"(max 400 chars; no ; | & ` < > quotes backslash newline)"
+        )
     rest = PLACEHOLDER_RE.sub("", value)
     if any(c in rest for c in "${}"):
-        return (f"{field}: '$', '{{' and '}}' may only appear as ${{NAME}} or $NAME with NAME in "
-                f"{', '.join(PLACEHOLDERS)}")
+        return (
+            f"{field}: '$', '{{' and '}}' may only appear as ${{NAME}} or $NAME with NAME in "
+            f"{', '.join(PLACEHOLDERS)}"
+        )
     return None
 
 
 def expand(value: str, environ) -> str:
     """Replace the allowed placeholders from the runner's environment."""
+
     def sub(m):
         name = m.group(1) or m.group(2)
         v = environ.get(name)
         if not v:
             raise ValueError(f"${name} is not set in the runner environment")
         return v
+
     return PLACEHOLDER_RE.sub(sub, value)
 
 
-def validate(req, stem: str, repo: Path, known_ids: Optional[set] = None) -> list[str]:
+def validate(req, stem: str, repo: Path, known_ids: set | None = None) -> list[str]:
     """All rule violations of one request (empty list = valid)."""
     if not isinstance(req, dict):
         return ["request: must be a JSON object"]
@@ -200,8 +242,11 @@ def validate(req, stem: str, repo: Path, known_ids: Optional[set] = None) -> lis
 
     if "after_jobs" in req:
         aj = req["after_jobs"]
-        if not isinstance(aj, list) or not aj or not all(
-                isinstance(j, str) and JOB_ID_RE.match(j) for j in aj):
+        if (
+            not isinstance(aj, list)
+            or not aj
+            or not all(isinstance(j, str) and JOB_ID_RE.match(j) for j in aj)
+        ):
             errs.append(r"after_jobs: non-empty list of job ids matching ^\d{1,12}$")
 
     if "post" in req:
@@ -250,7 +295,6 @@ def load_cancels(repo: Path, known_ids: set) -> tuple[dict, dict]:
     queue request ids only, never raw job ids, so it can only reach jobs this
     queue submitted (other projects' jobs are out of reach)."""
     return _load_controls(repo / CANCEL_DIR, known_ids, actions=None)
-
 
 
 def _load_controls(directory: Path, known_ids: set, actions) -> tuple[dict, dict]:
@@ -311,6 +355,7 @@ def _cancel(c: dict, reqs: dict, run: Run, environ, cwd) -> dict:
 
 # ----------------------------------------------------------------------- state
 
+
 def _iso(t: float) -> str:
     return time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime(t))
 
@@ -335,7 +380,8 @@ def load_state(path: Path) -> dict:
 
 # ---------------------------------------------------------------------- slurm
 
-def parse_job_id(out: str) -> Optional[str]:
+
+def parse_job_id(out: str) -> str | None:
     """--parsable output: "123" or "123;cluster"; None unless numeric."""
     first = (out or "").strip().splitlines()[0] if (out or "").strip() else ""
     jid = first.split(";", 1)[0].strip()
@@ -346,12 +392,17 @@ def job_ids(entry: dict) -> list[str]:
     return [j for j in (entry.get("jobid") or "").split(",") if j]
 
 
-def poll_states(run: Run, ids: list[str], env, cwd) -> tuple[Optional[dict], Optional[str]]:
+def poll_states(run: Run, ids: list[str], env, cwd) -> tuple[dict | None, str | None]:
     """{base job id: [state per allocation]} from sacct, or (None, error)."""
     if not ids:
         return {}, None
-    r = _call(run, ["sacct", "-n", "-P", "-X", "-j", ",".join(ids), "--format=JobID,State"],
-              env, cwd, timeout=120)
+    r = _call(
+        run,
+        ["sacct", "-n", "-P", "-X", "-j", ",".join(ids), "--format=JobID,State"],
+        env,
+        cwd,
+        timeout=120,
+    )
     if r.returncode != 0:
         return None, (r.stderr or r.stdout)[:300]
     states: dict[str, list[str]] = {}
@@ -375,18 +426,39 @@ def cluster_snapshot(run: Run, env=None, cwd=None) -> dict:
     if r.returncode != 0:
         snap["squeue_error"] = (r.stderr or r.stdout or "squeue failed")[:300]
     else:
-        keys = ["jobid", "name", "state", "elapsed", "time_limit", "nodes",
-                "reason_or_nodelist", "start"]
+        keys = [
+            "jobid",
+            "name",
+            "state",
+            "elapsed",
+            "time_limit",
+            "nodes",
+            "reason_or_nodelist",
+            "start",
+        ]
         for line in r.stdout.splitlines():
             if not line.strip():
                 continue
             parts = line.split("|", 7)
             parts += [""] * (8 - len(parts))
-            row = dict(zip(keys, (p.strip() for p in parts)))
+            row = dict(zip(keys, (p.strip() for p in parts), strict=True))
             snap["squeue"].append(row)
             snap["counts"][row["state"]] = snap["counts"].get(row["state"], 0) + 1
-    r = _call(run, ["sacct", "-n", "-P", "-X", "-S", "now-24hours",
-                    "--format=JobID,JobName,State,Elapsed,ExitCode,End"], env, cwd, timeout=120)
+    r = _call(
+        run,
+        [
+            "sacct",
+            "-n",
+            "-P",
+            "-X",
+            "-S",
+            "now-24hours",
+            "--format=JobID,JobName,State,Elapsed,ExitCode,End",
+        ],
+        env,
+        cwd,
+        timeout=120,
+    )
     if r.returncode != 0:
         snap["sacct_error"] = (r.stderr or r.stdout or "sacct failed")[:300]
     else:
@@ -398,14 +470,25 @@ def cluster_snapshot(run: Run, env=None, cwd=None) -> dict:
             jid, name, st, el, ex, end = (parts[0], "|".join(parts[1:-4]), *parts[-4:])
             state = st.split()[0] if st.split() else ""
             if state in TERMINAL:
-                snap["ended_24h"].append({"jobid": jid, "name": name, "state": state,
-                                          "elapsed": el, "exit": ex, "end": end})
+                snap["ended_24h"].append(
+                    {
+                        "jobid": jid,
+                        "name": name,
+                        "state": state,
+                        "elapsed": el,
+                        "exit": ex,
+                        "end": end,
+                    }
+                )
     return snap
 
 
 # ------------------------------------------------------------------------ tick
 
-def _submit(req: dict, dep_ids: list[str], repo: Path, run: Run, environ) -> tuple[Optional[str], Optional[str]]:
+
+def _submit(
+    req: dict, dep_ids: list[str], repo: Path, run: Run, environ
+) -> tuple[str | None, str | None]:
     """(job id, None) or (None, error)."""
     try:
         env = dict(environ) | {k: expand(v, environ) for k, v in req.get("env", {}).items()}
@@ -428,27 +511,38 @@ def _submit(req: dict, dep_ids: list[str], repo: Path, run: Run, environ) -> tup
     return jid, None
 
 
-def _run_post(req: dict, repo: Path, run: Run, environ) -> tuple[str, Optional[str]]:
+def _run_post(req: dict, repo: Path, run: Run, environ) -> tuple[str, str | None]:
     """(output tail, error or None)."""
     post = req["post"]
     try:
         args = [expand(a, environ) for a in post.get("args", [])]
     except ValueError as e:
         return "", str(e)[:500]
-    r = _call(run, [sys.executable, "-m", post["module"], *args], dict(environ), str(repo),
-              timeout=POST_TIMEOUT)
+    r = _call(
+        run,
+        [sys.executable, "-m", post["module"], *args],
+        dict(environ),
+        str(repo),
+        timeout=POST_TIMEOUT,
+    )
     out = ((r.stdout or "") + (r.stderr or ""))[-3000:]
     err = None if r.returncode == 0 else (f"exit {r.returncode}: " + (r.stderr or r.stdout))[:500]
     return out, err
 
 
-def _collect(message: str, repo: Path, run: Run, environ) -> Optional[str]:
+def _collect(message: str, repo: Path, run: Run, environ) -> str | None:
     r = _call(run, [*COLLECTOR, message], dict(environ), str(repo), timeout=900)
     return None if r.returncode == 0 else (r.stderr or r.stdout or "collector failed")[-300:]
 
 
-def tick(repo, state_path, status_path=None, run: Run = default_run, environ=None,
-         clock: Callable[[], float] = time.time) -> Optional[dict]:
+def tick(
+    repo,
+    state_path,
+    status_path=None,
+    run: Run = default_run,
+    environ=None,
+    clock: Callable[[], float] = time.time,
+) -> dict | None:
     """One pass: submit, poll, post-process, collect, status, heartbeat.
     Returns a summary dict, or None when another runner holds the lock."""
     repo = Path(repo)
@@ -457,7 +551,9 @@ def tick(repo, state_path, status_path=None, run: Run = default_run, environ=Non
     if status_path is None:
         base = environ.get("OPS_BASE")
         if not base:
-            raise SystemExit("OPS_BASE is not set (scripts/ops/runner.sh sets it) and no --status given")
+            raise SystemExit(
+                "OPS_BASE is not set (scripts/ops/runner.sh sets it) and no --status given"
+            )
         status_path = Path(base) / "status.json"
     status_path = Path(status_path)
     state_path.parent.mkdir(parents=True, exist_ok=True)
@@ -475,8 +571,7 @@ def tick(repo, state_path, status_path=None, run: Run = default_run, environ=Non
         os.close(lock_fd)
 
 
-def _tick_locked(repo: Path, state_path: Path, status_path: Path, run: Run, environ,
-                 clock) -> dict:
+def _tick_locked(repo: Path, state_path: Path, status_path: Path, run: Run, environ, clock) -> dict:
     now = clock()
     state = load_state(state_path)
     reqs = state["requests"]
@@ -504,8 +599,12 @@ def _tick_locked(repo: Path, state_path: Path, status_path: Path, run: Run, envi
             if e.get("jobid"):
                 continue  # already submitted / registered: never again
             if "script" not in req:  # watch-only
-                e.update(jobid=",".join(req["after_jobs"]), watch_only=True,
-                         submitted=_iso(now), what=req["what"])
+                e.update(
+                    jobid=",".join(req["after_jobs"]),
+                    watch_only=True,
+                    submitted=_iso(now),
+                    what=req["what"],
+                )
                 e.pop("waiting_for", None)
                 atomic_write_json(state_path, state)
                 progress = True
@@ -519,16 +618,27 @@ def _tick_locked(repo: Path, state_path: Path, status_path: Path, run: Run, envi
             # sbatch rejects --dependency on a job slurmctld has purged
             # ("Job dependency problem"), which a long-finished job is.
             mode = req.get("after_mode", "afterok")
-            failed = [a for a in req.get("after", []) if reqs[a].get("finished")
-                      and mode == "afterok" and set(reqs[a].get("states", [])) != {"COMPLETED"}]
+            failed = [
+                a
+                for a in req.get("after", [])
+                if reqs[a].get("finished")
+                and mode == "afterok"
+                and set(reqs[a].get("states", [])) != {"COMPLETED"}
+            ]
             if failed:
-                e["submit_error"] = f"dependency did not complete: {failed} (afterok); not submitted"
+                e["submit_error"] = (
+                    f"dependency did not complete: {failed} (afterok); not submitted"
+                )
                 continue
             if attempts >= MAX_NEW:
                 continue
             attempts += 1
-            dep_ids = [j for a in req.get("after", []) if not reqs[a].get("finished")
-                       for j in job_ids(reqs[a])]
+            dep_ids = [
+                j
+                for a in req.get("after", [])
+                if not reqs[a].get("finished")
+                for j in job_ids(reqs[a])
+            ]
             jid, err = _submit(req, dep_ids, repo, run, environ)
             if jid:
                 e.update(jobid=jid, submitted=_iso(now), what=req["what"])
@@ -555,8 +665,14 @@ def _tick_locked(repo: Path, state_path: Path, status_path: Path, run: Run, envi
     for cid, reason in bad_cancels.items():
         state["cancels"][cid] = {"invalid": reason}
     # Poll unfinished jobs.
-    open_ids = sorted({j for rid, e in reqs.items() if rid in valid and e.get("jobid")
-                       and not e.get("finished") for j in job_ids(e)})
+    open_ids = sorted(
+        {
+            j
+            for rid, e in reqs.items()
+            if rid in valid and e.get("jobid") and not e.get("finished")
+            for j in job_ids(e)
+        }
+    )
     states, poll_err = poll_states(run, open_ids, environ, str(repo))
     state["poll_error"] = poll_err
     to_collect = []
@@ -592,15 +708,24 @@ def _tick_locked(repo: Path, state_path: Path, status_path: Path, run: Run, envi
 
     snap = cluster_snapshot(run, environ, str(repo))
     summary["cluster"] = snap["counts"]
-    status = {"updated": _iso(now), "queue": sorted(set(valid) | set(invalid)), "cluster": snap,
-              "requests": {}, "cancels": state["cancels"]}
+    status = {
+        "updated": _iso(now),
+        "queue": sorted(set(valid) | set(invalid)),
+        "cluster": snap,
+        "requests": {},
+        "cancels": state["cancels"],
+    }
     for rid in status["queue"]:
         e = reqs.get(rid, {})
         status["requests"][rid] = {
-            "jobid": e.get("jobid"), "states": e.get("states", []),
-            "submitted": e.get("submitted"), "finished": e.get("finished"),
-            "collected": e.get("collected"), "submit_error": e.get("submit_error"),
-            "post_error": e.get("post_error"), "invalid": e.get("invalid"),
+            "jobid": e.get("jobid"),
+            "states": e.get("states", []),
+            "submitted": e.get("submitted"),
+            "finished": e.get("finished"),
+            "collected": e.get("collected"),
+            "submit_error": e.get("submit_error"),
+            "post_error": e.get("post_error"),
+            "invalid": e.get("invalid"),
             "waiting_for": e.get("waiting_for"),
             "post_output_tail": (e.get("post_output") or "")[-800:],
         }
@@ -611,8 +736,15 @@ def _tick_locked(repo: Path, state_path: Path, status_path: Path, run: Run, envi
     # finished requests take tens of minutes.
     if to_collect:
         ids = [rid for rid, _ in to_collect]
-        msg = to_collect[0][1] if len(ids) == 1 else (
-            f"ops {len(ids)} requests: " + ", ".join(ids[:6]) + (", ..." if len(ids) > 6 else ""))
+        msg = (
+            to_collect[0][1]
+            if len(ids) == 1
+            else (
+                f"ops {len(ids)} requests: "
+                + ", ".join(ids[:6])
+                + (", ..." if len(ids) > 6 else "")
+            )
+        )
         err = _collect(msg, repo, run, environ)
         for rid in ids:
             reqs[rid]["collect_error"] = err
@@ -632,6 +764,7 @@ def _tick_locked(repo: Path, state_path: Path, status_path: Path, run: Run, envi
 
 # ------------------------------------------------------------------------- CLI
 
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="python3 -m rqops.queue")
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -649,14 +782,18 @@ def main(argv=None) -> int:
             print(f"INVALID {stem}: {reason}")
         for stem, reason in sorted(cinvalid.items()):
             print(f"INVALID control {stem}: {reason}")
-        print(f"{len(valid)} valid, {len(invalid)} invalid; {len(cvalid)} cancel files valid, "
-              f"{len(cinvalid)} invalid")
+        print(
+            f"{len(valid)} valid, {len(invalid)} invalid; {len(cvalid)} cancel files valid, "
+            f"{len(cinvalid)} invalid"
+        )
         return 1 if invalid or cinvalid else 0
     s = tick(a.repo, a.state, a.status)
     if s is not None:
         counts = " ".join(f"{k}={v}" for k, v in sorted(s["cluster"].items())) or "none"
-        print(f"{s['time']} submitted={s['submitted']} finished={s['finished']} "
-              f"collected={s['collected']} invalid={s['invalid']} | cluster: {counts}")
+        print(
+            f"{s['time']} submitted={s['submitted']} finished={s['finished']} "
+            f"collected={s['collected']} invalid={s['invalid']} | cluster: {counts}"
+        )
     return 0
 
 

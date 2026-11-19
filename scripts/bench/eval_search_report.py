@@ -17,30 +17,44 @@ import json
 import os
 import pathlib
 
-PAPER = {"flux": {"FID": 51.20, "sFID": 224.82, "IS": 157.46},
-         "bifrost": {"FID": 25.77, "sFID": 53.67, "IS": 98.57}}
-PAPER_T4 = {"bifrost": {"FID": 18.64, "sFID": 43.64, "IS": 156.01}}   # Table 4, 64 steps
+PAPER = {
+    "flux": {"FID": 51.20, "sFID": 224.82, "IS": 157.46},
+    "bifrost": {"FID": 25.77, "sFID": 53.67, "IS": 98.57},
+}
+PAPER_T4 = {"bifrost": {"FID": 18.64, "sFID": 43.64, "IS": 156.01}}  # Table 4, 64 steps
 
 
 def main() -> None:
     root = pathlib.Path(os.environ.get("LEVELB_ROOT", pathlib.Path.home() / "work" / "levelb"))
-    for arm, folders in (("flux", sorted((root / "samples").glob("flux*_seed0"))),
-                         ("bifrost", [root / "samples" / "bifrost_seed0"])):
-        print(f"=== {arm}   paper Table 1: " + "  ".join(f"{k} {v}" for k, v in PAPER[arm].items())
-              + ("" if arm not in PAPER_T4 else "   | Table 4: " + "  ".join(
-                  f"{k} {v}" for k, v in PAPER_T4[arm].items())))
+    for arm, folders in (
+        ("flux", sorted((root / "samples").glob("flux*_seed0"))),
+        ("bifrost", [root / "samples" / "bifrost_seed0"]),
+    ):
+        print(
+            f"=== {arm}   paper Table 1: "
+            + "  ".join(f"{k} {v}" for k, v in PAPER[arm].items())
+            + (
+                ""
+                if arm not in PAPER_T4
+                else "   | Table 4: " + "  ".join(f"{k} {v}" for k, v in PAPER_T4[arm].items())
+            )
+        )
         for folder in folders:
             files = sorted(folder.glob("samples_10000*.metrics.json"))
             if not files:
                 print(f"  {folder.name}: not scored")
             for f in files:
                 m = json.loads(f.read_text())
-                variant = f.name[len("samples_10000."):-len(".metrics.json")]
-                dev = {k: 100 * (m[k] - PAPER[arm][k]) / PAPER[arm][k] for k in ("FID", "sFID", "IS")}
+                variant = f.name[len("samples_10000.") : -len(".metrics.json")]
+                dev = {
+                    k: 100 * (m[k] - PAPER[arm][k]) / PAPER[arm][k] for k in ("FID", "sFID", "IS")
+                }
                 ok = abs(dev["FID"]) <= 5 and abs(dev["sFID"]) <= 10 and abs(dev["IS"]) <= 5
-                print(f"  {folder.name:14s} {variant:12s} FID {m['FID']:8.3f} ({dev['FID']:+6.1f}%)  "
-                      f"sFID {m['sFID']:8.3f} ({dev['sFID']:+6.1f}%)  IS {m['IS']:8.2f} "
-                      f"({dev['IS']:+6.1f}%)" + ("   <== matches" if ok else ""))
+                print(
+                    f"  {folder.name:14s} {variant:12s} FID {m['FID']:8.3f} ({dev['FID']:+6.1f}%)  "
+                    f"sFID {m['sFID']:8.3f} ({dev['sFID']:+6.1f}%)  IS {m['IS']:8.2f} "
+                    f"({dev['IS']:+6.1f}%)" + ("   <== matches" if ok else "")
+                )
         print()
 
 
