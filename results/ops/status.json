@@ -157,7 +157,7 @@
     "time_limit": "1-00:00:00"
    },
    {
-    "elapsed": "45:24",
+    "elapsed": "1:45:33",
     "jobid": "1507934",
     "name": "levelb-sample",
     "nodes": "1",
@@ -167,7 +167,7 @@
     "time_limit": "1-00:00:00"
    },
    {
-    "elapsed": "11:58:32",
+    "elapsed": "12:58:41",
     "jobid": "1507929",
     "name": "levelb-adarq",
     "nodes": "1",
@@ -217,7 +217,7 @@
     "time_limit": "12:00:00"
    },
    {
-    "elapsed": "25:29",
+    "elapsed": "1:25:38",
     "jobid": "1507933",
     "name": "adm-score",
     "nodes": "1",
@@ -295,5 +295,5 @@
    "waiting_for": null
   }
  },
- "updated": "2026-11-19T09:26:49"
+ "updated": "2026-11-19T10:26:58"
 }
