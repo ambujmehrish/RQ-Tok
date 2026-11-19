@@ -464,6 +464,45 @@ IS 51.79 (ADM); FID 26.223 (val) — slightly worse than the 16-epoch run's seed
 so stopping at the held-out minimum of the code CE does not close the gap. Seeds 1–2 and
 the soft-target run pending.
 
+**Next: code-sampling sweep on the existing 16-epoch AdaRQ-Flow checkpoint (validation only;
+declared before any pilot runs; not queued until the running jobs finish).**
+- Sampler (`AdaRQHeads.sample_level`): halting is gated — halt vs continue is drawn from the
+  ORIGINAL halt probability softmax(ℓ)[K]; only when continuing are temperature / top-p /
+  greedy applied, to the K ordinary codes alone. At T = 1 without filtering this equals the
+  previous categorical sampler (tested). Level 1 never halts. Separate random streams for
+  codes, halting, residuals (torch) and token order (NumPy) and the renderer, so a setting
+  changes only what it targets. The generated depth histogram is logged against the
+  tokenizer's (1/2/3/4: 51.7 / 18.1 / 8.7 / 21.5 %) as a diagnostic, not a target.
+- Fixed: 16-epoch checkpoint, w = 1, 32-step residual solver with unit noise, FLUX settings.
+- Configurations (code temperatures T1..T4 / filter on ordinary codes): A 1,1,1,1 / none
+  (baseline); B 0.8×4 / none; C 1×4 / top-p 0.95; D 0.8×4 / top-p 0.95; E 0.7,0.85,1,1 /
+  top-p 0.95; F greedy ordinary codes (halting and residual still sampled). Starting values,
+  not established optima.
+- Pilot: 2,000 class-balanced samples (2 per class), validation seed 100, identical prompts,
+  token orders and renderer seeds across configurations; Bifrost-1 at the same size and seed
+  as reference. Scored ONLY against the held-out 10k (the scoring job refuses any other
+  reference for N ≠ 10,000): FID / sFID / precision / recall, plus requested-class top-1/top-5
+  with a fixed classifier (torchvision ResNet-50 IMAGENET1K_V2; ceiling = the same classifier
+  on 2,000 real held-out crops). Pilot FIDs are compared only with each other.
+- Looked for: a large precision and class-accuracy gain that keeps part of the recall
+  advantage. If greedy codes (F) barely help, stop on code temperature and examine the
+  residual and the rollout. Survivors are confirmed at 10,000 × 3 seeds on the test set as a
+  declared variant; the pre-registered 16-epoch result stays as reported.
+- Then, in order: residual initial-noise scale α ∈ {1, 0.8, 0.6} on the winning code sampler
+  (empirical; the flow was trained with unit noise, so α is not a principled temperature),
+  and the rollout-mismatch diagnostic below.
+
+**Reveal schedule.** With 64 steps for 64 tokens, upstream's clamps (at least one token per
+step, at most masked − 1) make every step reveal exactly one token, so the cosine schedule
+has no effect: the rollout is linear. Asserted on every sampled batch.
+
+**Training–sampling mismatch (both arms; diagnostic planned).** Training masks at least 45
+of 64 tokens, so the branch sees at most 19 visible tokens, all real; a rollout reaches 63
+visible tokens, all generated. To measure on held-out data: prediction quality with real vs
+generated visible latents at matched visible counts, and with ground-truth vs sampled code
+prefixes, by rollout stage. A sharp drop with generated context points to a training change
+(wider mask ratios, exposure to imperfect context) rather than more aggressive filtering.
+
 **Faithfulness gate.** Our retrained Bifrost-1 must reach FID <= 30.9 (within 20% of
 25.77). If it does not, the baseline is not faithful and no comparison is reported until
 it is fixed.

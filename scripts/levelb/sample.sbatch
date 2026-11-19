@@ -63,8 +63,15 @@ if [ "$ARM" = "adarq" ]; then
   EXTRA=(--heads "$HEADS" --tok "$LEVELB_ROOT/adarq_tok")
 fi
 if [ "$ARM" != "flux" ]; then EXTRA+=(--branch "$BRANCH" --controlnet "$CN"); fi
+# validation pilots (EXPERIMENTS.md, code-sampling sweep): N, BALANCED and the AdaRQ code
+# sampler; defaults reproduce the protocol (10,000 samples, temperature 1, no filtering)
+[ -n "${CODE_TEMPS:-}" ] && EXTRA+=(--code-temps "$CODE_TEMPS")
+[ -n "${TOP_P:-}" ] && EXTRA+=(--top-p "$TOP_P")
+[ "${GREEDY:-0}" = 1 ] && EXTRA+=(--greedy-codes)
+[ -n "${RESIDUAL_SCALE:-}" ] && EXTRA+=(--residual-scale "$RESIDUAL_SCALE")
+[ "${BALANCED:-0}" = 1 ] && EXTRA+=(--class-balanced)
 python -m levelb.sample --arm "$ARM" "${EXTRA[@]+"${EXTRA[@]}"}" \
-    --data "$LEVELB_ROOT/imagenet256" --seed "$SEED" --n 10000 \
+    --data "$LEVELB_ROOT/imagenet256" --seed "$SEED" --n "${N:-10000}" \
     --shard "$SHARD" --nshards "$NSHARDS" --out "$OUT" \
     --res "${RES:-256}" --batch "${BATCH:-16}"
 echo "=== shard $SHARD/$NSHARDS of $ARM seed $SEED done: $OUT ==="

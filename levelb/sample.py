@@ -94,7 +94,8 @@ def mar_decode(model, conv, prompts: list[str], cfg_weight: float = 1.0,
 @torch.no_grad()
 def mar_decode_adarq(model, heads, conv, prompts: list[str], cfg_weight: float = 1.0,
                      np_seed: int | None = None, flow_steps: int = 32,
-                     generator: torch.Generator | None = None):
+                     generator=None, code_temps=None, top_p: float | None = None,
+                     greedy: bool = False, residual_scale: float = 1.0):
     """The same MAR loop as ``mar_decode`` (unconditional + conditional halves, random
     order, one token per step, cosine schedule); the revealed patch is produced by the
     AdaRQ heads instead of the linear head: codes depth by depth from guided logits, then
@@ -140,7 +141,9 @@ def mar_decode_adarq(model, heads, conv, prompts: list[str], cfg_weight: float =
         mask = mask_next.float()
         where = to_pred.nonzero(as_tuple=True)
         lat, dep = heads.sample(hid[bsz:][where], hid[:bsz][where], cfg_weight=cfg_weight,
-                                flow_steps=flow_steps, generator=generator)
+                                code_temps=code_temps, top_p=top_p, greedy=greedy,
+                                residual_scale=residual_scale, flow_steps=flow_steps,
+                                generators=generator)
         cur[where] = lat.to(cur.dtype)
         depths[where] = dep
         tokens = cur
@@ -218,6 +221,18 @@ def main() -> None:
     ap.add_argument("--heads", default=None, help="adarq: final_heads.pt")
     ap.add_argument("--tok", default=None, help="adarq: Stage-0 dir (tokenizer.pt)")
     ap.add_argument("--flow-steps", type=int, default=32)
+    ap.add_argument("--code-temps", default="1",
+                    help="adarq: code temperature per level, e.g. 0.7,0.85,1,1 (one value = all "
+                         "levels; 0 = greedy at that level). Applied to the ordinary codes only; "
+                         "halting is gated on the original halt probability")
+    ap.add_argument("--top-p", type=float, default=None,
+                    help="adarq: nucleus filter on the ordinary codes (halting unaffected)")
+    ap.add_argument("--greedy-codes", action="store_true",
+                    help="adarq: always take the most likely ordinary code (halting stays sampled)")
+    ap.add_argument("--residual-scale", type=float, default=1.0,
+                    help="adarq: initial-noise scale of the residual flow (1 = as trained)")
+    ap.add_argument("--class-balanced", action="store_true",
+                    help="every class exactly n/1000 times, in a seeded random order")
     ap.add_argument("--branch", default=None, help="final_trainable.pt of Stage 1")
     ap.add_argument("--controlnet", default=None, help="final_controlnet.pt of Stage 2")
     ap.add_argument("--data", required=True, help="imagenet256 dir (class names, FLUX text)")
@@ -250,7 +265,14 @@ def main() -> None:
     pooled = from_bits(np.load(root / "flux_pooled.npy"))
     names = json.loads((root / "class_names.json").read_text())
 
-    classes = np.random.default_rng(args.seed).integers(0, 1000, args.n)
+    if args.class_balanced:
+        if args.n % 1000:
+            raise SystemExit("--class-balanced needs --n to be a multiple of 1000")
+        classes = np.random.default_rng(args.seed).permutation(
+            np.repeat(np.arange(1000), args.n // 1000))
+    else:
+        classes = np.random.default_rng(args.seed).integers(0, 1000, args.n)
+    code_temps = [float(t) for t in args.code_temps.split(",")]
     lo, hi = args.shard * args.n // args.nshards, (args.shard + 1) * args.n // args.nshards
     out = pathlib.Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
@@ -281,6 +303,7 @@ def main() -> None:
 
     imgs = np.zeros((hi - lo, args.res, args.res, 3), dtype=np.uint8)
     depth_sum, depth_n = 0, 0
+    depth_hist = np.zeros(5, dtype=np.int64)            # index = sampled depth (1..4)
     for s in range(lo, hi, args.batch):
         e = min(s + args.batch, hi)
         lab = classes[s:e]
@@ -300,12 +323,18 @@ def main() -> None:
             tokens, revealed = mar_decode(model, conv, names_b, cfg_weight=args.cfg_weight,
                                           np_seed=bseed)
         else:
+            # separate streams (codes, halting, residuals); MAR orders use NumPy (np_seed)
+            # and the renderer its own generator, so settings change only what they target
+            gens = {name: torch.Generator(device=dev).manual_seed(4 * bseed + off)
+                    for name, off in (("code", 1), ("halt", 2), ("res", 3))}
             tokens, revealed, depth = mar_decode_adarq(
                 model, heads, conv, names_b, cfg_weight=args.cfg_weight, np_seed=bseed,
-                flow_steps=args.flow_steps,
-                generator=torch.Generator(device=dev).manual_seed(bseed))
+                flow_steps=args.flow_steps, generator=gens, code_temps=code_temps,
+                top_p=args.top_p, greedy=args.greedy_codes,
+                residual_scale=args.residual_scale)
             depth_sum += int(depth.sum())
             depth_n += depth.numel()
+            depth_hist += np.bincount(depth.flatten().cpu().numpy(), minlength=5)[:5]
         if set(revealed) != {1}:
             raise RuntimeError(f"MAR revealed {sorted(set(revealed))} tokens per step; "
                                "upstream's guidance slicing needs exactly 1")
@@ -319,7 +348,9 @@ def main() -> None:
     np.savez(part, arr_0=imgs, labels=classes[lo:hi])
     (out / f"shard{args.shard:02d}of{args.nshards:02d}.json").write_text(json.dumps(
         {**vars(args), "range": [lo, hi],
-         "mean_depth": (depth_sum / depth_n) if depth_n else None}, indent=2))
+         "mean_depth": (depth_sum / depth_n) if depth_n else None,
+         "depth_hist": depth_hist[1:].tolist() if depth_n else None,
+         "revealed_per_step": "1 (asserted every batch)"}, indent=2))
     print(f"wrote {part}")
 
 

@@ -189,37 +189,75 @@ class AdaRQHeads(nn.Module):
                 "code_ce_hard": (ce_hard / denom).detach()}
 
     # -- sampling ---------------------------------------------------------------------
+    def sample_level(self, lg: torch.Tensor, lvl: int, temp: float, top_p: float | None,
+                     greedy: bool, u_halt: torch.Tensor, u_code: torch.Tensor) -> torch.Tensor:
+        """One level of code sampling from guided raw logits ``lg`` [M, K+1] -> symbols [M].
+
+        Gated: halt-vs-continue is decided first from the ORIGINAL (untempered, unfiltered)
+        halt probability softmax(lg)[K]; only when continuing are temperature, top-p or greedy
+        applied, to the K ordinary code logits alone. At temp 1 without filtering this is the
+        plain categorical over all K+1 symbols. Level 1 never halts. ``u_halt``/``u_code`` are
+        one uniform draw per row each, so the random streams stay aligned across settings.
+        """
+        k = self.K
+        if lvl == 0:
+            halt = torch.zeros(lg.shape[0], dtype=torch.bool, device=lg.device)
+        else:
+            halt = u_halt < torch.softmax(lg, dim=-1)[:, k]
+        code = lg[:, :k]
+        if greedy or temp == 0:
+            q = code.argmax(-1)
+        else:
+            probs = torch.softmax(code / temp, dim=-1)
+            if top_p is not None and top_p < 1.0:
+                sp, idx = probs.sort(dim=-1, descending=True)
+                keep = (sp.cumsum(-1) - sp) < top_p        # smallest prefix with mass >= top_p
+                probs = torch.zeros_like(probs).scatter(-1, idx, sp * keep)
+            cdf = probs.cumsum(-1)
+            q = torch.searchsorted(cdf, (u_code * cdf[:, -1]).unsqueeze(-1), right=True)
+            q = q.squeeze(-1).clamp_max(k - 1)
+        return torch.where(halt, torch.full_like(q, k), q)
+
     @torch.no_grad()
-    def sample(self, h_c, h_u=None, cfg_weight: float = 1.0, temperature: float = 1.0,
-               flow_steps: int = 32, generator: torch.Generator | None = None):
-        """One latent per row of h: codes depth by depth (guided logits), then the residual
-        by Euler integration of the guided velocity. Returns (latent [M, d], depth [M])."""
+    def sample(self, h_c, h_u=None, cfg_weight: float = 1.0, code_temps=None,
+               top_p: float | None = None, greedy: bool = False, residual_scale: float = 1.0,
+               flow_steps: int = 32, generators=None, temperature: float | None = None,
+               generator: torch.Generator | None = None):
+        """One latent per row of h: codes depth by depth (guided logits, gated halting, see
+        ``sample_level``), then the residual by Euler integration of the guided velocity from
+        ``residual_scale`` x N(0, I). ``generators``: {"code", "halt", "res"} torch generators
+        (separate streams), or one generator for all. Returns (latent [M, d], depth [M])."""
+        temps = list(code_temps) if code_temps is not None else [temperature or 1.0] * self.D
+        if len(temps) == 1:
+            temps = temps * self.D
+        if len(temps) != self.D:
+            raise ValueError(f"code_temps needs {self.D} values (one per level), got {temps}")
+        g = generators if generators is not None else generator
+        gc, gh, gr = (g["code"], g["halt"], g["res"]) if isinstance(g, dict) else (g, g, g)
         h_c = h_c.float()                       # heads run in fp32 (backbone may be bf16)
         h_u = None if h_u is None else h_u.float()
-        m = h_c.shape[0]
-        codes = torch.full((m, self.D), self.K, dtype=torch.long, device=h_c.device)
-        alive = torch.ones(m, dtype=torch.bool, device=h_c.device)
-        zhat = torch.zeros(m, self.books.shape[-1], device=h_c.device, dtype=self.books.dtype)
+        m, dev = h_c.shape[0], h_c.device
+        codes = torch.full((m, self.D), self.K, dtype=torch.long, device=dev)
+        alive = torch.ones(m, dtype=torch.bool, device=dev)
+        zhat = torch.zeros(m, self.books.shape[-1], device=dev, dtype=self.books.dtype)
         for lvl in range(self.D):
-            # guide the RAW logits, then forbid <halt> at level 1: masking first would give
-            # -inf - (-inf) = NaN in the guidance arithmetic
+            # guide the RAW logits (masking <halt> first would give -inf - (-inf) = NaN)
             lg = self.code_logits(h_c, zhat, lvl, forbid_halt=False)
             if h_u is not None:
                 lu = self.code_logits(h_u, zhat, lvl, forbid_halt=False)
                 lg = lu + cfg_weight * (lg - lu)
-            if lvl == 0:
-                lg[..., self.K] = float("-inf")
-            probs = torch.softmax(lg / temperature, dim=-1)
-            q = torch.multinomial(probs, 1, generator=generator).squeeze(-1)
+            u_halt = torch.rand(m, device=dev, generator=gh)   # drawn every level: aligned
+            u_code = torch.rand(m, device=dev, generator=gc)
+            q = self.sample_level(lg, lvl, temps[lvl], top_p, greedy, u_halt, u_code)
             q = torch.where(alive, q, torch.full_like(q, self.K))
             alive = alive & (q != self.K)                      # <halt> ends the patch
             codes[:, lvl] = q
             zhat = zhat + self.books[lvl][q.clamp_max(self.K - 1)] * alive[:, None]
         cond_c = h_c + self.res_cond(zhat.to(h_c.dtype))
         cond_u = None if h_u is None else h_u + self.res_cond(zhat.to(h_u.dtype))
-        x = torch.randn(m, zhat.shape[-1], device=h_c.device, generator=generator)
+        x = residual_scale * torch.randn(m, zhat.shape[-1], device=dev, generator=gr)
         for i in range(flow_steps):
-            t = torch.full((m,), i / flow_steps, device=h_c.device)
+            t = torch.full((m,), i / flow_steps, device=dev)
             v = self.flow(x.to(h_c.dtype), t, cond_c).float()
             if cond_u is not None:
                 vu = self.flow(x.to(h_c.dtype), t, cond_u).float()

@@ -78,3 +78,86 @@ def test_guided_sampling_has_no_nan_at_level_one():
     lat2, _ = heads.sample(h_c, h_u, cfg_weight=3.0, flow_steps=2,
                            generator=torch.Generator().manual_seed(0))
     assert torch.isfinite(lat2).all()
+
+
+def _level_draws(heads, lg, lvl, n, **kw):
+    """Draw n symbols for one row of logits with fresh uniforms."""
+    g = torch.Generator().manual_seed(0)
+    rows = lg.expand(n, -1)
+    u_h, u_c = torch.rand(n, generator=g), torch.rand(n, generator=g)
+    return heads.sample_level(rows, lvl, kw.get("temp", 1.0), kw.get("top_p"),
+                              kw.get("greedy", False), u_h, u_c)
+
+
+def test_gated_sampler_equals_categorical_at_temperature_one():
+    heads = _heads()
+    torch.manual_seed(3)
+    lg = torch.randn(1, K + 1) * 2
+    q = _level_draws(heads, lg, 2, 200_000)
+    freq = torch.bincount(q, minlength=K + 1).float() / len(q)
+    assert torch.allclose(freq, torch.softmax(lg[0], -1), atol=4e-3)
+    # level 1: never halts, codes in proportion to the ordinary-code softmax
+    q0 = _level_draws(heads, lg, 0, 200_000)
+    assert (q0 != K).all()
+    f0 = torch.bincount(q0, minlength=K + 1).float()[:K] / len(q0)
+    assert torch.allclose(f0, torch.softmax(lg[0, :K], -1), atol=4e-3)
+
+
+def test_temperature_and_top_p_leave_the_halt_probability_unchanged():
+    heads = _heads()
+    torch.manual_seed(4)
+    lg = torch.randn(1, K + 1)
+    lg[0, K] = 1.5                                       # a substantial halt probability
+    p_halt = float(torch.softmax(lg[0], -1)[K])
+    for kw in ({"temp": 0.5}, {"top_p": 0.5}, {"temp": 0.7, "top_p": 0.9}, {"greedy": True}):
+        q = _level_draws(heads, lg, 1, 200_000, **kw)
+        assert abs(float((q == K).float().mean()) - p_halt) < 4e-3, kw
+
+
+def test_greedy_and_top_p_restrict_the_ordinary_codes():
+    heads = _heads()
+    torch.manual_seed(5)
+    lg = torch.randn(1, K + 1)
+    lg[0, K] = -1e4                                      # never halts: look at codes only
+    q = _level_draws(heads, lg, 1, 50_000, greedy=True)
+    assert (q == lg[0, :K].argmax()).all()
+    p = torch.softmax(lg[0, :K], -1)
+    order = p.argsort(descending=True)
+    nucleus = order[: int((p[order].cumsum(0) - p[order] < 0.6).sum())]
+    q = _level_draws(heads, lg, 1, 50_000, top_p=0.6)
+    assert set(q.unique().tolist()) <= set(nucleus.tolist())
+    assert len(set(q.unique().tolist())) == len(nucleus)  # every nucleus code reachable
+
+
+def test_separate_streams_keep_halting_and_residuals_aligned():
+    """Changing the code temperature must not change the halting or residual draws."""
+    heads = _heads().eval()
+    torch.manual_seed(6)
+    h = torch.randn(64, HIDDEN)
+
+    def run(temps):
+        gens = {k: torch.Generator().manual_seed(s) for k, s in (("code", 1), ("halt", 2),
+                                                                 ("res", 3))}
+        return heads.sample(h, None, code_temps=temps, generators=gens, flow_steps=2)
+
+    a_lat, a_dep = run([1.0] * D)
+    b_lat, b_dep = run([1.0] * D)
+    assert torch.equal(a_lat, b_lat) and torch.equal(a_dep, b_dep)       # reproducible
+    for temps in ([0.5] * D, [0.0] * D):
+        lat, dep = run(temps)
+        assert torch.isfinite(lat).all() and (dep >= 1).all()
+    # the residual noise comes from its own stream: with no flow steps the latent is
+    # zhat + s * scale * x0, so (latent - zhat) / s is the same x0 whatever the code settings
+    x0 = torch.randn(64, heads.books.shape[-1], generator=torch.Generator().manual_seed(3))
+    for temps, code_seed in (([1.0] * D, 1), ([0.3] * D, 9)):
+        gens = {k: torch.Generator().manual_seed(s) for k, s in (("code", code_seed),
+                                                                 ("halt", 2), ("res", 3))}
+        lat, dep = heads.sample(h, None, code_temps=temps, generators=gens, flow_steps=0,
+                                residual_scale=0.5)
+        # same streams with residual_scale 0 gives zhat alone
+        gens0 = {k: torch.Generator().manual_seed(s) for k, s in (("code", code_seed),
+                                                                  ("halt", 2), ("res", 3))}
+        lat0, dep0 = heads.sample(h, None, code_temps=temps, generators=gens0, flow_steps=0,
+                                  residual_scale=0.0)
+        assert torch.equal(dep, dep0)
+        assert torch.allclose((lat - lat0) / heads.res_rms, 0.5 * x0, atol=1e-5)

@@ -59,13 +59,19 @@ else
   [ -f "$BENCH_ROOT/ADM_CALIBRATED" ] || die "evaluator not calibrated yet; run with CALIBRATE=1 first"
   SAMPLES="${SAMPLES:?set SAMPLES=<npz with arr_0 uint8 [N,256,256,3]> or a levelb sample folder}"
   REF="${REF:-adm}"
+  # NSAMPLES: the protocol scores exactly 10,000; a smaller validation pilot (e.g. 2,000) may
+  # only be scored against the held-out validation reference, never a test reference
+  NSAMPLES="${NSAMPLES:-10000}"
+  if [ "$NSAMPLES" != 10000 ] && [ "$REF" != heldout ]; then
+    die "NSAMPLES=$NSAMPLES is a validation pilot: only REF=heldout is allowed"
+  fi
   if [ -d "$SAMPLES" ]; then
-    # a levelb.sample folder: merge its shards (all of them, in order) into samples_10000.npz
-    python - "$SAMPLES" <<'PY'
+    # a levelb.sample folder: merge its shards (all of them, in order) into samples_<N>.npz
+    python - "$SAMPLES" "$NSAMPLES" <<'PY'
 import pathlib, re, sys
 import numpy as np
-d = pathlib.Path(sys.argv[1])
-out = d / "samples_10000.npz"
+d, N = pathlib.Path(sys.argv[1]), int(sys.argv[2])
+out = d / f"samples_{N}.npz"
 if out.exists():
     sys.exit(0)
 shards = sorted(d.glob("shard*of*.npz"))
@@ -85,8 +91,8 @@ def header(path):
     return shape, dtype
 heads = [header(p) for p in shards]
 n = sum(h[0][0] for h in heads)
-if n != 10000 or len({(h[0][1:], h[1]) for h in heads}) != 1:
-    sys.exit(f"{d}: shards hold {n} images (expected 10000) or differ in shape/dtype")
+if n != N or len({(h[0][1:], h[1]) for h in heads}) != 1:
+    sys.exit(f"{d}: shards hold {n} images (expected {N}) or differ in shape/dtype")
 # stream shard by shard through a memmap: peak memory is one shard, not the whole set
 tmp = d / "merge.tmp.npy"
 mm = np.lib.format.open_memmap(tmp, mode="w+", dtype=heads[0][1], shape=(n,) + heads[0][0][1:])
@@ -99,14 +105,14 @@ for p in shards:
         labels.append(z["labels"])
 mm.flush()
 labels = np.concatenate(labels)
-part = d / "samples_10000.partial.npz"
+part = d / f"samples_{N}.partial.npz"
 np.savez(part, arr_0=mm, labels=labels)
 part.replace(out)
 del mm
 tmp.unlink()
 print(f"  merged {len(shards)} shard(s) -> {out}")
 PY
-    SAMPLES="$SAMPLES/samples_10000.npz"
+    SAMPLES="$SAMPLES/samples_${NSAMPLES}.npz"
   fi
 fi
 # adm (primary) and val (secondary) are the test references; the others exist only to
@@ -150,16 +156,16 @@ PY
   SAMPLES="${SAMPLES%.npz}.r${RESIZE}.npz"
 fi
 # SAMPLE_RES: the expected sample size (the protocol's 256 unless searching)
-python - "$SAMPLES" "$CALIBRATE" "${SAMPLE_RES:-256}" <<'PY'
+python - "$SAMPLES" "$CALIBRATE" "${SAMPLE_RES:-256}" "${NSAMPLES:-10000}" <<'PY'
 import sys
 import numpy as np
-r = int(sys.argv[3])
+r, N = int(sys.argv[3]), int(sys.argv[4])
 with np.load(sys.argv[1], mmap_mode="r") as z:
     a = z["arr_0"]
     if a.dtype != np.uint8 or a.shape[1:] != (r, r, 3):
         sys.exit(f"samples must be uint8 [N, {r}, {r}, 3], got {a.dtype}{a.shape}")
-    if sys.argv[2] != "1" and a.shape[0] != 10000:
-        sys.exit(f"{a.shape[0]} samples; the Bifrost-1 protocol scores exactly 10,000")
+    if sys.argv[2] != "1" and a.shape[0] != N:
+        sys.exit(f"{a.shape[0]} samples; expected {N} (the protocol scores exactly 10,000)")
     print(f"  {a.shape[0]} samples at {r} px")
 PY
 
