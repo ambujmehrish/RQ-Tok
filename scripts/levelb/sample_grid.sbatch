@@ -1,6 +1,6 @@
 #!/bin/bash
 # =====================================================================================
-# Side-by-side sample grid (CPU only): same classes, one row per arm, a real held-out
+# Side-by-side sample grid (H200 partition; CPU work): same classes, one row per arm, a real held-out
 # image on top. Writes results/levelb/figures/samples_seed${SEED}.png (+ .txt), which the
 # job queue's collector pushes to git.
 #
@@ -8,7 +8,8 @@
 #       scripts/levelb/sample_grid.sbatch
 # =====================================================================================
 #SBATCH --job-name=sample-grid
-#SBATCH --partition=vhpc
+#SBATCH --partition=gpus
+#SBATCH --gres=gpu:h200:1
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=2

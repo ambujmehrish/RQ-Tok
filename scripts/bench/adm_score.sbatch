@@ -13,14 +13,15 @@
 # IS 215.837, FID 3.9426, sFID 6.1404, Precision 0.8265, Recall 0.5309) within tolerance;
 # until it passes no model is scored. Writes <samples>.<ref>.metrics.json.
 #
-# CPU only: the evaluator runs on tensorflow-cpu. On an H200 node (job 1506465) its FID
+# Runs on an H200 node (user: H200 only) but computes on CPU: the evaluator is tensorflow-cpu. On an H200 node (job 1506465) its FID
 # raised "Imaginary component 0.0646"; on a CPU node (adm_diag, job 1506499) and off-cluster
 # the same lock, commit and batches reproduce FID 3.9426 / sFID 6.1404 with a real sqrtm.
 # BLAS threads are pinned to the allocated CPUs; the node and CPU are recorded with every
 # result, and calibration and scoring run on the same kind of node.
 # =====================================================================================
 #SBATCH --job-name=adm-score
-#SBATCH --partition=vhpc
+#SBATCH --partition=gpus
+#SBATCH --gres=gpu:h200:1
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
@@ -57,6 +58,10 @@ if [ "$CALIBRATE" = "1" ]; then
   SAMPLES="$ADM_DIR/admnet_guided_upsampled_imagenet256.npz"; REF="adm"
 else
   [ -f "$BENCH_ROOT/ADM_CALIBRATED" ] || die "evaluator not calibrated yet; run with CALIBRATE=1 first"
+  # calibration holds only for the CPU type it ran on (the evaluator's linear algebra failed on
+  # one node type before threads were pinned): refuse to score anywhere else
+  CAL_CPU=$(sed 's/^[^|]*| //' "$BENCH_ROOT/ADM_CALIBRATED")
+  [ "$CAL_CPU" = "$CPU_MODEL" ] || die "calibrated on '$CAL_CPU', this node is '$CPU_MODEL': run CALIBRATE=1 here first"
   SAMPLES="${SAMPLES:?set SAMPLES=<npz with arr_0 uint8 [N,256,256,3]> or a levelb sample folder}"
   REF="${REF:-adm}"
   # NSAMPLES: the protocol scores exactly 10,000; a smaller validation pilot (e.g. 2,000) may
