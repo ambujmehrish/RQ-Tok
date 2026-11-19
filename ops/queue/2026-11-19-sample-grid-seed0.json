@@ -1,0 +1,11 @@
+{
+ "id": "2026-11-19-sample-grid-seed0",
+ "what": "sample grid: real / FLUX / Bifrost-1 / AdaRQ-Flow / tuned, same 16 classes (seed 0)",
+ "script": "scripts/levelb/sample_grid.sbatch",
+ "env": {
+  "ARMS": "flux bifrost adarq adarq_tuned",
+  "SEED": "0",
+  "N": "16"
+ },
+ "collect": true
+}
