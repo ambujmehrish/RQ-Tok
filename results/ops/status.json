@@ -2,8 +2,8 @@
  "cancels": {},
  "cluster": {
   "counts": {
-   "PENDING": 12,
-   "RUNNING": 2
+   "PENDING": 10,
+   "RUNNING": 3
   },
   "ended_24h": [
    {
@@ -27,6 +27,14 @@
     "end": "2026-11-18T21:27:37",
     "exit": "0:0",
     "jobid": "1507925",
+    "name": "levelb-sample",
+    "state": "COMPLETED"
+   },
+   {
+    "elapsed": "05:37:02",
+    "end": "2026-11-19T03:04:39",
+    "exit": "0:0",
+    "jobid": "1507926",
     "name": "levelb-sample",
     "state": "COMPLETED"
    },
@@ -111,16 +119,6 @@
     "jobid": "1507934",
     "name": "levelb-sample",
     "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "2026-11-19T21:27:37",
-    "state": "PENDING",
-    "time_limit": "1-00:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1507931",
-    "name": "levelb-sample",
-    "nodes": "1",
     "reason_or_nodelist": "(Resources)",
     "start": "2026-11-19T21:23:06",
     "state": "PENDING",
@@ -137,22 +135,22 @@
     "time_limit": "1-00:00:00"
    },
    {
-    "elapsed": "4:47:32",
+    "elapsed": "11:19",
+    "jobid": "1507931",
+    "name": "levelb-sample",
+    "nodes": "1",
+    "reason_or_nodelist": "vhpc15",
+    "start": "2026-11-19T03:04:39",
+    "state": "RUNNING",
+    "time_limit": "1-00:00:00"
+   },
+   {
+    "elapsed": "5:47:41",
     "jobid": "1507929",
     "name": "levelb-adarq",
     "nodes": "1",
     "reason_or_nodelist": "vhpc13",
     "start": "2026-11-18T21:28:17",
-    "state": "RUNNING",
-    "time_limit": "1-00:00:00"
-   },
-   {
-    "elapsed": "4:48:12",
-    "jobid": "1507926",
-    "name": "levelb-sample",
-    "nodes": "1",
-    "reason_or_nodelist": "vhpc15",
-    "start": "2026-11-18T21:27:37",
     "state": "RUNNING",
     "time_limit": "1-00:00:00"
    },
@@ -227,13 +225,13 @@
     "time_limit": "12:00:00"
    },
    {
-    "elapsed": "0:00",
+    "elapsed": "11:19",
     "jobid": "1507927",
     "name": "adm-score",
     "nodes": "1",
-    "reason_or_nodelist": "(Dependency)",
-    "start": "N/A",
-    "state": "PENDING",
+    "reason_or_nodelist": "vhpc5",
+    "start": "2026-11-19T03:04:39",
+    "state": "RUNNING",
     "time_limit": "12:00:00"
    }
   ]
@@ -298,12 +296,13 @@
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "PENDING",
+    "RUNNING"
    ],
    "submit_error": null,
    "submitted": "2026-11-18T17:14:12",
    "waiting_for": null
   }
  },
- "updated": "2026-11-19T02:15:49"
+ "updated": "2026-11-19T03:15:58"
 }
