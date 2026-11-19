@@ -2,8 +2,8 @@
  "cancels": {},
  "cluster": {
   "counts": {
-   "PENDING": 6,
-   "RUNNING": 2
+   "PENDING": 7,
+   "RUNNING": 8
   },
   "ended_24h": [
    {
@@ -141,6 +141,14 @@
     "jobid": "1507947",
     "name": "adm-score",
     "state": "COMPLETED"
+   },
+   {
+    "elapsed": "00:10:09",
+    "end": "2026-11-19T12:57:28",
+    "exit": "0:0",
+    "jobid": "1508041",
+    "name": "eval-refs",
+    "state": "COMPLETED"
    }
   ],
   "squeue": [
@@ -156,6 +164,16 @@
    },
    {
     "elapsed": "0:00",
+    "jobid": "1508048",
+    "name": "levelb-adarq",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "1-00:00:00"
+   },
+   {
+    "elapsed": "0:00",
     "jobid": "1507930",
     "name": "levelb-adarq",
     "nodes": "1",
@@ -165,7 +183,7 @@
     "time_limit": "1-00:00:00"
    },
    {
-    "elapsed": "3:45:52",
+    "elapsed": "4:21:01",
     "jobid": "1507934",
     "name": "levelb-sample",
     "nodes": "1",
@@ -175,7 +193,7 @@
     "time_limit": "1-00:00:00"
    },
    {
-    "elapsed": "14:59:00",
+    "elapsed": "15:34:09",
     "jobid": "1507929",
     "name": "levelb-adarq",
     "nodes": "1",
@@ -223,6 +241,66 @@
     "start": "N/A",
     "state": "PENDING",
     "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "4:57",
+    "jobid": "1508042",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "vhpc6",
+    "start": "2026-11-19T12:57:29",
+    "state": "RUNNING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "4:57",
+    "jobid": "1508043",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "vhpc6",
+    "start": "2026-11-19T12:57:29",
+    "state": "RUNNING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "4:57",
+    "jobid": "1508044",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "vhpc7",
+    "start": "2026-11-19T12:57:29",
+    "state": "RUNNING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "4:57",
+    "jobid": "1508045",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "vhpc7",
+    "start": "2026-11-19T12:57:29",
+    "state": "RUNNING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "4:57",
+    "jobid": "1508046",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "vhpc8",
+    "start": "2026-11-19T12:57:29",
+    "state": "RUNNING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "4:57",
+    "jobid": "1508047",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "vhpc8",
+    "start": "2026-11-19T12:57:29",
+    "state": "RUNNING",
+    "time_limit": "12:00:00"
    }
   ]
  },
@@ -230,7 +308,15 @@
   "2026-11-18-watch-flux1024",
   "2026-11-18-watch-seed12-scores",
   "2026-11-18-watch-soft",
-  "2026-11-18-watch-tuned-samples"
+  "2026-11-18-watch-tuned-samples",
+  "2026-11-19-eval-refs",
+  "2026-11-19-score-flux-adm128",
+  "2026-11-19-score-flux-adm512",
+  "2026-11-19-score-flux-adm64",
+  "2026-11-19-score-flux-heldout",
+  "2026-11-19-score-flux-val",
+  "2026-11-19-score-flux-valsquash",
+  "2026-11-19-soft-p3"
  ],
  "requests": {
   "2026-11-18-watch-flux1024": {
@@ -291,7 +377,119 @@
    "submit_error": null,
    "submitted": "2026-11-18T17:14:12",
    "waiting_for": null
+  },
+  "2026-11-19-eval-refs": {
+   "collected": "2026-11-19T13:02:26",
+   "finished": "2026-11-19T13:02:26",
+   "invalid": null,
+   "jobid": "1508041",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [
+    "COMPLETED"
+   ],
+   "submit_error": null,
+   "submitted": "2026-11-19T12:47:19",
+   "waiting_for": null
+  },
+  "2026-11-19-score-flux-adm128": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508042",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [
+    "RUNNING"
+   ],
+   "submit_error": null,
+   "submitted": "2026-11-19T12:47:19",
+   "waiting_for": null
+  },
+  "2026-11-19-score-flux-adm512": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508043",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [
+    "RUNNING"
+   ],
+   "submit_error": null,
+   "submitted": "2026-11-19T12:47:19",
+   "waiting_for": null
+  },
+  "2026-11-19-score-flux-adm64": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508044",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [
+    "RUNNING"
+   ],
+   "submit_error": null,
+   "submitted": "2026-11-19T12:47:19",
+   "waiting_for": null
+  },
+  "2026-11-19-score-flux-heldout": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508045",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [
+    "RUNNING"
+   ],
+   "submit_error": null,
+   "submitted": "2026-11-19T12:47:19",
+   "waiting_for": null
+  },
+  "2026-11-19-score-flux-val": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508046",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [
+    "RUNNING"
+   ],
+   "submit_error": null,
+   "submitted": "2026-11-19T12:47:19",
+   "waiting_for": null
+  },
+  "2026-11-19-score-flux-valsquash": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508047",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [
+    "RUNNING"
+   ],
+   "submit_error": null,
+   "submitted": "2026-11-19T12:47:19",
+   "waiting_for": null
+  },
+  "2026-11-19-soft-p3": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508048",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [
+    "PENDING"
+   ],
+   "submit_error": null,
+   "submitted": "2026-11-19T12:47:19",
+   "waiting_for": null
   }
  },
- "updated": "2026-11-19T12:27:17"
+ "updated": "2026-11-19T13:02:26"
 }

@@ -1,0 +1,34 @@
+  0.19 / 0.19 GB
+/home/ambuj.mehrish/work/bench/adm/VIRTUAL_imagenet64_labeled.npz (10000, 64, 64, 3) ['arr_0', 'mu', 'mu_clip', 'mu_s', 'sigma', 'sigma_clip', 'sigma_s']
+  0.27 / 0.56 GB
+  0.54 / 0.56 GB
+  0.56 / 0.56 GB
+/home/ambuj.mehrish/work/bench/adm/VIRTUAL_imagenet128_labeled.npz (10000, 128, 128, 3) ['arr_0', 'mu', 'mu_clip', 'mu_s', 'sigma', 'sigma_clip', 'sigma_s']
+  0.27 / 0.86 GB
+  0.54 / 0.86 GB
+  0.81 / 0.86 GB
+  0.86 / 0.86 GB
+/home/ambuj.mehrish/work/bench/adm/VIRTUAL_imagenet512.npz (1000, 512, 512, 3) ['arr_0', 'mu', 'mu_clip', 'mu_s', 'sigma', 'sigma_clip', 'sigma_s']
+wrote /home/ambuj.mehrish/work/levelb/imagenet256/refs/heldout_10000.npz: 10000 held-out images
+  3572/50000
+  7144/50000
+  10716/50000
+  14288/50000
+  17860/50000
+  21432/50000
+  25003/50000
+  28574/50000
+  32145/50000
+  35716/50000
+  39287/50000
+  42858/50000
+  46429/50000
+  50000/50000
+wrote /home/ambuj.mehrish/work/levelb/imagenet256/refs/val_squash_50000.npz
+total 11520024
+drwxr-xr-x 2 ambuj.mehrish vhpc        103 Nov 19 12:57 .
+drwxr-xr-x 4 ambuj.mehrish vhpc       4096 Nov 19 12:47 ..
+-rw-r--r-- 1 ambuj.mehrish vhpc        390 Nov 19 12:53 ADM_EXTRA_SHA256SUMS
+-rw-r--r-- 1 ambuj.mehrish vhpc 1966080264 Nov 19 12:55 heldout_10000.npz
+-rw-r--r-- 1 ambuj.mehrish vhpc 9830400360 Nov 19 12:57 val_squash_50000.npz
+=== reference sets ready ===
