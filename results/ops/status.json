@@ -6,35 +6,11 @@
   },
   "ended_24h": [
    {
-    "elapsed": "23:52:14",
-    "end": "2026-11-19T21:20:31",
-    "exit": "0:0",
-    "jobid": "1507929",
-    "name": "levelb-adarq",
-    "state": "COMPLETED"
-   },
-   {
     "elapsed": "23:52:20",
     "end": "2026-11-20T21:12:51",
     "exit": "0:0",
     "jobid": "1507930",
     "name": "levelb-adarq",
-    "state": "COMPLETED"
-   },
-   {
-    "elapsed": "05:37:13",
-    "end": "2026-11-19T21:17:53",
-    "exit": "0:0",
-    "jobid": "1507937",
-    "name": "levelb-sample",
-    "state": "COMPLETED"
-   },
-   {
-    "elapsed": "00:20:18",
-    "end": "2026-11-19T21:38:11",
-    "exit": "0:0",
-    "jobid": "1507938",
-    "name": "adm-score",
     "state": "COMPLETED"
    },
    {
@@ -48,7 +24,7 @@
   ],
   "squeue": [
    {
-    "elapsed": "1:08",
+    "elapsed": "31:27",
     "jobid": "1508048",
     "name": "levelb-adarq",
     "nodes": "1",
@@ -258,5 +234,5 @@
    "waiting_for": null
   }
  },
- "updated": "2026-11-20T21:13:59"
+ "updated": "2026-11-20T21:44:18"
 }

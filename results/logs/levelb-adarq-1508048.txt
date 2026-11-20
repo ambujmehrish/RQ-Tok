@@ -2,3 +2,21 @@
   warnings.warn(message, FutureWarning)
 2026-11-20 21:13:12 PID=2188725 __init__.py:49 setup_logging() INFO → 'standard' logger initialized.
 Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:01<00:01,  1.48s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:02<00:00,  1.15s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:02<00:00,  1.20s/it]
+vision_denoising_type:  mar
+[adarq] soft code targets, T per level [214.697, 60.654, 28.243, 17.92]
+Using a slow image processor as `use_fast` is unset and a slow processor was saved with this model. `use_fast=True` will be the default behavior in v4.48, even if the model was saved with a slow processor. This will result in minor differences in outputs. You'll still be able to use a slow processor with `use_fast=False`.
+[resume] step 137737 (epoch 13, pos 1106816)
+[adarq] 2,815,065,092 trainable (heads 40,158,212 vs Bifrost-1 linear head 4,196,352) | 158880 steps
+  step 137750/158880 loss 3.8643 (ce 2.7210 flow 1.1433) 0.39 it/s
+  step 137800/158880 loss 3.9041 (ce 2.7513 flow 1.1528) 0.40 it/s
+  step 137850/158880 loss 3.9132 (ce 2.7368 flow 1.1763) 0.40 it/s
+  step 137900/158880 loss 3.8990 (ce 2.7441 flow 1.1549) 0.40 it/s
+  step 137950/158880 loss 3.9752 (ce 2.8201 flow 1.1551) 0.40 it/s
+  step 138000/158880 loss 3.9856 (ce 2.8203 flow 1.1653) 0.40 it/s
+  step 138050/158880 loss 3.9181 (ce 2.7520 flow 1.1662) 0.34 it/s
+  step 138100/158880 loss 3.9063 (ce 2.7278 flow 1.1785) 0.35 it/s
+  step 138150/158880 loss 3.8801 (ce 2.7061 flow 1.1740) 0.36 it/s
+  step 138200/158880 loss 3.9145 (ce 2.7612 flow 1.1533) 0.36 it/s
+  step 138250/158880 loss 3.8714 (ce 2.7037 flow 1.1677) 0.36 it/s
+  step 138300/158880 loss 4.0312 (ce 2.8633 flow 1.1680) 0.37 it/s
+  step 138350/158880 loss 3.8351 (ce 2.6890 flow 1.1462) 0.37 it/s
