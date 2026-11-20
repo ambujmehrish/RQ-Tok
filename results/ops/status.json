@@ -2,7 +2,6 @@
  "cancels": {},
  "cluster": {
   "counts": {
-   "PENDING": 1,
    "RUNNING": 1
   },
   "ended_24h": [
@@ -11,6 +10,14 @@
     "end": "2026-11-19T21:20:31",
     "exit": "0:0",
     "jobid": "1507929",
+    "name": "levelb-adarq",
+    "state": "COMPLETED"
+   },
+   {
+    "elapsed": "23:52:20",
+    "end": "2026-11-20T21:12:51",
+    "exit": "0:0",
+    "jobid": "1507930",
     "name": "levelb-adarq",
     "state": "COMPLETED"
    },
@@ -41,22 +48,12 @@
   ],
   "squeue": [
    {
-    "elapsed": "0:00",
+    "elapsed": "1:08",
     "jobid": "1508048",
     "name": "levelb-adarq",
     "nodes": "1",
-    "reason_or_nodelist": "(Dependency)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "1-00:00:00"
-   },
-   {
-    "elapsed": "23:23:10",
-    "jobid": "1507930",
-    "name": "levelb-adarq",
-    "nodes": "1",
     "reason_or_nodelist": "vhpc13",
-    "start": "2026-11-19T21:20:31",
+    "start": "2026-11-20T21:12:51",
     "state": "RUNNING",
     "time_limit": "1-00:00:00"
    }
@@ -107,15 +104,14 @@
    "waiting_for": null
   },
   "2026-11-18-watch-soft": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-20T21:13:59",
+   "finished": "2026-11-20T21:13:59",
    "invalid": null,
    "jobid": "1507929,1507930",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "COMPLETED",
-    "RUNNING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-18T17:14:12",
@@ -255,12 +251,12 @@
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "RUNNING"
    ],
    "submit_error": null,
    "submitted": "2026-11-19T12:47:19",
    "waiting_for": null
   }
  },
- "updated": "2026-11-20T20:43:41"
+ "updated": "2026-11-20T21:13:59"
 }

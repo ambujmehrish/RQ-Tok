@@ -683,3 +683,20 @@ Using a slow image processor as `use_fast` is unset and a slow processor was sav
   step 136950/158880 loss 3.9899 (ce 2.8087 flow 1.1811) 0.40 it/s
   step 137000/158880 loss 3.9319 (ce 2.7656 flow 1.1663) 0.40 it/s
   step 137050/158880 loss 3.8586 (ce 2.7061 flow 1.1525) 0.40 it/s
+  step 137100/158880 loss 3.8535 (ce 2.6966 flow 1.1568) 0.40 it/s
+  step 137150/158880 loss 3.9249 (ce 2.7849 flow 1.1400) 0.40 it/s
+  step 137200/158880 loss 3.9065 (ce 2.7344 flow 1.1721) 0.40 it/s
+  step 137250/158880 loss 3.8419 (ce 2.6524 flow 1.1895) 0.40 it/s
+  step 137300/158880 loss 3.9885 (ce 2.8300 flow 1.1585) 0.40 it/s
+  step 137350/158880 loss 3.8600 (ce 2.6828 flow 1.1772) 0.40 it/s
+  step 137400/158880 loss 3.9844 (ce 2.8248 flow 1.1596) 0.40 it/s
+  step 137450/158880 loss 3.8974 (ce 2.7091 flow 1.1883) 0.40 it/s
+  step 137500/158880 loss 3.9118 (ce 2.7372 flow 1.1746) 0.40 it/s
+  step 137550/158880 loss 3.9199 (ce 2.7440 flow 1.1760) 0.40 it/s
+  step 137600/158880 loss 3.8449 (ce 2.6509 flow 1.1940) 0.40 it/s
+  step 137650/158880 loss 3.9385 (ce 2.7817 flow 1.1568) 0.40 it/s
+  step 137700/158880 loss 3.9042 (ce 2.7410 flow 1.1632) 0.40 it/s
+### USR1: asking trainer to checkpoint
+[adarq] stopped at step 137737/158880; resubmit to continue
+note: no held-out eval logged yet
+=== not finished yet: resubmit this job to continue ===
