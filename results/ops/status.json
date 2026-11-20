@@ -15,14 +15,6 @@
     "state": "COMPLETED"
    },
    {
-    "elapsed": "01:31:24",
-    "end": "2026-11-19T16:09:26",
-    "exit": "0:0",
-    "jobid": "1507936",
-    "name": "adm-score",
-    "state": "COMPLETED"
-   },
-   {
     "elapsed": "05:37:13",
     "end": "2026-11-19T21:17:53",
     "exit": "0:0",
@@ -59,7 +51,7 @@
     "time_limit": "1-00:00:00"
    },
    {
-    "elapsed": "18:20:42",
+    "elapsed": "19:21:11",
     "jobid": "1507930",
     "name": "levelb-adarq",
     "nodes": "1",
@@ -270,5 +262,5 @@
    "waiting_for": null
   }
  },
- "updated": "2026-11-20T15:41:13"
+ "updated": "2026-11-20T16:41:42"
 }
