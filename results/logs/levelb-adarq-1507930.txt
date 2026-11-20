@@ -506,3 +506,34 @@ Using a slow image processor as `use_fast` is unset and a slow processor was sav
   step 128200/158880 loss 3.9669 (ce 2.7814 flow 1.1855) 0.40 it/s
   step 128250/158880 loss 3.9106 (ce 2.7154 flow 1.1953) 0.40 it/s
   step 128300/158880 loss 4.0042 (ce 2.8375 flow 1.1667) 0.40 it/s
+  step 128350/158880 loss 3.9348 (ce 2.7429 flow 1.1919) 0.40 it/s
+  step 128400/158880 loss 3.9954 (ce 2.8331 flow 1.1624) 0.40 it/s
+  step 128450/158880 loss 3.9422 (ce 2.7904 flow 1.1518) 0.40 it/s
+  step 128500/158880 loss 3.8703 (ce 2.7094 flow 1.1610) 0.40 it/s
+  step 128550/158880 loss 3.8379 (ce 2.6576 flow 1.1803) 0.40 it/s
+  step 128600/158880 loss 3.9665 (ce 2.7981 flow 1.1683) 0.40 it/s
+  step 128650/158880 loss 3.8817 (ce 2.7116 flow 1.1701) 0.40 it/s
+  step 128700/158880 loss 3.9383 (ce 2.7775 flow 1.1608) 0.40 it/s
+  step 128750/158880 loss 3.9522 (ce 2.7873 flow 1.1650) 0.40 it/s
+  step 128800/158880 loss 4.0250 (ce 2.8642 flow 1.1609) 0.40 it/s
+  step 128850/158880 loss 3.9620 (ce 2.7909 flow 1.1711) 0.40 it/s
+  step 128900/158880 loss 3.8680 (ce 2.6963 flow 1.1717) 0.40 it/s
+  step 128950/158880 loss 3.8307 (ce 2.6725 flow 1.1582) 0.40 it/s
+  step 129000/158880 loss 3.8866 (ce 2.7167 flow 1.1699) 0.40 it/s
+  step 129050/158880 loss 3.9439 (ce 2.7665 flow 1.1773) 0.40 it/s
+  step 129100/158880 loss 3.8619 (ce 2.7204 flow 1.1414) 0.40 it/s
+  step 129150/158880 loss 3.8756 (ce 2.7130 flow 1.1626) 0.40 it/s
+  step 129200/158880 loss 3.8774 (ce 2.6963 flow 1.1811) 0.40 it/s
+  step 129250/158880 loss 3.8911 (ce 2.7022 flow 1.1889) 0.40 it/s
+  step 129300/158880 loss 3.8674 (ce 2.6839 flow 1.1834) 0.40 it/s
+  step 129350/158880 loss 3.9249 (ce 2.7654 flow 1.1595) 0.40 it/s
+  step 129400/158880 loss 3.8471 (ce 2.6822 flow 1.1649) 0.40 it/s
+  step 129450/158880 loss 3.9544 (ce 2.8145 flow 1.1399) 0.40 it/s
+  step 129500/158880 loss 3.9558 (ce 2.7675 flow 1.1884) 0.40 it/s
+  step 129550/158880 loss 3.9670 (ce 2.7858 flow 1.1812) 0.40 it/s
+  step 129600/158880 loss 3.8293 (ce 2.6752 flow 1.1541) 0.40 it/s
+  step 129650/158880 loss 3.8212 (ce 2.6744 flow 1.1469) 0.40 it/s
+  step 129700/158880 loss 3.8785 (ce 2.7252 flow 1.1533) 0.40 it/s
+  step 129750/158880 loss 3.9124 (ce 2.7557 flow 1.1566) 0.40 it/s
+  step 129800/158880 loss 3.9807 (ce 2.8147 flow 1.1659) 0.40 it/s
+  step 129850/158880 loss 3.8275 (ce 2.6507 flow 1.1768) 0.40 it/s
