@@ -7,22 +7,6 @@
   },
   "ended_24h": [
    {
-    "elapsed": "00:34:01",
-    "end": "2026-11-19T03:38:40",
-    "exit": "0:0",
-    "jobid": "1507927",
-    "name": "adm-score",
-    "state": "COMPLETED"
-   },
-   {
-    "elapsed": "00:26:45",
-    "end": "2026-11-19T04:05:25",
-    "exit": "0:0",
-    "jobid": "1507928",
-    "name": "adm-score",
-    "state": "COMPLETED"
-   },
-   {
     "elapsed": "23:52:14",
     "end": "2026-11-19T21:20:31",
     "exit": "0:0",
@@ -179,7 +163,7 @@
     "time_limit": "1-00:00:00"
    },
    {
-    "elapsed": "6:14:50",
+    "elapsed": "7:15:19",
     "jobid": "1507930",
     "name": "levelb-adarq",
     "nodes": "1",
@@ -390,5 +374,5 @@
    "waiting_for": null
   }
  },
- "updated": "2026-11-20T03:35:21"
+ "updated": "2026-11-20T04:35:50"
 }
