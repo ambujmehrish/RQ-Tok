@@ -139,7 +139,7 @@
     "time_limit": "1-00:00:00"
    },
    {
-    "elapsed": "13:18:14",
+    "elapsed": "14:18:43",
     "jobid": "1507930",
     "name": "levelb-adarq",
     "nodes": "1",
@@ -350,5 +350,5 @@
    "waiting_for": null
   }
  },
- "updated": "2026-11-20T10:38:45"
+ "updated": "2026-11-20T11:39:14"
 }
