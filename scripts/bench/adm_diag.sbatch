@@ -9,7 +9,8 @@
 # then replays its FID under several OpenBLAS thread/kernel settings. Diagnostic only.
 # =====================================================================================
 #SBATCH --job-name=adm-diag
-#SBATCH --partition=vhpc
+#SBATCH --partition=gpus
+#SBATCH --gres=gpu:h200:1
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
@@ -36,4 +37,5 @@ set -u
 [ "$(git -C "$ADM_DIR/guided-diffusion" rev-parse HEAD)" = "$ADM_COMMIT" ] || die "evaluator checkout moved"
 export TMPDIR="/tmp/$USER-${SLURM_JOB_ID:-local}"; mkdir -p "$TMPDIR"; trap 'rm -rf "$TMPDIR"' EXIT
 sha256sum -c "$ADM_DIR/SHA256SUMS" || die "downloaded batches changed since setup"
-python "$REPO/scripts/bench/adm_diag.py" "$ADM_DIR" "$BENCH_ROOT/adm_diag"
+# DIAG_OUT: a separate folder per node type, so the statistics are this node's own
+python "$REPO/scripts/bench/adm_diag.py" "$ADM_DIR" "$BENCH_ROOT/${DIAG_OUT:-adm_diag}"

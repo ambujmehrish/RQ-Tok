@@ -27,16 +27,24 @@ import platform
 import subprocess
 import sys
 
-OFF_CLUSTER = {"IS": 215.837158203125, "mu_sum": 484.324591524899, "trace": 159.40084783863261,
-               "FID": 3.9425650421262617, "sFID": 6.14042664133342,
-               "prod_sum": {"FID": 142402.55221067026, "sFID": 41910.87643270046}}
+OFF_CLUSTER = {
+    "IS": 215.837158203125,
+    "mu_sum": 484.324591524899,
+    "trace": 159.40084783863261,
+    "FID": 3.9425650421262617,
+    "sFID": 6.14042664133342,
+    "prod_sum": {"FID": 142402.55221067026, "sFID": 41910.87643270046},
+}
 
-REPLAY = r'''
+REPLAY = r"""
 import json, sys
 import numpy as np
 from scipy import linalg
-sys.path.insert(0, sys.argv[1])
-import evaluator as ev                                   # unmodified, imports TensorFlow
+import os
+WITH_TF = os.environ.get("REPLAY_WITH_TF", "1") == "1"
+if WITH_TF:
+    sys.path.insert(0, sys.argv[1])
+    import evaluator as ev                               # unmodified, imports TensorFlow
 r, s = np.load(sys.argv[2]), np.load(sys.argv[3])
 out = {}
 for name, mu1, s1, mu2, s2 in (("FID", s["mu"], s["sigma"], r["mu"], r["sigma"]),
@@ -47,13 +55,22 @@ for name, mu1, s1, mu2, s2 in (("FID", s["mu"], s["sigma"], r["mu"], r["sigma"])
            "sqrtm_finite": bool(np.isfinite(cm).all()), "complex": bool(np.iscomplexobj(cm)),
            "max_imag": float(np.abs(np.imag(cm)).max()), "sqrtm_err": float(err),
            "prod_sum": float(prod.sum())}
-    try:
-        rec["value"] = float(ev.FIDStatistics(mu1, s1).frechet_distance(ev.FIDStatistics(mu2, s2)))
-    except Exception as e:                                # report, do not hide
-        rec["error"] = f"{type(e).__name__}: {e}"
+    if WITH_TF:
+        try:
+            rec["value"] = float(
+                ev.FIDStatistics(mu1, s1).frechet_distance(ev.FIDStatistics(mu2, s2)))
+        except Exception as e:                            # report, do not hide
+            rec["error"] = f"{type(e).__name__}: {e}"
+    else:                                                 # the evaluator's formula, no TF loaded
+        d = mu1 - mu2
+        if np.iscomplexobj(cm) and not np.allclose(np.diagonal(cm).imag, 0, atol=1e-3):
+            rec["error"] = f"Imaginary component {np.max(np.abs(cm.imag))}"
+        else:
+            rec["value"] = float(d.dot(d) + np.trace(s1) + np.trace(s2)
+                                 - 2 * np.trace(np.real(cm)))
     out[name] = rec
 print("RESULT " + json.dumps(out))
-'''
+"""
 
 
 def sh(cmd: str) -> str:
@@ -68,13 +85,26 @@ def main() -> None:
 
     import numpy as np
     import scipy
+
     print("=== 1. machine and libraries")
-    print("host", platform.node(), "|", sh("lscpu | grep 'Model name'"), "| cpus usable",
-          len(os.sched_getaffinity(0)))
+    print(
+        "host",
+        platform.node(),
+        "|",
+        sh("lscpu | grep 'Model name'"),
+        "| cpus usable",
+        len(os.sched_getaffinity(0)),
+    )
     print("numpy", np.__version__, "scipy", scipy.__version__)
     print(sh(f"OPENBLAS_VERBOSE=2 {sys.executable} -c 'import numpy, scipy.linalg' 2>&1 | head -4"))
-    for k in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_CORETYPE",
-              "TF_ENABLE_ONEDNN_OPTS", "SLURM_CPUS_PER_TASK"):
+    for k in (
+        "OMP_NUM_THREADS",
+        "OPENBLAS_NUM_THREADS",
+        "MKL_NUM_THREADS",
+        "OPENBLAS_CORETYPE",
+        "TF_ENABLE_ONEDNN_OPTS",
+        "SLURM_CPUS_PER_TASK",
+    ):
         print(f"  {k}={os.environ.get(k)}")
 
     stats = out / "sample_stats.npz"
@@ -82,30 +112,53 @@ def main() -> None:
     if not stats.exists():
         import evaluator as ev
         import tensorflow.compat.v1 as tf
+
         e = ev.Evaluator(tf.Session(config=tf.ConfigProto(allow_soft_placement=True)))
         e.warmup()
         pool, spatial = e.read_activations(str(adm / "admnet_guided_upsampled_imagenet256.npz"))
         fs, fss = e.compute_statistics(pool), e.compute_statistics(spatial)
-        np.savez(stats, mu=fs.mu, sigma=fs.sigma, mu_s=fss.mu, sigma_s=fss.sigma,
-                 IS=e.compute_inception_score(pool), n=len(pool))
+        np.savez(
+            stats,
+            mu=fs.mu,
+            sigma=fs.sigma,
+            mu_s=fss.mu,
+            sigma_s=fss.sigma,
+            IS=e.compute_inception_score(pool),
+            n=len(pool),
+        )
     z = np.load(stats)
-    got = {"IS": float(z["IS"]), "mu_sum": float(z["mu"].astype(np.float64).sum()),
-           "trace": float(np.trace(z["sigma"]))}
+    got = {
+        "IS": float(z["IS"]),
+        "mu_sum": float(z["mu"].astype(np.float64).sum()),
+        "trace": float(np.trace(z["sigma"])),
+    }
     for k, v in got.items():
         print(f"  {k}: {v!r}  (off-cluster {OFF_CLUSTER[k]!r}, diff {v - OFF_CLUSTER[k]:.3e})")
 
     print("=== 3. FID replay in fresh processes")
     ref = adm / "VIRTUAL_imagenet256_labeled.npz"
     ncpu = str(len(os.sched_getaffinity(0)))
-    runs = [("default threads", {}), ("1 thread", {"OPENBLAS_NUM_THREADS": "1"}),
-            (f"{ncpu} threads", {"OPENBLAS_NUM_THREADS": ncpu}),
-            ("Haswell kernels", {"OPENBLAS_CORETYPE": "Haswell"}),
-            ("Haswell, 1 thread", {"OPENBLAS_CORETYPE": "Haswell", "OPENBLAS_NUM_THREADS": "1"})]
+    runs = [
+        ("default threads", {}),
+        ("1 thread", {"OPENBLAS_NUM_THREADS": "1"}),
+        (f"{ncpu} threads", {"OPENBLAS_NUM_THREADS": ncpu}),
+        ("Haswell kernels", {"OPENBLAS_CORETYPE": "Haswell"}),
+        ("Haswell, 1 thread", {"OPENBLAS_CORETYPE": "Haswell", "OPENBLAS_NUM_THREADS": "1"}),
+        ("SkylakeX kernels", {"OPENBLAS_CORETYPE": "SkylakeX"}),
+        ("SapphireRapids kernels", {"OPENBLAS_CORETYPE": "SapphireRapids"}),
+        ("Prescott (generic) kernels", {"OPENBLAS_CORETYPE": "Prescott"}),
+        ("no TensorFlow in process", {"REPLAY_WITH_TF": "0"}),
+        ("no TensorFlow, Haswell", {"REPLAY_WITH_TF": "0", "OPENBLAS_CORETYPE": "Haswell"}),
+    ]
     summary = {}
     for label, extra in runs:
         env = {**os.environ, **extra}
-        r = subprocess.run([sys.executable, "-c", REPLAY, str(evals), str(ref), str(stats)],
-                           env=env, capture_output=True, text=True)
+        r = subprocess.run(
+            [sys.executable, "-c", REPLAY, str(evals), str(ref), str(stats)],
+            env=env,
+            capture_output=True,
+            text=True,
+        )
         line = next((ln for ln in r.stdout.splitlines() if ln.startswith("RESULT ")), None)
         if line is None:
             print(f"  [{label}] process failed rc={r.returncode}: {r.stderr.strip()[-300:]}")

@@ -1,0 +1,12 @@
+{
+ "id": "2026-11-21-adm-diag-h200",
+ "what": "ADM evaluator diagnostic on an H200 node (Xeon 6760P): its own statistics, OpenBLAS core detected, FID replay under default/1-thread/Haswell/SkylakeX/SapphireRapids/Prescott kernels, with and without TensorFlow",
+ "script": "scripts/bench/adm_diag.sbatch",
+ "env": {
+  "DIAG_OUT": "adm_diag_h200"
+ },
+ "sbatch": {
+  "time": "04:00:00"
+ },
+ "collect": true
+}

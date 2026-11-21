@@ -1,0 +1,12 @@
+{
+ "id": "2026-11-21-cancel-soft-scores-uncalibrated",
+ "what": "cancel the 6 soft-target scorings: they depend on the failed H200 recalibration (DependencyNeverSatisfied); requeued once a calibration passes",
+ "requests": [
+  "2026-11-21-soft-score-adm-seed0",
+  "2026-11-21-soft-score-adm-seed1",
+  "2026-11-21-soft-score-adm-seed2",
+  "2026-11-21-soft-score-val-seed0",
+  "2026-11-21-soft-score-val-seed1",
+  "2026-11-21-soft-score-val-seed2"
+ ]
+}
