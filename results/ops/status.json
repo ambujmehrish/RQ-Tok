@@ -3,7 +3,7 @@
  "cluster": {
   "counts": {
    "PENDING": 6,
-   "RUNNING": 3
+   "RUNNING": 1
   },
   "ended_24h": [
    {
@@ -29,6 +29,22 @@
     "jobid": "1508105",
     "name": "adm-score",
     "state": "FAILED"
+   },
+   {
+    "elapsed": "05:33:57",
+    "end": "2026-11-21T21:01:56",
+    "exit": "0:0",
+    "jobid": "1508106",
+    "name": "levelb-sample",
+    "state": "COMPLETED"
+   },
+   {
+    "elapsed": "05:36:23",
+    "end": "2026-11-21T21:04:22",
+    "exit": "0:0",
+    "jobid": "1508107",
+    "name": "levelb-sample",
+    "state": "COMPLETED"
    }
   ],
   "squeue": [
@@ -93,32 +109,12 @@
     "time_limit": "12:00:00"
    },
    {
-    "elapsed": "4:26:01",
+    "elapsed": "4:36:11",
     "jobid": "1508108",
     "name": "levelb-sample",
     "nodes": "1",
     "reason_or_nodelist": "vhpc13",
     "start": "2026-11-21T16:29:55",
-    "state": "RUNNING",
-    "time_limit": "1-00:00:00"
-   },
-   {
-    "elapsed": "5:27:57",
-    "jobid": "1508106",
-    "name": "levelb-sample",
-    "nodes": "1",
-    "reason_or_nodelist": "vhpc14",
-    "start": "2026-11-21T15:27:59",
-    "state": "RUNNING",
-    "time_limit": "1-00:00:00"
-   },
-   {
-    "elapsed": "5:27:57",
-    "jobid": "1508107",
-    "name": "levelb-sample",
-    "nodes": "1",
-    "reason_or_nodelist": "vhpc15",
-    "start": "2026-11-21T15:27:59",
     "state": "RUNNING",
     "time_limit": "1-00:00:00"
    }
@@ -347,28 +343,28 @@
    "waiting_for": null
   },
   "2026-11-21-soft-sample-seed0": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-21T21:06:06",
+   "finished": "2026-11-21T21:06:06",
    "invalid": null,
    "jobid": "1508106",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "RUNNING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-21T15:27:59",
    "waiting_for": null
   },
   "2026-11-21-soft-sample-seed1": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-21T21:06:06",
+   "finished": "2026-11-21T21:06:06",
    "invalid": null,
    "jobid": "1508107",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "RUNNING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-21T15:27:59",
@@ -473,5 +469,5 @@
    "waiting_for": null
   }
  },
- "updated": "2026-11-21T20:55:56"
+ "updated": "2026-11-21T21:06:06"
 }
