@@ -61,7 +61,7 @@
   ],
   "squeue": [
    {
-    "elapsed": "0:01",
+    "elapsed": "5:08",
     "jobid": "1508122",
     "name": "adm-diag",
     "nodes": "1",
@@ -288,7 +288,9 @@
    "jobid": "1508122",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "RUNNING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-21T23:47:29",
    "waiting_for": null
@@ -350,70 +352,70 @@
    "waiting_for": null
   },
   "2026-11-21-soft-score-adm-seed0": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-21T23:52:37",
+   "finished": "2026-11-21T23:52:37",
    "invalid": null,
    "jobid": "1508109",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "CANCELLED"
    ],
    "submit_error": null,
    "submitted": "2026-11-21T15:27:59",
    "waiting_for": null
   },
   "2026-11-21-soft-score-adm-seed1": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-21T23:52:37",
+   "finished": "2026-11-21T23:52:37",
    "invalid": null,
    "jobid": "1508110",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "CANCELLED"
    ],
    "submit_error": null,
    "submitted": "2026-11-21T15:27:59",
    "waiting_for": null
   },
   "2026-11-21-soft-score-adm-seed2": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-21T23:52:37",
+   "finished": "2026-11-21T23:52:37",
    "invalid": null,
    "jobid": "1508111",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "CANCELLED"
    ],
    "submit_error": null,
    "submitted": "2026-11-21T15:27:59",
    "waiting_for": null
   },
   "2026-11-21-soft-score-val-seed0": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-21T23:52:37",
+   "finished": "2026-11-21T23:52:37",
    "invalid": null,
    "jobid": "1508112",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "CANCELLED"
    ],
    "submit_error": null,
    "submitted": "2026-11-21T15:27:59",
    "waiting_for": null
   },
   "2026-11-21-soft-score-val-seed1": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-21T23:52:37",
+   "finished": "2026-11-21T23:52:37",
    "invalid": null,
    "jobid": "1508113",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "CANCELLED"
    ],
    "submit_error": null,
    "submitted": "2026-11-21T15:27:59",
@@ -434,5 +436,5 @@
    "waiting_for": null
   }
  },
- "updated": "2026-11-21T23:47:29"
+ "updated": "2026-11-21T23:52:37"
 }
