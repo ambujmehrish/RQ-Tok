@@ -459,6 +459,17 @@ real; plain FLUX 157 = 46%; paper Bifrost-1 98.6 (Table 1) / 156.0 (Table 4); Ad
 reliably conveys the class, which plain FLUX often misses. Its limitation is diversity
 (recall 0.25), not an IS anomaly. The paper's Table 1 value is below plain FLUX, unlike ours.
 
+**ADM recalibration on an H200 node (job 1508105, vhpc13, Intel Xeon 6760P, 8 pinned BLAS
+threads): FAILED** — IS 215.837158203125, then FID raised `Imaginary component
+0.06457371957532043`, identical to every digit to the first H200-node attempt (job 1506465,
+unpinned threads). So it is deterministic and tied to that CPU, not to thread count. Its IS
+equals our off-cluster value to every digit, so the activations are identical; replaying the
+FID step off-cluster on those activations under OpenBLAS kernels Prescott, Core2, Penryn,
+Nehalem, Atom, Barcelona, Haswell (plus SkylakeX, Cooperlake, SapphireRapids, Zen,
+Sandybridge earlier) always gives a real sqrtm and FID 3.9426. The calibrated setup remains
+the CPU partition (vhpc05, AMD EPYC 7413); the scoring job refuses any other CPU type, so
+the soft-target scorings queued behind this calibration cannot run.
+
 **Soft-target AdaRQ-Flow training finished** (158,880 steps): held-out hard code CE ended at
 2.603 (minimum 2.545 at 85k; the hard-target run's minimum was 2.365), flow loss 1.169. Its
 overfitting is milder but its code prediction is worse. Not yet sampled.
