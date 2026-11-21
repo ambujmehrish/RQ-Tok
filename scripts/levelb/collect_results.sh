@@ -46,3 +46,8 @@ mkdir -p "$D/levelb"
 LEVELB_ROOT="$LEVELB_ROOT" "${OPS_PYTHON:-python3}" "$REPO/scripts/levelb/status.py" > "$D/levelb/status.txt"
 echo "  $D/levelb/status.txt"
 du -sh "$D"
+# per-node-type diagnostics (adm_diag_<tag>/adm_diag.json -> results/bench/adm/adm_diag_<tag>.json)
+for f in "$BENCH_ROOT"/adm_diag_*/adm_diag.json; do
+  [ -f "$f" ] || continue
+  mkdir -p "$D/bench/adm" && cp "$f" "$D/bench/adm/$(basename "$(dirname "$f")").json" && echo "  $f"
+done
