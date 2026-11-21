@@ -450,6 +450,15 @@ sFID 28.05–28.63, IS 51.3–51.8, precision 0.61–0.62, recall 0.64–0.65 (v
 code-CE minimum does not help. (Seed 2 may have been sampled after the separate-stream change;
 same distribution at default settings.)
 
+**IS of real images (anchor).** The ADM reference batch itself (10,000 real ImageNet images,
+activations with the evaluator's own code, off-cluster): **IS 337.85**; its FID against the
+batch's stored statistics is 3.90 — the stored statistics are presumably from a larger image
+set, so ~3.9 is the finite-sample floor at 10k. Against it: Bifrost-1 (ours) 266.5 = 79% of
+real; plain FLUX 157 = 46%; paper Bifrost-1 98.6 (Table 1) / 156.0 (Table 4); AdaRQ-Flow 56.1
+= 17%. Our Bifrost-1's IS is below real images, not above: it is high because the bridge
+reliably conveys the class, which plain FLUX often misses. Its limitation is diversity
+(recall 0.25), not an IS anomaly. The paper's Table 1 value is below plain FLUX, unlike ours.
+
 **Soft-target AdaRQ-Flow training finished** (158,880 steps): held-out hard code CE ended at
 2.603 (minimum 2.545 at 85k; the hard-target run's minimum was 2.365), flow loss 1.169. Its
 overfitting is milder but its code prediction is worse. Not yet sampled.
