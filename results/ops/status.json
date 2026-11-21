@@ -2,7 +2,7 @@
  "cancels": {},
  "cluster": {
   "counts": {
-   "PENDING": 7,
+   "PENDING": 6,
    "RUNNING": 3
   },
   "ended_24h": [
@@ -21,6 +21,14 @@
     "jobid": "1508048",
     "name": "levelb-adarq",
     "state": "COMPLETED"
+   },
+   {
+    "elapsed": "01:01:56",
+    "end": "2026-11-21T16:29:55",
+    "exit": "1:0",
+    "jobid": "1508105",
+    "name": "adm-score",
+    "state": "FAILED"
    }
   ],
   "squeue": [
@@ -59,7 +67,7 @@
     "jobid": "1508111",
     "name": "adm-score",
     "nodes": "1",
-    "reason_or_nodelist": "(Dependency)",
+    "reason_or_nodelist": "(DependencyNeverSatisfied)",
     "start": "N/A",
     "state": "PENDING",
     "time_limit": "12:00:00"
@@ -69,7 +77,7 @@
     "jobid": "1508110",
     "name": "adm-score",
     "nodes": "1",
-    "reason_or_nodelist": "(Dependency)",
+    "reason_or_nodelist": "(DependencyNeverSatisfied)",
     "start": "N/A",
     "state": "PENDING",
     "time_limit": "12:00:00"
@@ -79,33 +87,23 @@
     "jobid": "1508109",
     "name": "adm-score",
     "nodes": "1",
-    "reason_or_nodelist": "(Dependency)",
+    "reason_or_nodelist": "(DependencyNeverSatisfied)",
     "start": "N/A",
     "state": "PENDING",
     "time_limit": "12:00:00"
    },
    {
-    "elapsed": "0:00",
+    "elapsed": "3:36",
     "jobid": "1508108",
     "name": "levelb-sample",
     "nodes": "1",
-    "reason_or_nodelist": "(Resources)",
-    "start": "2026-11-22T03:27:59",
-    "state": "PENDING",
+    "reason_or_nodelist": "vhpc13",
+    "start": "2026-11-21T16:29:55",
+    "state": "RUNNING",
     "time_limit": "1-00:00:00"
    },
    {
-    "elapsed": "25:11",
-    "jobid": "1508105",
-    "name": "adm-score",
-    "nodes": "1",
-    "reason_or_nodelist": "vhpc13",
-    "start": "2026-11-21T15:27:59",
-    "state": "RUNNING",
-    "time_limit": "12:00:00"
-   },
-   {
-    "elapsed": "25:11",
+    "elapsed": "1:05:32",
     "jobid": "1508106",
     "name": "levelb-sample",
     "nodes": "1",
@@ -115,7 +113,7 @@
     "time_limit": "1-00:00:00"
    },
    {
-    "elapsed": "25:11",
+    "elapsed": "1:05:32",
     "jobid": "1508107",
     "name": "levelb-sample",
     "nodes": "1",
@@ -335,14 +333,14 @@
    "waiting_for": null
   },
   "2026-11-21-adm-recalibrate-h200": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-21T16:33:31",
+   "finished": "2026-11-21T16:33:31",
    "invalid": null,
    "jobid": "1508105",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "RUNNING"
+    "FAILED"
    ],
    "submit_error": null,
    "submitted": "2026-11-21T15:27:59",
@@ -384,7 +382,7 @@
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "RUNNING"
    ],
    "submit_error": null,
    "submitted": "2026-11-21T15:27:59",
@@ -475,5 +473,5 @@
    "waiting_for": null
   }
  },
- "updated": "2026-11-21T15:53:10"
+ "updated": "2026-11-21T16:33:31"
 }
