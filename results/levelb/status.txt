@@ -124,8 +124,8 @@
            75000    3.47840    2.34577    1.13263  (-0.14%)
 
 === AdaRQ-Flow branch, soft code targets  (/home/ambuj.mehrish/work/levelb/branch_adarq_soft)
-  step 151500/158880 (95.4%) epoch 15 | 0.401 it/s | ~0.2 days left (~1 more 24 h jobs)
-  train loss 3.8429 code_ce 2.6747 flow 1.1682 | grad norm 0.205 | lr 2.40e-05
+  step 152900/158880 (96.2%) epoch 15 | 0.400 it/s | ~0.2 days left (~1 more 24 h jobs)
+  train loss 3.8117 code_ce 2.6459 flow 1.1658 | grad norm 0.214 | lr 1.94e-05
   held-out:  step       loss    code_ce  code_ce_hard       flow
             5000    4.38691    3.17760    2.83303    1.20931
            10000    4.31797    3.10137    2.74307    1.21660  (-1.57%)
