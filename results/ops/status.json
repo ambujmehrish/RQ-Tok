@@ -16,7 +16,7 @@
   ],
   "squeue": [
    {
-    "elapsed": "13:37:50",
+    "elapsed": "14:38:20",
     "jobid": "1508048",
     "name": "levelb-adarq",
     "nodes": "1",
@@ -226,5 +226,5 @@
    "waiting_for": null
   }
  },
- "updated": "2026-11-21T10:50:41"
+ "updated": "2026-11-21T11:51:11"
 }
