@@ -1,7 +1,10 @@
 {
  "cancels": {},
  "cluster": {
-  "counts": {},
+  "counts": {
+   "PENDING": 7,
+   "RUNNING": 3
+  },
   "ended_24h": [
    {
     "elapsed": "23:52:20",
@@ -20,7 +23,108 @@
     "state": "COMPLETED"
    }
   ],
-  "squeue": []
+  "squeue": [
+   {
+    "elapsed": "0:00",
+    "jobid": "1508114",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508113",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508112",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508111",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508110",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508109",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508108",
+    "name": "levelb-sample",
+    "nodes": "1",
+    "reason_or_nodelist": "(Resources)",
+    "start": "2026-11-22T03:27:59",
+    "state": "PENDING",
+    "time_limit": "1-00:00:00"
+   },
+   {
+    "elapsed": "25:11",
+    "jobid": "1508105",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "vhpc13",
+    "start": "2026-11-21T15:27:59",
+    "state": "RUNNING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "25:11",
+    "jobid": "1508106",
+    "name": "levelb-sample",
+    "nodes": "1",
+    "reason_or_nodelist": "vhpc14",
+    "start": "2026-11-21T15:27:59",
+    "state": "RUNNING",
+    "time_limit": "1-00:00:00"
+   },
+   {
+    "elapsed": "25:11",
+    "jobid": "1508107",
+    "name": "levelb-sample",
+    "nodes": "1",
+    "reason_or_nodelist": "vhpc15",
+    "start": "2026-11-21T15:27:59",
+    "state": "RUNNING",
+    "time_limit": "1-00:00:00"
+   }
+  ]
  },
  "queue": [
   "2026-11-18-watch-flux1024",
@@ -35,7 +139,17 @@
   "2026-11-19-score-flux-heldout",
   "2026-11-19-score-flux-val",
   "2026-11-19-score-flux-valsquash",
-  "2026-11-19-soft-p3"
+  "2026-11-19-soft-p3",
+  "2026-11-21-adm-recalibrate-h200",
+  "2026-11-21-soft-sample-seed0",
+  "2026-11-21-soft-sample-seed1",
+  "2026-11-21-soft-sample-seed2",
+  "2026-11-21-soft-score-adm-seed0",
+  "2026-11-21-soft-score-adm-seed1",
+  "2026-11-21-soft-score-adm-seed2",
+  "2026-11-21-soft-score-val-seed0",
+  "2026-11-21-soft-score-val-seed1",
+  "2026-11-21-soft-score-val-seed2"
  ],
  "requests": {
   "2026-11-18-watch-flux1024": {
@@ -219,7 +333,147 @@
    "submit_error": null,
    "submitted": "2026-11-19T12:47:19",
    "waiting_for": null
+  },
+  "2026-11-21-adm-recalibrate-h200": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508105",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [
+    "RUNNING"
+   ],
+   "submit_error": null,
+   "submitted": "2026-11-21T15:27:59",
+   "waiting_for": null
+  },
+  "2026-11-21-soft-sample-seed0": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508106",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [
+    "RUNNING"
+   ],
+   "submit_error": null,
+   "submitted": "2026-11-21T15:27:59",
+   "waiting_for": null
+  },
+  "2026-11-21-soft-sample-seed1": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508107",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [
+    "RUNNING"
+   ],
+   "submit_error": null,
+   "submitted": "2026-11-21T15:27:59",
+   "waiting_for": null
+  },
+  "2026-11-21-soft-sample-seed2": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508108",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [
+    "PENDING"
+   ],
+   "submit_error": null,
+   "submitted": "2026-11-21T15:27:59",
+   "waiting_for": null
+  },
+  "2026-11-21-soft-score-adm-seed0": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508109",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [
+    "PENDING"
+   ],
+   "submit_error": null,
+   "submitted": "2026-11-21T15:27:59",
+   "waiting_for": null
+  },
+  "2026-11-21-soft-score-adm-seed1": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508110",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [
+    "PENDING"
+   ],
+   "submit_error": null,
+   "submitted": "2026-11-21T15:27:59",
+   "waiting_for": null
+  },
+  "2026-11-21-soft-score-adm-seed2": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508111",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [
+    "PENDING"
+   ],
+   "submit_error": null,
+   "submitted": "2026-11-21T15:27:59",
+   "waiting_for": null
+  },
+  "2026-11-21-soft-score-val-seed0": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508112",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [
+    "PENDING"
+   ],
+   "submit_error": null,
+   "submitted": "2026-11-21T15:27:59",
+   "waiting_for": null
+  },
+  "2026-11-21-soft-score-val-seed1": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508113",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [
+    "PENDING"
+   ],
+   "submit_error": null,
+   "submitted": "2026-11-21T15:27:59",
+   "waiting_for": null
+  },
+  "2026-11-21-soft-score-val-seed2": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508114",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [
+    "PENDING"
+   ],
+   "submit_error": null,
+   "submitted": "2026-11-21T15:27:59",
+   "waiting_for": null
   }
  },
- "updated": "2026-11-21T14:52:39"
+ "updated": "2026-11-21T15:53:10"
 }
