@@ -1,8 +1,21 @@
 {
- "cancels": {},
+ "cancels": {
+  "2026-11-21-cancel-soft-scores-uncalibrated": {
+   "at": "2026-11-21T23:47:29",
+   "jobs": [
+    "1508109",
+    "1508110",
+    "1508111",
+    "1508112",
+    "1508113",
+    "1508114"
+   ],
+   "skipped": {}
+  }
+ },
  "cluster": {
   "counts": {
-   "PENDING": 6
+   "RUNNING": 1
   },
   "ended_24h": [
    {
@@ -48,64 +61,14 @@
   ],
   "squeue": [
    {
-    "elapsed": "0:00",
-    "jobid": "1508114",
-    "name": "adm-score",
+    "elapsed": "0:01",
+    "jobid": "1508122",
+    "name": "adm-diag",
     "nodes": "1",
-    "reason_or_nodelist": "(Dependency)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "12:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508113",
-    "name": "adm-score",
-    "nodes": "1",
-    "reason_or_nodelist": "(Dependency)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "12:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508112",
-    "name": "adm-score",
-    "nodes": "1",
-    "reason_or_nodelist": "(Dependency)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "12:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508111",
-    "name": "adm-score",
-    "nodes": "1",
-    "reason_or_nodelist": "(DependencyNeverSatisfied)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "12:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508110",
-    "name": "adm-score",
-    "nodes": "1",
-    "reason_or_nodelist": "(DependencyNeverSatisfied)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "12:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508109",
-    "name": "adm-score",
-    "nodes": "1",
-    "reason_or_nodelist": "(DependencyNeverSatisfied)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "12:00:00"
+    "reason_or_nodelist": "vhpc13",
+    "start": "2026-11-21T23:47:29",
+    "state": "RUNNING",
+    "time_limit": "4:00:00"
    }
   ]
  },
@@ -123,6 +86,7 @@
   "2026-11-19-score-flux-val",
   "2026-11-19-score-flux-valsquash",
   "2026-11-19-soft-p3",
+  "2026-11-21-adm-diag-h200",
   "2026-11-21-adm-recalibrate-h200",
   "2026-11-21-soft-sample-seed0",
   "2026-11-21-soft-sample-seed1",
@@ -317,6 +281,18 @@
    "submitted": "2026-11-19T12:47:19",
    "waiting_for": null
   },
+  "2026-11-21-adm-diag-h200": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508122",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [],
+   "submit_error": null,
+   "submitted": "2026-11-21T23:47:29",
+   "waiting_for": null
+  },
   "2026-11-21-adm-recalibrate-h200": {
    "collected": "2026-11-21T16:33:31",
    "finished": "2026-11-21T16:33:31",
@@ -444,19 +420,19 @@
    "waiting_for": null
   },
   "2026-11-21-soft-score-val-seed2": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-21T23:47:29",
+   "finished": "2026-11-21T23:47:29",
    "invalid": null,
    "jobid": "1508114",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "CANCELLED"
    ],
    "submit_error": null,
    "submitted": "2026-11-21T15:27:59",
    "waiting_for": null
   }
  },
- "updated": "2026-11-21T22:57:04"
+ "updated": "2026-11-21T23:47:29"
 }
