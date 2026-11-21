@@ -1,0 +1,9 @@
+{
+ "id": "2026-11-21-adm-recalibrate-h200",
+ "what": "ADM evaluator calibration on an H200 node (must reproduce ADM-G+U: IS 215.837, FID 3.9426, sFID 6.1404, P 0.8265, R 0.5309)",
+ "script": "scripts/bench/adm_score.sbatch",
+ "env": {
+  "CALIBRATE": "1"
+ },
+ "collect": true
+}

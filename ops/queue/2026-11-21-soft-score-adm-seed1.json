@@ -1,0 +1,14 @@
+{
+ "id": "2026-11-21-soft-score-adm-seed1",
+ "what": "score soft-target seed 1 against the ADM reference (primary)",
+ "script": "scripts/bench/adm_score.sbatch",
+ "env": {
+  "SAMPLES": "${LEVELB_ROOT}/samples/adarq_soft_seed1",
+  "REF": "adm"
+ },
+ "after": [
+  "2026-11-21-soft-sample-seed1",
+  "2026-11-21-adm-recalibrate-h200"
+ ],
+ "collect": true
+}
