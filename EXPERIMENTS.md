@@ -442,7 +442,17 @@ held-out 10k) and the question to the authors.
 
 No reference set reproduces the paper's FLUX row; with the 1024-px test, generation size and
 reference choice are both ruled out. The paper's FID/sFID pipeline remains unknown (question
-to the authors pending). Tuned AdaRQ-Flow seed 1: FID 30.174 / sFID 28.439 / IS 51.30 (ADM).
+to the authors pending).
+
+**Tuned AdaRQ-Flow (75k steps), 3 seeds (ADM):** FID 29.829 / 30.174 / 30.317 = 30.11 ± 0.25,
+sFID 28.05–28.63, IS 51.3–51.8, precision 0.61–0.62, recall 0.64–0.65 (val reference FID
+26.22 / 26.53 / 26.62). Worse than the 16-epoch run (28.38 ± 0.33): stopping at the held-out
+code-CE minimum does not help. (Seed 2 may have been sampled after the separate-stream change;
+same distribution at default settings.)
+
+**Soft-target AdaRQ-Flow training finished** (158,880 steps): held-out hard code CE ended at
+2.603 (minimum 2.545 at 85k; the hard-target run's minimum was 2.365), flow loss 1.169. Its
+overfitting is milder but its code prediction is worse. Not yet sampled.
 
 **Test results — 3 seeds (10,000 samples each; calibrated ADM evaluator).** Mean ± std:
 
