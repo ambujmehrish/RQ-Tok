@@ -1,0 +1,209 @@
+{
+  "stats": {
+    "IS": 215.837158203125,
+    "mu_sum": 484.324591524899,
+    "trace": 159.40084783863261
+  },
+  "replay": {
+    "default threads": {
+      "FID": {
+        "prod_finite": true,
+        "sqrtm_finite": true,
+        "complex": true,
+        "max_imag": 0.06457371957532043,
+        "sqrtm_err": 5.819697183965812e-28,
+        "prod_sum": 137135.1708914625,
+        "error": "ValueError: Imaginary component 0.06457371957532043"
+      },
+      "sFID": {
+        "prod_finite": true,
+        "sqrtm_finite": true,
+        "complex": true,
+        "max_imag": 0.37710054996922626,
+        "sqrtm_err": 2.7198319238514147e-26,
+        "prod_sum": 36972.70279290124,
+        "error": "ValueError: Imaginary component 0.37710054996922626"
+      }
+    },
+    "1 thread": {
+      "FID": {
+        "prod_finite": true,
+        "sqrtm_finite": true,
+        "complex": true,
+        "max_imag": 0.1635824363974967,
+        "sqrtm_err": 1.472185390214452e-27,
+        "prod_sum": 136794.5455811148,
+        "error": "ValueError: Imaginary component 0.1635824363974967"
+      },
+      "sFID": {
+        "prod_finite": true,
+        "sqrtm_finite": true,
+        "complex": true,
+        "max_imag": 1.0426726849994827,
+        "sqrtm_err": 3.111955320123146e-25,
+        "prod_sum": 36559.36909093237,
+        "error": "ValueError: Imaginary component 1.0426726849994827"
+      }
+    },
+    "8 threads": {
+      "FID": {
+        "prod_finite": true,
+        "sqrtm_finite": true,
+        "complex": true,
+        "max_imag": 0.06457371957532043,
+        "sqrtm_err": 5.819697183965812e-28,
+        "prod_sum": 137135.1708914625,
+        "error": "ValueError: Imaginary component 0.06457371957532043"
+      },
+      "sFID": {
+        "prod_finite": true,
+        "sqrtm_finite": true,
+        "complex": true,
+        "max_imag": 0.37710054996922626,
+        "sqrtm_err": 2.7198319238514147e-26,
+        "prod_sum": 36972.70279290124,
+        "error": "ValueError: Imaginary component 0.37710054996922626"
+      }
+    },
+    "Haswell kernels": {
+      "FID": {
+        "prod_finite": true,
+        "sqrtm_finite": true,
+        "complex": false,
+        "max_imag": 0.0,
+        "sqrtm_err": 1.677929263831717e-27,
+        "prod_sum": 142402.55221067026,
+        "value": 3.9425650421267164
+      },
+      "sFID": {
+        "prod_finite": true,
+        "sqrtm_finite": true,
+        "complex": false,
+        "max_imag": 0.0,
+        "sqrtm_err": 8.770525206839565e-27,
+        "prod_sum": 41910.87643270046,
+        "value": 6.1404265817293435
+      }
+    },
+    "Haswell, 1 thread": {
+      "FID": {
+        "prod_finite": true,
+        "sqrtm_finite": true,
+        "complex": false,
+        "max_imag": 0.0,
+        "sqrtm_err": 5.368762203063051e-28,
+        "prod_sum": 142402.55221067026,
+        "value": 3.942565042126205
+      },
+      "sFID": {
+        "prod_finite": true,
+        "sqrtm_finite": true,
+        "complex": false,
+        "max_imag": 0.0,
+        "sqrtm_err": 6.875182560756142e-27,
+        "prod_sum": 41910.87643270046,
+        "value": 6.1404265817293435
+      }
+    },
+    "SkylakeX kernels": {
+      "FID": {
+        "prod_finite": true,
+        "sqrtm_finite": true,
+        "complex": false,
+        "max_imag": 0.0,
+        "sqrtm_err": 8.233907470014022e-28,
+        "prod_sum": 142402.55221067026,
+        "value": 3.942565042126148
+      },
+      "sFID": {
+        "prod_finite": true,
+        "sqrtm_finite": true,
+        "complex": false,
+        "max_imag": 0.0,
+        "sqrtm_err": 8.66838508821999e-27,
+        "prod_sum": 41910.87643270046,
+        "value": 6.140426641334216
+      }
+    },
+    "SapphireRapids kernels": {
+      "FID": {
+        "prod_finite": true,
+        "sqrtm_finite": true,
+        "complex": true,
+        "max_imag": 0.06457371957532043,
+        "sqrtm_err": 5.819697183965812e-28,
+        "prod_sum": 137135.1708914625,
+        "error": "ValueError: Imaginary component 0.06457371957532043"
+      },
+      "sFID": {
+        "prod_finite": true,
+        "sqrtm_finite": true,
+        "complex": true,
+        "max_imag": 0.37710054996922626,
+        "sqrtm_err": 2.7198319238514147e-26,
+        "prod_sum": 36972.70279290124,
+        "error": "ValueError: Imaginary component 0.37710054996922626"
+      }
+    },
+    "Prescott (generic) kernels": {
+      "FID": {
+        "prod_finite": true,
+        "sqrtm_finite": true,
+        "complex": false,
+        "max_imag": 0.0,
+        "sqrtm_err": 1.1376712876904365e-27,
+        "prod_sum": 142402.55221067026,
+        "value": 3.9425650421266027
+      },
+      "sFID": {
+        "prod_finite": true,
+        "sqrtm_finite": true,
+        "complex": false,
+        "max_imag": 0.0,
+        "sqrtm_err": 1.1405661794736042e-26,
+        "prod_sum": 41910.876432700476,
+        "value": 6.140426641333875
+      }
+    },
+    "no TensorFlow in process": {
+      "FID": {
+        "prod_finite": true,
+        "sqrtm_finite": true,
+        "complex": true,
+        "max_imag": 0.06457371957532043,
+        "sqrtm_err": 5.819697183965812e-28,
+        "prod_sum": 137135.1708914625,
+        "error": "Imaginary component 0.06457371957532043"
+      },
+      "sFID": {
+        "prod_finite": true,
+        "sqrtm_finite": true,
+        "complex": true,
+        "max_imag": 0.37710054996922626,
+        "sqrtm_err": 2.7198319238514147e-26,
+        "prod_sum": 36972.70279290124,
+        "error": "Imaginary component 0.37710054996922626"
+      }
+    },
+    "no TensorFlow, Haswell": {
+      "FID": {
+        "prod_finite": true,
+        "sqrtm_finite": true,
+        "complex": false,
+        "max_imag": 0.0,
+        "sqrtm_err": 1.677929263831717e-27,
+        "prod_sum": 142402.55221067026,
+        "value": 3.9425650421267164
+      },
+      "sFID": {
+        "prod_finite": true,
+        "sqrtm_finite": true,
+        "complex": false,
+        "max_imag": 0.0,
+        "sqrtm_err": 8.770525206839565e-27,
+        "prod_sum": 41910.87643270046,
+        "value": 6.1404265817293435
+      }
+    }
+  }
+}

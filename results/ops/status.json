@@ -14,9 +14,7 @@
   }
  },
  "cluster": {
-  "counts": {
-   "RUNNING": 1
-  },
+  "counts": {},
   "ended_24h": [
    {
     "elapsed": "14:53:25",
@@ -57,20 +55,17 @@
     "jobid": "1508108",
     "name": "levelb-sample",
     "state": "COMPLETED"
-   }
-  ],
-  "squeue": [
+   },
    {
-    "elapsed": "10:16",
+    "elapsed": "00:58:37",
+    "end": "2026-11-22T00:46:06",
+    "exit": "0:0",
     "jobid": "1508122",
     "name": "adm-diag",
-    "nodes": "1",
-    "reason_or_nodelist": "vhpc13",
-    "start": "2026-11-21T23:47:29",
-    "state": "RUNNING",
-    "time_limit": "4:00:00"
+    "state": "COMPLETED"
    }
-  ]
+  ],
+  "squeue": []
  },
  "queue": [
   "2026-11-18-watch-flux1024",
@@ -282,14 +277,14 @@
    "waiting_for": null
   },
   "2026-11-21-adm-diag-h200": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-22T00:48:10",
+   "finished": "2026-11-22T00:48:10",
    "invalid": null,
    "jobid": "1508122",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "RUNNING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-21T23:47:29",
@@ -436,5 +431,5 @@
    "waiting_for": null
   }
  },
- "updated": "2026-11-21T23:57:45"
+ "updated": "2026-11-22T00:48:10"
 }
