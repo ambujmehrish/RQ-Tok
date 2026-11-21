@@ -1,9 +1,7 @@
 {
  "cancels": {},
  "cluster": {
-  "counts": {
-   "RUNNING": 1
-  },
+  "counts": {},
   "ended_24h": [
    {
     "elapsed": "23:52:20",
@@ -12,20 +10,17 @@
     "jobid": "1507930",
     "name": "levelb-adarq",
     "state": "COMPLETED"
-   }
-  ],
-  "squeue": [
+   },
    {
-    "elapsed": "14:38:20",
+    "elapsed": "14:53:25",
+    "end": "2026-11-21T12:06:16",
+    "exit": "0:0",
     "jobid": "1508048",
     "name": "levelb-adarq",
-    "nodes": "1",
-    "reason_or_nodelist": "vhpc13",
-    "start": "2026-11-20T21:12:51",
-    "state": "RUNNING",
-    "time_limit": "1-00:00:00"
+    "state": "COMPLETED"
    }
-  ]
+  ],
+  "squeue": []
  },
  "queue": [
   "2026-11-18-watch-flux1024",
@@ -212,19 +207,19 @@
    "waiting_for": null
   },
   "2026-11-19-soft-p3": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-21T12:06:23",
+   "finished": "2026-11-21T12:06:23",
    "invalid": null,
    "jobid": "1508048",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "RUNNING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-19T12:47:19",
    "waiting_for": null
   }
  },
- "updated": "2026-11-21T11:51:11"
+ "updated": "2026-11-21T12:06:23"
 }

@@ -430,3 +430,11 @@ Using a slow image processor as `use_fast` is unset and a slow processor was sav
   step 158550/158880 loss 3.9638 (ce 2.7915 flow 1.1722) 0.40 it/s
   step 158600/158880 loss 3.8258 (ce 2.6672 flow 1.1586) 0.40 it/s
   step 158650/158880 loss 3.8425 (ce 2.6927 flow 1.1498) 0.40 it/s
+  step 158700/158880 loss 3.9040 (ce 2.7201 flow 1.1838) 0.40 it/s
+  step 158750/158880 loss 3.8984 (ce 2.7184 flow 1.1800) 0.40 it/s
+  step 158800/158880 loss 3.8658 (ce 2.6939 flow 1.1719) 0.40 it/s
+  step 158850/158880 loss 3.8560 (ce 2.6750 flow 1.1810) 0.40 it/s
+  [heldout] step 158880 {'heldout_loss': 4.169403601437807, 'heldout_code_ce': 3.0003513991832733, 'heldout_code_ce_hard': 2.602835725992918, 'heldout_flow': 1.169052205979824}
+[adarq] finished 158880 steps -> /home/ambuj.mehrish/work/levelb/branch_adarq_soft
+note: no held-out eval logged yet
+=== AdaRQ-Flow Stage 1 complete: /home/ambuj.mehrish/work/levelb/branch_adarq_soft ===
