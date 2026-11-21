@@ -648,6 +648,8 @@ def _tick_locked(repo: Path, state_path: Path, status_path: Path, run: Run, envi
             else:
                 e["submit_error"] = err
                 e["submit_attempts"] = e.get("submit_attempts", 0) + 1
+                if e["submit_attempts"] == 1:  # report a new failure at once, not every retry
+                    summary.setdefault("first_failures", []).append(rid)
             atomic_write_json(state_path, state)  # immediately after each submission
 
     # Cancellations (each cancel file acts once; a failed scancel is retried).
@@ -750,6 +752,18 @@ def _tick_locked(repo: Path, state_path: Path, status_path: Path, run: Run, envi
             reqs[rid]["collect_error"] = err
         if err:
             print(f"collector failed for {', '.join(ids)}: {err}")
+    # Submissions (and first submit failures) are pushed at once, so a queued request is
+    # visible as submitted or failed within one tick instead of at the next heartbeat.
+    elif summary["submitted"] or summary.get("first_failures"):
+        bad = summary.get("first_failures", [])
+        msg = f"ops submitted {summary['submitted']}" + (
+            f"; submit failed: {', '.join(bad[:6])}" if bad else ""
+        )
+        err = _collect(msg, repo, run, environ)
+        if err:
+            print(f"submission push failed (sent with the next push): {err}")
+        else:
+            state["last_heartbeat"] = now
     # Heartbeat: status reaches git about hourly even before any job ends.
     if now - float(state.get("last_heartbeat", 0)) >= HEARTBEAT_EVERY:
         err = _collect("ops heartbeat (status only)", repo, run, environ)

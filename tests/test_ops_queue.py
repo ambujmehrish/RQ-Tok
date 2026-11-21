@@ -285,7 +285,8 @@ def test_tick_full_lifecycle(repo):
         "--out",
         "/work/levelb/results/x/s.json",
     ]
-    assert fake.collects() == ["ops 2 requests: a, b"]
+    # one push when a and b were submitted, then one when they finished
+    assert fake.collects() == ["ops submitted 2", "ops 2 requests: a, b"]
     st = status(repo)["requests"]
     assert st["a"]["states"] == ["COMPLETED"] and st["a"]["collected"]
     assert "post done" in st["a"]["post_output_tail"]
@@ -294,7 +295,7 @@ def test_tick_full_lifecycle(repo):
     for _ in range(2):
         s = do_tick(repo, fake)
         assert s["submitted"] == 0 and s["collected"] == 0
-    assert len(fake.sbatch()) == 2 and len(fake.posts()) == 1 and len(fake.collects()) == 1
+    assert len(fake.sbatch()) == 2 and len(fake.posts()) == 1 and len(fake.collects()) == 2
 
 
 def test_array_tasks_map_to_base_id(repo):
@@ -582,3 +583,18 @@ def test_holds_are_not_supported(repo):
     put(repo, "a", script="scripts/levelb/eval_baselines.sbatch", hold=True)
     valid, invalid = q.load_requests(repo)
     assert "a" in invalid and "keys" in invalid["a"]
+
+
+def test_submissions_and_first_failures_are_pushed_once(repo):
+    put(repo, "a", script="scripts/levelb/eval_baselines.sbatch")
+    fake = FakeSlurm()
+    do_tick(repo, fake)
+    assert fake.collects() == ["ops submitted 1"]
+    do_tick(repo, fake)                       # nothing new: no extra push
+    assert fake.collects() == ["ops submitted 1"]
+    put(repo, "b", script="scripts/levelb/eval_baselines.sbatch")
+    fake.sbatch_error = "sbatch: error: QOSMaxSubmitJobPerUserLimit"
+    do_tick(repo, fake)                       # first failure: pushed once
+    do_tick(repo, fake)                       # retried, not pushed again
+    assert fake.collects() == ["ops submitted 1", "ops submitted 0; submit failed: b"]
+
