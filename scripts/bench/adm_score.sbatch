@@ -181,7 +181,8 @@ with np.load(sys.argv[1], mmap_mode="r") as z:
     print(f"  {a.shape[0]} samples at {r} px")
 PY
 
-OUT="${SAMPLES%.npz}.${REF}.metrics"
+# OUT_TAG: keep a rescoring next to an existing score instead of overwriting it
+OUT="${SAMPLES%.npz}.${REF}${OUT_TAG:+.$OUT_TAG}.metrics"
 ( cd "$ADM_DIR" && python guided-diffusion/evaluations/evaluator.py "$REF_NPZ" "$SAMPLES" ) \
   2>&1 | tee "$OUT.log"
 python - "$OUT.log" "$OUT.json" "$CALIBRATE" "$(hostname)" "$CPU_MODEL" "$NCPU" \

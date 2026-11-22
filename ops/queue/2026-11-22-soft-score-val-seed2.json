@@ -1,0 +1,13 @@
+{
+ "id": "2026-11-22-soft-score-val-seed2",
+ "what": "score soft-target AdaRQ-Flow seed 2 against ImageNet val (secondary), H200 node",
+ "script": "scripts/bench/adm_score.sbatch",
+ "env": {
+  "SAMPLES": "${LEVELB_ROOT}/samples/adarq_soft_seed2",
+  "REF": "val"
+ },
+ "after": [
+  "2026-11-22-soft-score-adm-seed2"
+ ],
+ "collect": true
+}

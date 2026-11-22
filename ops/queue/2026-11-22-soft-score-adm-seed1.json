@@ -1,0 +1,10 @@
+{
+ "id": "2026-11-22-soft-score-adm-seed1",
+ "what": "score soft-target AdaRQ-Flow seed 1 against the ADM reference (primary), H200 node",
+ "script": "scripts/bench/adm_score.sbatch",
+ "env": {
+  "SAMPLES": "${LEVELB_ROOT}/samples/adarq_soft_seed1",
+  "REF": "adm"
+ },
+ "collect": true
+}

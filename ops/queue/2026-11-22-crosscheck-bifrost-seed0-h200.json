@@ -1,0 +1,11 @@
+{
+ "id": "2026-11-22-crosscheck-bifrost-seed0-h200",
+ "what": "cross-check: rescore Bifrost-1 seed 0 (ADM ref) on an H200 node; must match its CPU-node score (FID 16.991)",
+ "script": "scripts/bench/adm_score.sbatch",
+ "env": {
+  "SAMPLES": "${LEVELB_ROOT}/samples/bifrost_seed0",
+  "REF": "adm",
+  "OUT_TAG": "h200"
+ },
+ "collect": true
+}
