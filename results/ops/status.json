@@ -15,7 +15,7 @@
  },
  "cluster": {
   "counts": {
-   "PENDING": 1
+   "RUNNING": 1
   },
   "ended_24h": [
    {
@@ -69,13 +69,13 @@
   ],
   "squeue": [
    {
-    "elapsed": "0:00",
+    "elapsed": "1:00:30",
     "jobid": "1508131",
     "name": "adm-score",
     "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "N/A",
-    "state": "PENDING",
+    "reason_or_nodelist": "vhpc13",
+    "start": "2026-11-22T09:57:37",
+    "state": "RUNNING",
     "time_limit": "12:00:00"
    }
   ]
@@ -451,11 +451,13 @@
    "jobid": "1508131",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "RUNNING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-22T09:57:37",
    "waiting_for": null
   }
  },
- "updated": "2026-11-22T09:57:37"
+ "updated": "2026-11-22T10:58:06"
 }
