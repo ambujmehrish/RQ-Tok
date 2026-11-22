@@ -14,7 +14,9 @@
   }
  },
  "cluster": {
-  "counts": {},
+  "counts": {
+   "PENDING": 1
+  },
   "ended_24h": [
    {
     "elapsed": "14:53:25",
@@ -65,7 +67,18 @@
     "state": "COMPLETED"
    }
   ],
-  "squeue": []
+  "squeue": [
+   {
+    "elapsed": "0:00",
+    "jobid": "1508131",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   }
+  ]
  },
  "queue": [
   "2026-11-18-watch-flux1024",
@@ -91,7 +104,8 @@
   "2026-11-21-soft-score-adm-seed2",
   "2026-11-21-soft-score-val-seed0",
   "2026-11-21-soft-score-val-seed1",
-  "2026-11-21-soft-score-val-seed2"
+  "2026-11-21-soft-score-val-seed2",
+  "2026-11-22-adm-recalibrate-h200-skylakex"
  ],
  "requests": {
   "2026-11-18-watch-flux1024": {
@@ -429,7 +443,19 @@
    "submit_error": null,
    "submitted": "2026-11-21T15:27:59",
    "waiting_for": null
+  },
+  "2026-11-22-adm-recalibrate-h200-skylakex": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508131",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [],
+   "submit_error": null,
+   "submitted": "2026-11-22T09:57:37",
+   "waiting_for": null
   }
  },
- "updated": "2026-11-22T09:02:10"
+ "updated": "2026-11-22T09:57:37"
 }
