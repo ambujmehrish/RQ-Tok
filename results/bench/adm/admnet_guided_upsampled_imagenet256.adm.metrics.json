@@ -1,12 +1,13 @@
 {
-  "IS": 215.8371124267578,
-  "FID": 3.942567012487075,
-  "sFID": 6.140425599924356,
-  "Precision": 0.82558,
-  "Recall": 0.5288,
+  "IS": 215.837158203125,
+  "FID": 3.942565042126489,
+  "sFID": 6.140426641333988,
+  "Precision": 0.82556,
+  "Recall": 0.5289,
   "node": {
-    "host": "vhpc05",
-    "cpu": "AMD EPYC 7413 24-Core Processor",
-    "threads": 8
+    "host": "vhpc13",
+    "cpu": "Intel(R) Xeon(R) 6760P",
+    "threads": 8,
+    "openblas_core": "SkylakeX"
   }
 }

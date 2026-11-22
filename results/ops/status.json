@@ -14,9 +14,7 @@
   }
  },
  "cluster": {
-  "counts": {
-   "RUNNING": 1
-  },
+  "counts": {},
   "ended_24h": [
    {
     "elapsed": "14:53:25",
@@ -65,20 +63,17 @@
     "jobid": "1508122",
     "name": "adm-diag",
     "state": "COMPLETED"
-   }
-  ],
-  "squeue": [
+   },
    {
-    "elapsed": "1:00:30",
+    "elapsed": "01:42:14",
+    "end": "2026-11-22T11:39:51",
+    "exit": "0:0",
     "jobid": "1508131",
     "name": "adm-score",
-    "nodes": "1",
-    "reason_or_nodelist": "vhpc13",
-    "start": "2026-11-22T09:57:37",
-    "state": "RUNNING",
-    "time_limit": "12:00:00"
+    "state": "COMPLETED"
    }
-  ]
+  ],
+  "squeue": []
  },
  "queue": [
   "2026-11-18-watch-flux1024",
@@ -445,19 +440,19 @@
    "waiting_for": null
   },
   "2026-11-22-adm-recalibrate-h200-skylakex": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-22T11:43:30",
+   "finished": "2026-11-22T11:43:30",
    "invalid": null,
    "jobid": "1508131",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "RUNNING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-22T09:57:37",
    "waiting_for": null
   }
  },
- "updated": "2026-11-22T10:58:06"
+ "updated": "2026-11-22T11:43:30"
 }
