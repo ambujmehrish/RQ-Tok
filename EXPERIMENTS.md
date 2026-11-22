@@ -486,7 +486,11 @@ sampling are unaffected: their heavy linear algebra runs on the GPU through PyTo
 
 **Soft-target AdaRQ-Flow training finished** (158,880 steps): held-out hard code CE ended at
 2.603 (minimum 2.545 at 85k; the hard-target run's minimum was 2.365), flow loss 1.169. Its
-overfitting is milder but its code prediction is worse. Not yet sampled.
+overfitting is milder but its code prediction is worse. Sampled (3 × 10,000, default
+sampler, jobs 1508106–08), not yet scored (awaiting a valid calibration on the scoring node).
+Generated depth histogram (1/2/3/4), identical across seeds: 42.1 / 15.3 / 8.4 / 34.2 %, mean
+2.35 — deeper than the tokenizer's 51.7 / 18.1 / 8.7 / 21.5 % (mean 2.00): the soft-target
+heads halt later than the data does.
 
 **Test results — 3 seeds (10,000 samples each; calibrated ADM evaluator).** Mean ± std:
 
