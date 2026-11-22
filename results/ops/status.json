@@ -15,18 +15,10 @@
  },
  "cluster": {
   "counts": {
-   "PENDING": 6,
-   "RUNNING": 1
+   "PENDING": 4,
+   "RUNNING": 2
   },
   "ended_24h": [
-   {
-    "elapsed": "01:01:56",
-    "end": "2026-11-21T16:29:55",
-    "exit": "1:0",
-    "jobid": "1508105",
-    "name": "adm-score",
-    "state": "FAILED"
-   },
    {
     "elapsed": "05:33:57",
     "end": "2026-11-21T21:01:56",
@@ -66,6 +58,14 @@
     "jobid": "1508131",
     "name": "adm-score",
     "state": "COMPLETED"
+   },
+   {
+    "elapsed": "00:19:24",
+    "end": "2026-11-22T16:40:12",
+    "exit": "0:0",
+    "jobid": "1508157",
+    "name": "adm-score",
+    "state": "COMPLETED"
    }
   ],
   "squeue": [
@@ -74,28 +74,8 @@
     "jobid": "1508160",
     "name": "adm-score",
     "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "2026-11-23T15:04:51",
-    "state": "PENDING",
-    "time_limit": "12:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508159",
-    "name": "adm-score",
-    "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "2026-11-23T14:32:38",
-    "state": "PENDING",
-    "time_limit": "12:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508158",
-    "name": "adm-score",
-    "nodes": "1",
     "reason_or_nodelist": "(Resources)",
-    "start": "2026-11-23T04:20:48",
+    "start": "2026-11-23T04:33:29",
     "state": "PENDING",
     "time_limit": "12:00:00"
    },
@@ -130,12 +110,22 @@
     "time_limit": "12:00:00"
    },
    {
-    "elapsed": "0:06",
-    "jobid": "1508157",
+    "elapsed": "0:55",
+    "jobid": "1508159",
     "name": "adm-score",
     "nodes": "1",
     "reason_or_nodelist": "vhpc14",
-    "start": "2026-11-22T16:20:48",
+    "start": "2026-11-22T16:40:12",
+    "state": "RUNNING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "7:38",
+    "jobid": "1508158",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "vhpc13",
+    "start": "2026-11-22T16:33:29",
     "state": "RUNNING",
     "time_limit": "12:00:00"
    }
@@ -527,14 +517,14 @@
    "waiting_for": null
   },
   "2026-11-22-crosscheck-bifrost-seed0-h200": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-22T16:41:07",
+   "finished": "2026-11-22T16:41:07",
    "invalid": null,
    "jobid": "1508157",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "RUNNING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-22T12:18:56",
@@ -548,7 +538,7 @@
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "RUNNING"
    ],
    "submit_error": null,
    "submitted": "2026-11-22T12:18:56",
@@ -562,7 +552,7 @@
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "RUNNING"
    ],
    "submit_error": null,
    "submitted": "2026-11-22T12:18:56",
@@ -625,5 +615,5 @@
    "waiting_for": null
   }
  },
- "updated": "2026-11-22T16:20:54"
+ "updated": "2026-11-22T16:41:07"
 }
