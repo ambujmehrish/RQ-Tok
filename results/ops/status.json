@@ -15,7 +15,7 @@
  },
  "cluster": {
   "counts": {
-   "PENDING": 2,
+   "PENDING": 1,
    "RUNNING": 2
   },
   "ended_24h": [
@@ -82,41 +82,39 @@
     "jobid": "1508159",
     "name": "adm-score",
     "state": "COMPLETED"
+   },
+   {
+    "elapsed": "00:19:16",
+    "end": "2026-11-22T17:18:24",
+    "exit": "0:0",
+    "jobid": "1508160",
+    "name": "adm-score",
+    "state": "COMPLETED"
    }
   ],
   "squeue": [
    {
     "elapsed": "0:00",
-    "jobid": "1508162",
-    "name": "adm-score",
-    "nodes": "1",
-    "reason_or_nodelist": "(Resources)",
-    "start": "2026-11-23T04:59:08",
-    "state": "PENDING",
-    "time_limit": "12:00:00"
-   },
-   {
-    "elapsed": "0:00",
     "jobid": "1508163",
     "name": "adm-score",
     "nodes": "1",
-    "reason_or_nodelist": "(Dependency)",
-    "start": "N/A",
+    "reason_or_nodelist": "(Resources)",
+    "start": "2026-11-23T05:00:39",
     "state": "PENDING",
     "time_limit": "12:00:00"
    },
    {
-    "elapsed": "2:13",
-    "jobid": "1508160",
+    "elapsed": "3:11",
+    "jobid": "1508162",
     "name": "adm-score",
     "nodes": "1",
     "reason_or_nodelist": "vhpc14",
-    "start": "2026-11-22T16:59:08",
+    "start": "2026-11-22T17:18:24",
     "state": "RUNNING",
     "time_limit": "12:00:00"
    },
    {
-    "elapsed": "0:42",
+    "elapsed": "20:56",
     "jobid": "1508161",
     "name": "adm-score",
     "nodes": "1",
@@ -555,14 +553,14 @@
    "waiting_for": null
   },
   "2026-11-22-soft-score-adm-seed2": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-22T17:21:35",
+   "finished": "2026-11-22T17:21:35",
    "invalid": null,
    "jobid": "1508160",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "RUNNING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-22T12:18:56",
@@ -590,7 +588,7 @@
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "RUNNING"
    ],
    "submit_error": null,
    "submitted": "2026-11-22T12:18:56",
@@ -611,5 +609,5 @@
    "waiting_for": null
   }
  },
- "updated": "2026-11-22T17:01:21"
+ "updated": "2026-11-22T17:21:35"
 }
