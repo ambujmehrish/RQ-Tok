@@ -17,14 +17,6 @@
   "counts": {},
   "ended_24h": [
    {
-    "elapsed": "05:41:33",
-    "end": "2026-11-21T22:11:28",
-    "exit": "0:0",
-    "jobid": "1508108",
-    "name": "levelb-sample",
-    "state": "COMPLETED"
-   },
-   {
     "elapsed": "00:58:37",
     "end": "2026-11-22T00:46:06",
     "exit": "0:0",
@@ -583,5 +575,5 @@
    "waiting_for": null
   }
  },
- "updated": "2026-11-22T21:23:49"
+ "updated": "2026-11-22T22:24:17"
 }
