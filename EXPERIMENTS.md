@@ -470,6 +470,20 @@ Sandybridge earlier) always gives a real sqrtm and FID 3.9426. The calibrated se
 the CPU partition (vhpc05, AMD EPYC 7413); the scoring job refuses any other CPU type, so
 the soft-target scorings queued behind this calibration cannot run.
 
+**Cause found (H200-node diagnostic, job 1508122, vhpc13, Xeon 6760P).** The node's statistics
+equal ours to every digit (IS 215.837158203125, mean sum 484.324591524899, trace
+159.40084783863261). The fault is numpy's own matrix product: with the OpenBLAS kernel it
+selects by itself (numpy 1.23.5's bundled OpenBLAS reports "Cooperlake"; scipy's reports
+"SkylakeX"), the covariance product sums to 137135.17 instead of 142402.55, and the square
+root turns complex (imaginary 0.0646 — the observed failure; 1 thread: product 136794.55,
+imaginary 0.164). Same without TensorFlow in the process, and with OPENBLAS_CORETYPE=
+SapphireRapids. With SkylakeX, Haswell or Prescott kernels the product is bit-identical to
+the correct one (142402.55221067026) and FID = 3.9425650421 (published 3.9426). A library
+fault on this CPU, not the evaluator: `adm_score.sbatch` now sets OPENBLAS_CORETYPE=SkylakeX
+on that CPU model only and records the core in every result; calibration on an H200 node
+must pass with it before any scoring there (pending the user's go-ahead). Training and
+sampling are unaffected: their heavy linear algebra runs on the GPU through PyTorch.
+
 **Soft-target AdaRQ-Flow training finished** (158,880 steps): held-out hard code CE ended at
 2.603 (minimum 2.545 at 85k; the hard-target run's minimum was 2.365), flow loss 1.169. Its
 overfitting is milder but its code prediction is worse. Not yet sampled.

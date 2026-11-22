@@ -51,7 +51,14 @@ export TMPDIR="/tmp/$USER-${SLURM_JOB_ID:-local}"; mkdir -p "$TMPDIR"; trap 'rm 
 NCPU="${SLURM_CPUS_PER_TASK:?run through sbatch}"
 export OMP_NUM_THREADS="$NCPU" OPENBLAS_NUM_THREADS="$NCPU" MKL_NUM_THREADS="$NCPU"
 CPU_MODEL=$(lscpu | sed -n 's/^Model name: *//p' | head -1)
-echo "  node $(hostname) | $CPU_MODEL | $NCPU threads"
+# On the H200 nodes' Xeon 6760P, the OpenBLAS kernel numpy 1.23.5 selects by itself computes
+# the covariance product wrongly (diagnostic job 1508122: sum 137135 vs 142402, then an
+# imaginary sqrtm); the SkylakeX kernel is exact there (bit-identical product, FID 3.9426).
+# Only for that verified CPU; any other model must calibrate as it is.
+case "$CPU_MODEL" in
+  *"Xeon(R) 6760P"*) export OPENBLAS_CORETYPE=SkylakeX ;;
+esac
+echo "  node $(hostname) | $CPU_MODEL | $NCPU threads | OpenBLAS core ${OPENBLAS_CORETYPE:-auto}"
 
 CALIBRATE="${CALIBRATE:-0}"
 if [ "$CALIBRATE" = "1" ]; then
@@ -177,10 +184,12 @@ PY
 OUT="${SAMPLES%.npz}.${REF}.metrics"
 ( cd "$ADM_DIR" && python guided-diffusion/evaluations/evaluator.py "$REF_NPZ" "$SAMPLES" ) \
   2>&1 | tee "$OUT.log"
-python - "$OUT.log" "$OUT.json" "$CALIBRATE" "$(hostname)" "$CPU_MODEL" "$NCPU" <<'PY'
+python - "$OUT.log" "$OUT.json" "$CALIBRATE" "$(hostname)" "$CPU_MODEL" "$NCPU" \
+    "${OPENBLAS_CORETYPE:-auto}" <<'PY'
 import json, re, sys
 log, out, calibrate = sys.argv[1], sys.argv[2], sys.argv[3] == "1"
-node = {"host": sys.argv[4], "cpu": sys.argv[5], "threads": int(sys.argv[6])}
+node = {"host": sys.argv[4], "cpu": sys.argv[5], "threads": int(sys.argv[6]),
+        "openblas_core": sys.argv[7]}
 text = open(log).read()
 keys = {"Inception Score": "IS", "FID": "FID", "sFID": "sFID",
         "Precision": "Precision", "Recall": "Recall"}
