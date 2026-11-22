@@ -14,16 +14,10 @@
   }
  },
  "cluster": {
-  "counts": {},
+  "counts": {
+   "PENDING": 7
+  },
   "ended_24h": [
-   {
-    "elapsed": "14:53:25",
-    "end": "2026-11-21T12:06:16",
-    "exit": "0:0",
-    "jobid": "1508048",
-    "name": "levelb-adarq",
-    "state": "COMPLETED"
-   },
    {
     "elapsed": "01:01:56",
     "end": "2026-11-21T16:29:55",
@@ -73,7 +67,78 @@
     "state": "COMPLETED"
    }
   ],
-  "squeue": []
+  "squeue": [
+   {
+    "elapsed": "0:00",
+    "jobid": "1508163",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508162",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508161",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508160",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508159",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508158",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508157",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   }
+  ]
  },
  "queue": [
   "2026-11-18-watch-flux1024",
@@ -100,7 +165,14 @@
   "2026-11-21-soft-score-val-seed0",
   "2026-11-21-soft-score-val-seed1",
   "2026-11-21-soft-score-val-seed2",
-  "2026-11-22-adm-recalibrate-h200-skylakex"
+  "2026-11-22-adm-recalibrate-h200-skylakex",
+  "2026-11-22-crosscheck-bifrost-seed0-h200",
+  "2026-11-22-soft-score-adm-seed0",
+  "2026-11-22-soft-score-adm-seed1",
+  "2026-11-22-soft-score-adm-seed2",
+  "2026-11-22-soft-score-val-seed0",
+  "2026-11-22-soft-score-val-seed1",
+  "2026-11-22-soft-score-val-seed2"
  ],
  "requests": {
   "2026-11-18-watch-flux1024": {
@@ -452,7 +524,91 @@
    "submit_error": null,
    "submitted": "2026-11-22T09:57:37",
    "waiting_for": null
+  },
+  "2026-11-22-crosscheck-bifrost-seed0-h200": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508157",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [],
+   "submit_error": null,
+   "submitted": "2026-11-22T12:18:56",
+   "waiting_for": null
+  },
+  "2026-11-22-soft-score-adm-seed0": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508158",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [],
+   "submit_error": null,
+   "submitted": "2026-11-22T12:18:56",
+   "waiting_for": null
+  },
+  "2026-11-22-soft-score-adm-seed1": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508159",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [],
+   "submit_error": null,
+   "submitted": "2026-11-22T12:18:56",
+   "waiting_for": null
+  },
+  "2026-11-22-soft-score-adm-seed2": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508160",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [],
+   "submit_error": null,
+   "submitted": "2026-11-22T12:18:56",
+   "waiting_for": null
+  },
+  "2026-11-22-soft-score-val-seed0": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508161",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [],
+   "submit_error": null,
+   "submitted": "2026-11-22T12:18:56",
+   "waiting_for": null
+  },
+  "2026-11-22-soft-score-val-seed1": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508162",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [],
+   "submit_error": null,
+   "submitted": "2026-11-22T12:18:56",
+   "waiting_for": null
+  },
+  "2026-11-22-soft-score-val-seed2": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508163",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [],
+   "submit_error": null,
+   "submitted": "2026-11-22T12:18:56",
+   "waiting_for": null
   }
  },
- "updated": "2026-11-22T11:58:42"
+ "updated": "2026-11-22T12:18:56"
 }
