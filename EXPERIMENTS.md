@@ -484,6 +484,13 @@ on that CPU model only and records the core in every result; calibration on an H
 must pass with it before any scoring there (pending the user's go-ahead). Training and
 sampling are unaffected: their heavy linear algebra runs on the GPU through PyTorch.
 
+**ADM recalibration on an H200 node with the fix (job 1508131, vhpc13, Xeon 6760P,
+OPENBLAS_CORETYPE=SkylakeX): PASSED** — IS 215.8372 (published 215.837), FID 3.9426
+(3.942565042), sFID 6.1404, Precision 0.8256 (0.8265 ± 0.005), Recall 0.5289 (0.5309 ±
+0.005). Same five numbers as the CPU-node calibration (vhpc05: FID 3.942567012, Precision
+0.8256, Recall 0.5288). `ADM_CALIBRATED` now names the Xeon 6760P, so scoring from here on
+runs on H200 nodes; all earlier test scores were computed on the AMD CPU node.
+
 **Soft-target AdaRQ-Flow training finished** (158,880 steps): held-out hard code CE ended at
 2.603 (minimum 2.545 at 85k; the hard-target run's minimum was 2.365), flow loss 1.169. Its
 overfitting is milder but its code prediction is worse. Sampled (3 × 10,000, default
