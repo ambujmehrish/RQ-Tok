@@ -17,22 +17,6 @@
   "counts": {},
   "ended_24h": [
    {
-    "elapsed": "05:33:57",
-    "end": "2026-11-21T21:01:56",
-    "exit": "0:0",
-    "jobid": "1508106",
-    "name": "levelb-sample",
-    "state": "COMPLETED"
-   },
-   {
-    "elapsed": "05:36:23",
-    "end": "2026-11-21T21:04:22",
-    "exit": "0:0",
-    "jobid": "1508107",
-    "name": "levelb-sample",
-    "state": "COMPLETED"
-   },
-   {
     "elapsed": "05:41:33",
     "end": "2026-11-21T22:11:28",
     "exit": "0:0",
@@ -599,5 +583,5 @@
    "waiting_for": null
   }
  },
- "updated": "2026-11-22T20:23:20"
+ "updated": "2026-11-22T21:23:49"
 }
