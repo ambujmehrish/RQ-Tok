@@ -1,0 +1,14 @@
+{
+ "id": "2026-11-23-sweep-sample-adarq_F",
+ "what": "code-sampling sweep pilot, F: greedy ordinary codes: 2,000 class-balanced samples, validation seed 100",
+ "script": "scripts/levelb/sample.sbatch",
+ "env": {
+  "SEED": "100",
+  "N": "2000",
+  "BALANCED": "1",
+  "ARM": "adarq",
+  "GREEDY": "1",
+  "TAG": "pilot_adarq_F"
+ },
+ "collect": true
+}

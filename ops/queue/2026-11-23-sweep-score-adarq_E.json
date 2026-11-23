@@ -1,0 +1,14 @@
+{
+ "id": "2026-11-23-sweep-score-adarq_E",
+ "what": "sweep pilot adarq_E: FID/sFID/P/R against the held-out validation reference (2,000 samples)",
+ "script": "scripts/bench/adm_score.sbatch",
+ "env": {
+  "SAMPLES": "${LEVELB_ROOT}/samples/pilot_adarq_E_seed100",
+  "REF": "heldout",
+  "NSAMPLES": "2000"
+ },
+ "after": [
+  "2026-11-23-sweep-sample-adarq_E"
+ ],
+ "collect": true
+}

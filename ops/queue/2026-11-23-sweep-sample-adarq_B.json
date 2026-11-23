@@ -1,0 +1,14 @@
+{
+ "id": "2026-11-23-sweep-sample-adarq_B",
+ "what": "code-sampling sweep pilot, B: T=0.8: 2,000 class-balanced samples, validation seed 100",
+ "script": "scripts/levelb/sample.sbatch",
+ "env": {
+  "SEED": "100",
+  "N": "2000",
+  "BALANCED": "1",
+  "ARM": "adarq",
+  "CODE_TEMPS": "0.8,0.8,0.8,0.8",
+  "TAG": "pilot_adarq_B"
+ },
+ "collect": true
+}

@@ -1,0 +1,13 @@
+{
+ "id": "2026-11-23-sweep-sample-bifrost",
+ "what": "code-sampling sweep pilot, Bifrost-1 reference: 2,000 class-balanced samples, validation seed 100",
+ "script": "scripts/levelb/sample.sbatch",
+ "env": {
+  "SEED": "100",
+  "N": "2000",
+  "BALANCED": "1",
+  "ARM": "bifrost",
+  "TAG": "pilot_bifrost"
+ },
+ "collect": true
+}

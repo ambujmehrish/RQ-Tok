@@ -1,0 +1,12 @@
+{
+ "id": "2026-11-23-sweep-classacc-adarq_D",
+ "what": "sweep pilot adarq_D: requested-class top-1/top-5 (ResNet-50)",
+ "script": "scripts/levelb/class_accuracy.sbatch",
+ "env": {
+  "SAMPLES": "${LEVELB_ROOT}/samples/pilot_adarq_D_seed100/samples_2000.npz"
+ },
+ "after": [
+  "2026-11-23-sweep-score-adarq_D"
+ ],
+ "collect": true
+}

@@ -1,0 +1,12 @@
+{
+ "id": "2026-11-23-sweep-classacc-bifrost",
+ "what": "sweep pilot bifrost: requested-class top-1/top-5 (ResNet-50)",
+ "script": "scripts/levelb/class_accuracy.sbatch",
+ "env": {
+  "SAMPLES": "${LEVELB_ROOT}/samples/pilot_bifrost_seed100/samples_2000.npz"
+ },
+ "after": [
+  "2026-11-23-sweep-score-bifrost"
+ ],
+ "collect": true
+}

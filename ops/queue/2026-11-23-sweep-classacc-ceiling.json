@@ -1,0 +1,9 @@
+{
+ "id": "2026-11-23-sweep-classacc-ceiling",
+ "what": "class-accuracy ceiling: ResNet-50 on 2,000 real held-out crops (2 per class)",
+ "script": "scripts/levelb/class_accuracy.sbatch",
+ "env": {
+  "HELDOUT_N": "2000"
+ },
+ "collect": true
+}
