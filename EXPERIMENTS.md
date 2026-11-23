@@ -499,6 +499,25 @@ Generated depth histogram (1/2/3/4), identical across seeds: 42.1 / 15.3 / 8.4 /
 2.35 — deeper than the tokenizer's 51.7 / 18.1 / 8.7 / 21.5 % (mean 2.00): the soft-target
 heads halt later than the data does.
 
+**Soft-target AdaRQ-Flow test results (3 seeds × 10,000; scored on H200 nodes, SkylakeX):**
+
+| reference | FID | sFID | IS | Precision | Recall |
+|---|---|---|---|---|---|
+| ADM (primary) | 41.537 ± 0.659 | 31.163 ± 0.202 | 39.13 ± 0.54 | 0.542 | 0.623 |
+| ImageNet val | 37.265 ± 0.593 | 34.340 ± 0.223 | 39.13 ± 0.54 | 0.485 | 0.633 |
+
+Per-seed FID (ADM): 40.793 / 42.050 / 41.767. Worse than the hard-target run on every
+metric (FID 28.38 → 41.54, +46%; sFID 28.61 → 31.16; IS 56.1 → 39.1; precision 0.616 →
+0.542; recall 0.649 → 0.623) — the first variant that also loses sFID. Soft targets flatten
+the code distribution, and sampling it at temperature 1 is even more random, consistent with
+its worse held-out hard code CE (2.60 vs 2.37) and deeper codes (34% at depth 4). This
+supports the code-sampling hypothesis behind the planned sweep: randomness in code
+selection, not overfitting, is what costs FID.
+
+**H200 scoring cross-check:** Bifrost-1 seed 0 rescored on an H200 node (vhpc14, SkylakeX):
+FID 16.991, sFID 28.270, IS 270.217, P 0.939, R 0.242 — identical to its CPU-node score, so
+scores from the two node types are interchangeable.
+
 **Test results — 3 seeds (10,000 samples each; calibrated ADM evaluator).** Mean ± std:
 
 | arm | reference | FID | sFID | IS | Precision | Recall |
