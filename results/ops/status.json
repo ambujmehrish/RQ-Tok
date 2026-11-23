@@ -14,10 +14,7 @@
   }
  },
  "cluster": {
-  "counts": {
-   "PENDING": 2,
-   "RUNNING": 1
-  },
+  "counts": {},
   "ended_24h": [
    {
     "elapsed": "00:19:24",
@@ -188,6 +185,14 @@
     "state": "COMPLETED"
    },
    {
+    "elapsed": "00:15:19",
+    "end": "2026-11-23T13:30:26",
+    "exit": "0:0",
+    "jobid": "1508252",
+    "name": "adm-score",
+    "state": "COMPLETED"
+   },
+   {
     "elapsed": "00:00:20",
     "end": "2026-11-23T10:02:52",
     "exit": "0:0",
@@ -226,40 +231,25 @@
     "jobid": "1508257",
     "name": "class-acc",
     "state": "COMPLETED"
-   }
-  ],
-  "squeue": [
+   },
    {
-    "elapsed": "0:00",
+    "elapsed": "00:00:18",
+    "end": "2026-11-23T13:30:44",
+    "exit": "0:0",
     "jobid": "1508258",
     "name": "class-acc",
-    "nodes": "1",
-    "reason_or_nodelist": "(Resources)",
-    "start": "2026-11-24T01:15:07",
-    "state": "PENDING",
-    "time_limit": "2:00:00"
+    "state": "COMPLETED"
    },
    {
-    "elapsed": "0:00",
+    "elapsed": "00:00:16",
+    "end": "2026-11-23T13:31:00",
+    "exit": "0:0",
     "jobid": "1508259",
     "name": "class-acc",
-    "nodes": "1",
-    "reason_or_nodelist": "(Dependency)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "2:00:00"
-   },
-   {
-    "elapsed": "2:40",
-    "jobid": "1508252",
-    "name": "adm-score",
-    "nodes": "1",
-    "reason_or_nodelist": "vhpc13",
-    "start": "2026-11-23T13:15:07",
-    "state": "RUNNING",
-    "time_limit": "12:00:00"
+    "state": "COMPLETED"
    }
-  ]
+  ],
+  "squeue": []
  },
  "queue": [
   "2026-11-18-watch-flux1024",
@@ -837,28 +827,28 @@
    "waiting_for": null
   },
   "2026-11-23-sweep-classacc-adarq_F": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-23T13:33:00",
+   "finished": "2026-11-23T13:33:00",
    "invalid": null,
    "jobid": "1508258",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-23T07:33:41",
    "waiting_for": null
   },
   "2026-11-23-sweep-classacc-bifrost": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-23T13:33:00",
+   "finished": "2026-11-23T13:33:00",
    "invalid": null,
    "jobid": "1508259",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-23T07:33:41",
@@ -1061,19 +1051,19 @@
    "waiting_for": null
   },
   "2026-11-23-sweep-score-bifrost": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-23T13:33:00",
+   "finished": "2026-11-23T13:33:00",
    "invalid": null,
    "jobid": "1508252",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "RUNNING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-23T07:33:41",
    "waiting_for": null
   }
  },
- "updated": "2026-11-23T13:17:47"
+ "updated": "2026-11-23T13:33:00"
 }
