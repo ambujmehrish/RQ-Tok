@@ -134,3 +134,12 @@ vision_denoising_type:  mar
   1824/10000 images
   1840/10000 images
   1856/10000 images
+  1872/10000 images
+  1888/10000 images
+  1904/10000 images
+  1920/10000 images
+  1936/10000 images
+  1952/10000 images
+  1968/10000 images
+  1984/10000 images
+  2000/10000 images

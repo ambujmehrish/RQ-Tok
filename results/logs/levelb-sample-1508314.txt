@@ -153,3 +153,13 @@ vision_denoising_type:  mar
   2128/10000 images
   2144/10000 images
   2160/10000 images
+  2176/10000 images
+  2192/10000 images
+  2208/10000 images
+  2224/10000 images
+  2240/10000 images
+  2256/10000 images
+  2272/10000 images
+  2288/10000 images
+  2304/10000 images
+  2320/10000 images

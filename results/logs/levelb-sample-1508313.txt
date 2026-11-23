@@ -638,3 +638,10 @@ vision_denoising_type:  mar
   9888/10000 images
   9904/10000 images
   9920/10000 images
+  9936/10000 images
+  9952/10000 images
+  9968/10000 images
+  9984/10000 images
+  10000/10000 images
+wrote /home/ambuj.mehrish/work/levelb/samples/adarq_E_seed2/shard00of01.npz
+=== shard 0/1 of adarq seed 2 done: /home/ambuj.mehrish/work/levelb/samples/adarq_E_seed2 ===
