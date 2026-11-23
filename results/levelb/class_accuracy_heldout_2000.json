@@ -1,0 +1,7 @@
+{
+  "top1": 0.9145,
+  "top5": 0.9905,
+  "n": 2000,
+  "classifier": "torchvision resnet50 IMAGENET1K_V2",
+  "source": "held-out training crops, 2 per class"
+}
