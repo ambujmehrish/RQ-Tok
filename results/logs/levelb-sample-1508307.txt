@@ -1,0 +1,132 @@
+/home/ambuj.mehrish/miniforge3/envs/bifrost1/lib/python3.11/site-packages/google/api_core/_python_version_support.py:273: FutureWarning: You are using a Python version (3.11.18) which Google will stop supporting in new releases of google.api_core once it reaches its end of life (2027-10-24). Please upgrade to the latest Python version, or at least Python 3.12, to continue receiving updates for google.api_core past that date.
+  warnings.warn(message, FutureWarning)
+2026-11-23 14:54:03 PID=2539175 __init__.py:49 setup_logging() INFO → 'standard' logger initialized.
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  5.28it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  5.80it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  5.71it/s]
+/home/ambuj.mehrish/projects/RQ-Tok/levelb/sample.py:159: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  state = torch.load(branch_ckpt, map_location="cpu")
+/home/ambuj.mehrish/projects/RQ-Tok/levelb/sample.py:167: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  heads.load_state_dict(torch.load(heads_ckpt, map_location="cpu"))
+Using a slow image processor as `use_fast` is unset and a slow processor was saved with this model. `use_fast=True` will be the default behavior in v4.48, even if the model was saved with a slow processor. This will result in minor differences in outputs. You'll still be able to use a slow processor with `use_fast=False`.
+vision_denoising_type:  mar
+Fetching 3 files:   0%|          | 0/3 [00:00<?, ?it/s]Fetching 3 files: 100%|██████████| 3/3 [00:00<00:00, 461.93it/s]
+Loading checkpoint shards:   0%|          | 0/3 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 3/3 [00:00<00:00, 41.04it/s]
+/home/ambuj.mehrish/projects/RQ-Tok/levelb/sample.py:209: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  cn.load_state_dict(torch.load(controlnet_ckpt, map_location="cpu"))
+Loading pipeline components...:   0%|          | 0/7 [00:00<?, ?it/s]Loading pipeline components...:  14%|█▍        | 1/7 [00:00<00:01,  5.63it/s]You set `add_prefix_space`. The tokenizer needs to be converted from the slow tokenizers
+Loading pipeline components...:  57%|█████▋    | 4/7 [00:00<00:00,  5.98it/s]
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  6.37it/s][A
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  6.22it/s][ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  6.23it/s]
+Loading pipeline components...:  86%|████████▌ | 6/7 [00:01<00:00,  5.84it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:01<00:00,  6.22it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:01<00:00,  6.08it/s]
+  16/2000 images
+  32/2000 images
+  48/2000 images
+  64/2000 images
+  80/2000 images
+  96/2000 images
+  112/2000 images
+  128/2000 images
+  144/2000 images
+  160/2000 images
+  176/2000 images
+  192/2000 images
+  208/2000 images
+  224/2000 images
+  240/2000 images
+  256/2000 images
+  272/2000 images
+  288/2000 images
+  304/2000 images
+  320/2000 images
+  336/2000 images
+  352/2000 images
+  368/2000 images
+  384/2000 images
+  400/2000 images
+  416/2000 images
+  432/2000 images
+  448/2000 images
+  464/2000 images
+  480/2000 images
+  496/2000 images
+  512/2000 images
+  528/2000 images
+  544/2000 images
+  560/2000 images
+  576/2000 images
+  592/2000 images
+  608/2000 images
+  624/2000 images
+  640/2000 images
+  656/2000 images
+  672/2000 images
+  688/2000 images
+  704/2000 images
+  720/2000 images
+  736/2000 images
+  752/2000 images
+  768/2000 images
+  784/2000 images
+  800/2000 images
+  816/2000 images
+  832/2000 images
+  848/2000 images
+  864/2000 images
+  880/2000 images
+  896/2000 images
+  912/2000 images
+  928/2000 images
+  944/2000 images
+  960/2000 images
+  976/2000 images
+  992/2000 images
+  1008/2000 images
+  1024/2000 images
+  1040/2000 images
+  1056/2000 images
+  1072/2000 images
+  1088/2000 images
+  1104/2000 images
+  1120/2000 images
+  1136/2000 images
+  1152/2000 images
+  1168/2000 images
+  1184/2000 images
+  1200/2000 images
+  1216/2000 images
+  1232/2000 images
+  1248/2000 images
+  1264/2000 images
+  1280/2000 images
+  1296/2000 images
+  1312/2000 images
+  1328/2000 images
+  1344/2000 images
+  1360/2000 images
+  1376/2000 images
+  1392/2000 images
+  1408/2000 images
+  1424/2000 images
+  1440/2000 images
+  1456/2000 images
+  1472/2000 images
+  1488/2000 images
+  1504/2000 images
+  1520/2000 images
+  1536/2000 images
+  1552/2000 images
+  1568/2000 images
+  1584/2000 images
+  1600/2000 images
+  1616/2000 images
+  1632/2000 images
+  1648/2000 images
+  1664/2000 images
+  1680/2000 images
+  1696/2000 images
+  1712/2000 images
+  1728/2000 images
+  1744/2000 images
+  1760/2000 images
+  1776/2000 images
+  1792/2000 images
