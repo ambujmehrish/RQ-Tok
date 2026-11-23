@@ -19,14 +19,6 @@
   },
   "ended_24h": [
    {
-    "elapsed": "01:42:14",
-    "end": "2026-11-22T11:39:51",
-    "exit": "0:0",
-    "jobid": "1508131",
-    "name": "adm-score",
-    "state": "COMPLETED"
-   },
-   {
     "elapsed": "00:19:24",
     "end": "2026-11-22T16:40:12",
     "exit": "0:0",
@@ -234,7 +226,7 @@
     "name": "adm-score",
     "nodes": "1",
     "reason_or_nodelist": "(Priority)",
-    "start": "2026-11-24T10:47:25",
+    "start": "2026-11-24T09:24:16",
     "state": "PENDING",
     "time_limit": "12:00:00"
    },
@@ -244,7 +236,7 @@
     "name": "adm-score",
     "nodes": "1",
     "reason_or_nodelist": "(Priority)",
-    "start": "N/A",
+    "start": "2026-11-24T12:30:17",
     "state": "PENDING",
     "time_limit": "12:00:00"
    },
@@ -1084,5 +1076,5 @@
    "waiting_for": null
   }
  },
- "updated": "2026-11-23T11:36:54"
+ "updated": "2026-11-23T12:37:25"
 }
