@@ -19,3 +19,22 @@ vision_denoising_type:  mar
 Loading pipeline components...:  71%|███████▏  | 5/7 [00:00<00:00,  8.34it/s]You set `add_prefix_space`. The tokenizer needs to be converted from the slow tokenizers
 Loading pipeline components...: 100%|██████████| 7/7 [00:01<00:00,  5.17it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:01<00:00,  6.14it/s]
   16/10000 images
+  32/10000 images
+  48/10000 images
+  64/10000 images
+  80/10000 images
+  96/10000 images
+  112/10000 images
+  128/10000 images
+  144/10000 images
+  160/10000 images
+  176/10000 images
+  192/10000 images
+  208/10000 images
+  224/10000 images
+  240/10000 images
+  256/10000 images
+  272/10000 images
+  288/10000 images
+  304/10000 images
+  320/10000 images
