@@ -15,7 +15,7 @@
  },
  "cluster": {
   "counts": {
-   "PENDING": 5,
+   "PENDING": 4,
    "RUNNING": 1
   },
   "ended_24h": [
@@ -210,6 +210,14 @@
     "jobid": "1508256",
     "name": "class-acc",
     "state": "COMPLETED"
+   },
+   {
+    "elapsed": "00:00:20",
+    "end": "2026-11-23T10:41:42",
+    "exit": "0:0",
+    "jobid": "1508257",
+    "name": "class-acc",
+    "state": "COMPLETED"
    }
   ],
   "squeue": [
@@ -219,7 +227,7 @@
     "name": "adm-score",
     "nodes": "1",
     "reason_or_nodelist": "(Priority)",
-    "start": "2026-11-24T07:31:00",
+    "start": "2026-11-24T09:52:02",
     "state": "PENDING",
     "time_limit": "12:00:00"
    },
@@ -254,17 +262,7 @@
     "time_limit": "2:00:00"
    },
    {
-    "elapsed": "0:00",
-    "jobid": "1508257",
-    "name": "class-acc",
-    "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "2:00:00"
-   },
-   {
-    "elapsed": "49:12",
+    "elapsed": "54:20",
     "jobid": "1508245",
     "name": "levelb-sample",
     "nodes": "1",
@@ -837,14 +835,14 @@
    "waiting_for": null
   },
   "2026-11-23-sweep-classacc-adarq_E": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-23T10:46:22",
+   "finished": "2026-11-23T10:46:22",
    "invalid": null,
    "jobid": "1508257",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-23T07:33:41",
@@ -1089,5 +1087,5 @@
    "waiting_for": null
   }
  },
- "updated": "2026-11-23T10:41:14"
+ "updated": "2026-11-23T10:46:22"
 }
