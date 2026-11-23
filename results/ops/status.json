@@ -17,14 +17,6 @@
   "counts": {},
   "ended_24h": [
    {
-    "elapsed": "00:58:37",
-    "end": "2026-11-22T00:46:06",
-    "exit": "0:0",
-    "jobid": "1508122",
-    "name": "adm-diag",
-    "state": "COMPLETED"
-   },
-   {
     "elapsed": "01:42:14",
     "end": "2026-11-22T11:39:51",
     "exit": "0:0",
@@ -575,5 +567,5 @@
    "waiting_for": null
   }
  },
- "updated": "2026-11-23T00:25:15"
+ "updated": "2026-11-23T01:25:43"
 }
