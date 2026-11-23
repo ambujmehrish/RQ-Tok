@@ -577,6 +577,18 @@ generated visible latents at matched visible counts, and with ground-truth vs sa
 prefixes, by rollout stage. A sharp drop with generated context points to a training change
 (wider mask ratios, exposure to imperfect context) rather than more aggressive filtering.
 
+**Evaluation-protocol conformance (test results).** Paper §5.1/§4 → ours: 10K samples →
+10,000 per seed; classes "randomly sampled from 1k categories" → uniform random, seeded;
+256×256 → 256; 64 MAR decoding steps, random order → same (one token per step); bridge
+guidance not stated → upstream default 1.0; FLUX 28 steps, ControlNet scale 0.7, guidance
+3.5 → same; FID / sFID / IS → same (+ precision/recall as extras). Not stated in the paper:
+the FID implementation and reference statistics ("following [MAR, xAR]") → OpenAI's ADM
+evaluator with its 256-px reference batch, calibrated; the prompt text → the class name
+(reproduces the paper's plain-FLUX IS). The code-sampling sweep is a validation procedure,
+not this protocol (2,000 class-balanced samples, held-out reference, class accuracy); any
+setting it selects is re-run under this exact protocol (10,000 random-class samples × 3
+seeds, ADM reference) before a result is reported. The Bifrost-1 arm is never changed.
+
 **Faithfulness gate.** Our retrained Bifrost-1 must reach FID <= 30.9 (within 20% of
 25.77). If it does not, the baseline is not faithful and no comparison is reported until
 it is fixed.
