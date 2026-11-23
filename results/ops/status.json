@@ -15,7 +15,8 @@
  },
  "cluster": {
   "counts": {
-   "PENDING": 4
+   "PENDING": 2,
+   "RUNNING": 1
   },
   "ended_24h": [
    {
@@ -179,6 +180,14 @@
     "state": "COMPLETED"
    },
    {
+    "elapsed": "00:16:34",
+    "end": "2026-11-23T13:15:07",
+    "exit": "0:0",
+    "jobid": "1508251",
+    "name": "adm-score",
+    "state": "COMPLETED"
+   },
+   {
     "elapsed": "00:00:20",
     "end": "2026-11-23T10:02:52",
     "exit": "0:0",
@@ -222,23 +231,13 @@
   "squeue": [
    {
     "elapsed": "0:00",
-    "jobid": "1508251",
-    "name": "adm-score",
+    "jobid": "1508258",
+    "name": "class-acc",
     "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "2026-11-24T09:24:16",
+    "reason_or_nodelist": "(Resources)",
+    "start": "2026-11-24T01:15:07",
     "state": "PENDING",
-    "time_limit": "12:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508252",
-    "name": "adm-score",
-    "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "2026-11-24T12:30:17",
-    "state": "PENDING",
-    "time_limit": "12:00:00"
+    "time_limit": "2:00:00"
    },
    {
     "elapsed": "0:00",
@@ -251,14 +250,14 @@
     "time_limit": "2:00:00"
    },
    {
-    "elapsed": "0:00",
-    "jobid": "1508258",
-    "name": "class-acc",
+    "elapsed": "2:40",
+    "jobid": "1508252",
+    "name": "adm-score",
     "nodes": "1",
-    "reason_or_nodelist": "(Dependency)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "2:00:00"
+    "reason_or_nodelist": "vhpc13",
+    "start": "2026-11-23T13:15:07",
+    "state": "RUNNING",
+    "time_limit": "12:00:00"
    }
   ]
  },
@@ -1048,14 +1047,14 @@
    "waiting_for": null
   },
   "2026-11-23-sweep-score-adarq_F": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-23T13:17:47",
+   "finished": "2026-11-23T13:17:47",
    "invalid": null,
    "jobid": "1508251",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-23T07:33:41",
@@ -1069,12 +1068,12 @@
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "RUNNING"
    ],
    "submit_error": null,
    "submitted": "2026-11-23T07:33:41",
    "waiting_for": null
   }
  },
- "updated": "2026-11-23T12:37:25"
+ "updated": "2026-11-23T13:17:47"
 }
