@@ -20,22 +20,6 @@
   },
   "ended_24h": [
    {
-    "elapsed": "01:50:25",
-    "end": "2026-11-22T18:51:04",
-    "exit": "0:0",
-    "jobid": "1508161",
-    "name": "adm-score",
-    "state": "COMPLETED"
-   },
-   {
-    "elapsed": "01:31:53",
-    "end": "2026-11-22T18:50:17",
-    "exit": "0:0",
-    "jobid": "1508162",
-    "name": "adm-score",
-    "state": "COMPLETED"
-   },
-   {
     "elapsed": "01:29:03",
     "end": "2026-11-22T19:32:42",
     "exit": "0:0",
@@ -452,7 +436,7 @@
     "time_limit": "2:00:00"
    },
    {
-    "elapsed": "30:10",
+    "elapsed": "1:30:42",
     "jobid": "1508313",
     "name": "levelb-sample",
     "nodes": "1",
@@ -462,7 +446,7 @@
     "time_limit": "1-00:00:00"
    },
    {
-    "elapsed": "1:39:05",
+    "elapsed": "2:39:37",
     "jobid": "1508312",
     "name": "levelb-sample",
     "nodes": "1",
@@ -472,7 +456,7 @@
     "time_limit": "1-00:00:00"
    },
    {
-    "elapsed": "1:42:44",
+    "elapsed": "2:43:16",
     "jobid": "1508311",
     "name": "levelb-sample",
     "nodes": "1",
@@ -1702,5 +1686,5 @@
    "waiting_for": null
   }
  },
- "updated": "2026-11-23T17:55:44"
+ "updated": "2026-11-23T18:56:16"
 }
