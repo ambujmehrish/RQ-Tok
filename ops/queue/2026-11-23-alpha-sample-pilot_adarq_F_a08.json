@@ -1,0 +1,15 @@
+{
+ "id": "2026-11-23-alpha-sample-pilot_adarq_F_a08",
+ "what": "VALIDATION pilot: greedy codes + residual noise scale 0.8, 2,000 class-balanced samples, seed 100",
+ "script": "scripts/levelb/sample.sbatch",
+ "env": {
+  "ARM": "adarq",
+  "SEED": "100",
+  "N": "2000",
+  "BALANCED": "1",
+  "GREEDY": "1",
+  "RESIDUAL_SCALE": "0.8",
+  "TAG": "pilot_adarq_F_a08"
+ },
+ "collect": true
+}

@@ -59,6 +59,13 @@ Settings the paper or upstream fixes are used as given; validation may only choo
 they leave open, and any such choice is recorded here before test scoring. The test runs
 on the final checkpoint at the fixed training budget, identically for both arms.
 
+**Winning and losing are decided on the test set only.** A validation pilot may choose a
+setting to carry forward; it never shows that one method beats another. In particular, the
+2,000-image pilot FIDs (held-out reference) are small-sample numbers: AdaRQ-Flow F's 32.04 vs
+Bifrost-1's 29.83 there does not mean the two are close. Their IS (89 vs 281), precision
+(0.71 vs 0.94) and class top-1 (0.57 vs 0.89) show a large gap, and on the test set the
+default AdaRQ-Flow sampler trails by 11 FID (28.38 vs 16.98).
+
 **Level A result — GenEval (job 1506427): Bifrost-1 reproduced, 0.804 vs paper 0.81.**
 Released checkpoint, official script, calibrated scorer. By task: single object 0.997,
 two object 0.922, counting 0.713, colors 0.838, position 0.718, color attribution 0.638
@@ -851,3 +858,16 @@ Stated in advance, so it is a decision rather than a negotiation:
 - **C1 and C2 both refuted** → the hybrid interface has no advantage; the remaining
   contribution is the capability claims (C5/C6) alone, which is a workshop note, not a
   paper. Say so rather than inflating it.
+
+## Queued 2026-11-23: sampler confirmation on test, residual-noise pilot on validation
+
+- **Test (decides).** Sampler F (greedy ordinary codes), chosen on validation **before** any
+  test scoring, is the primary sampler; E (T = 0.7, 0.85, 1, 1, top-p 0.95) is reported
+  alongside it, not picked between on test. Exact Bifrost-1 protocol: 10,000 random-class
+  samples × seeds 0, 1, 2, FID / sFID / IS (+P/R) vs the ADM reference; ImageNet-val FID
+  secondary. Class top-1/top-5 on seed 0 for F, E and Bifrost-1. Requests `2026-11-23-test-*`.
+- **Validation (tunes only).** Residual-noise scale α ∈ {0.8, 0.6} on sampler F; α = 1 is
+  pilot F. Same pilot protocol (seed 100, 2,000 class-balanced, held-out reference). If an α < 1
+  wins on validation, that setting gets its own full test run before any claim. Requests
+  `2026-11-23-alpha-*`.
+

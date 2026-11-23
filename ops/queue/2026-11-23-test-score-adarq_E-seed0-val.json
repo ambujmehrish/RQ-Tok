@@ -1,0 +1,13 @@
+{
+ "id": "2026-11-23-test-score-adarq_E-seed0-val",
+ "what": "TEST: score adarq_E seed 0 vs ImageNet val (secondary)",
+ "script": "scripts/bench/adm_score.sbatch",
+ "env": {
+  "SAMPLES": "${LEVELB_ROOT}/samples/adarq_E_seed0",
+  "REF": "val"
+ },
+ "after": [
+  "2026-11-23-test-score-adarq_E-seed0-adm"
+ ],
+ "collect": true
+}

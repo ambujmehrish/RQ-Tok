@@ -1,0 +1,12 @@
+{
+ "id": "2026-11-23-test-classacc-adarq_E-seed0",
+ "what": "TEST: requested-class top-1/top-5 of adarq_E seed 0 (ResNet-50)",
+ "script": "scripts/levelb/class_accuracy.sbatch",
+ "env": {
+  "SAMPLES": "${LEVELB_ROOT}/samples/adarq_E_seed0/samples_10000.npz"
+ },
+ "after": [
+  "2026-11-23-test-score-adarq_E-seed0-adm"
+ ],
+ "collect": true
+}

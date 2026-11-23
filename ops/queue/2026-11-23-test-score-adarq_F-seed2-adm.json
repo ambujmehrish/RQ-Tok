@@ -1,0 +1,13 @@
+{
+ "id": "2026-11-23-test-score-adarq_F-seed2-adm",
+ "what": "TEST: score adarq_F seed 2 vs ADM reference (primary)",
+ "script": "scripts/bench/adm_score.sbatch",
+ "env": {
+  "SAMPLES": "${LEVELB_ROOT}/samples/adarq_F_seed2",
+  "REF": "adm"
+ },
+ "after": [
+  "2026-11-23-test-sample-adarq_F-seed2"
+ ],
+ "collect": true
+}

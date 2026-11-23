@@ -1,0 +1,13 @@
+{
+ "id": "2026-11-23-test-sample-adarq_E-seed1",
+ "what": "TEST protocol: AdaRQ-Flow sampler E (T=0.7,0.85,1,1, top-p 0.95), 10,000 random-class samples, seed 1",
+ "script": "scripts/levelb/sample.sbatch",
+ "env": {
+  "ARM": "adarq",
+  "SEED": "1",
+  "TAG": "adarq_E",
+  "CODE_TEMPS": "0.7,0.85,1,1",
+  "TOP_P": "0.95"
+ },
+ "collect": true
+}

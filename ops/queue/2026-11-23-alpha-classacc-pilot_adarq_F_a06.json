@@ -1,0 +1,12 @@
+{
+ "id": "2026-11-23-alpha-classacc-pilot_adarq_F_a06",
+ "what": "VALIDATION pilot pilot_adarq_F_a06: requested-class top-1/top-5 (ResNet-50)",
+ "script": "scripts/levelb/class_accuracy.sbatch",
+ "env": {
+  "SAMPLES": "${LEVELB_ROOT}/samples/pilot_adarq_F_a06_seed100/samples_2000.npz"
+ },
+ "after": [
+  "2026-11-23-alpha-score-pilot_adarq_F_a06"
+ ],
+ "collect": true
+}

@@ -1,0 +1,9 @@
+{
+ "id": "2026-11-23-test-classacc-bifrost-seed0",
+ "what": "TEST: requested-class top-1/top-5 of Bifrost-1 seed 0 (existing samples)",
+ "script": "scripts/levelb/class_accuracy.sbatch",
+ "env": {
+  "SAMPLES": "${LEVELB_ROOT}/samples/bifrost_seed0/samples_10000.npz"
+ },
+ "collect": true
+}
