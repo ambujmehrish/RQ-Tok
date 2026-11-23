@@ -566,6 +566,33 @@ declared before any pilot runs; not queued until the running jobs finish).**
   (empirical; the flow was trained with unit noise, so α is not a principled temperature),
   and the rollout-mismatch diagnostic below.
 
+**Sweep result (validation only, 2026-11-23; 2,000 class-balanced samples, seed 100,
+held-out 10k reference; not a test result, not comparable with the 10k ADM-reference
+numbers).**
+
+| pilot | FID | sFID | IS | P | R | top-1 | top-5 | depth 1/2/3/4 % (mean) |
+|---|---|---|---|---|---|---|---|---|
+| A (T 1, no filter) | 46.71 | 121.87 | 53.2 | 0.602 | 0.625 | 0.425 | 0.683 | 44.8/15.2/8.4/31.7 (2.27) |
+| B (T 0.8) | 40.59 | 119.25 | 62.4 | 0.649 | 0.658 | 0.484 | 0.736 | 44.9/15.6/8.4/31.2 (2.26) |
+| C (top-p 0.95) | 43.77 | 120.63 | 55.7 | 0.630 | 0.652 | 0.443 | 0.689 | 44.2/15.4/8.4/32.0 (2.28) |
+| D (T 0.8, top-p 0.95) | 40.62 | 118.56 | 61.6 | 0.629 | 0.660 | 0.483 | 0.730 | 44.2/15.7/8.4/31.7 (2.28) |
+| E (T 0.7,0.85,1,1, top-p 0.95) | 37.92 | 118.29 | 68.3 | 0.653 | 0.666 | 0.511 | 0.753 | 44.4/15.3/8.4/31.8 (2.28) |
+| F (greedy codes) | **32.04** | **115.76** | **89.3** | **0.713** | **0.678** | **0.572** | **0.822** | 45.1/16.6/8.6/29.7 (2.23) |
+| Bifrost-1 (reference) | 29.83 | 110.71 | 280.7 | 0.942 | 0.676 | 0.888 | 0.990 | — |
+
+Class-accuracy ceiling (same classifier, 2,000 real held-out crops): top-1 0.9145, top-5
+0.9905; inflated because the classifier was trained on ImageNet train (published val
+top-1 80.9 %). Reading:
+- Monotone in code sharpness; greedy ordinary codes (F) are best on every metric: FID −31 %
+  vs A, within 2.2 of Bifrost-1's pilot FID, and recall is not lost (0.678 vs 0.676).
+- Gated halting kept depth stable across all settings (mean 2.23–2.28); the generated
+  depth over-uses level 4 vs the tokenizer (≈30 % vs 21.5 %) and under-uses level 1.
+- Precision and class identity remain far below Bifrost-1 (P 0.71 vs 0.94; top-1 0.57 vs
+  0.89; IS 89 vs 281). Code-selection randomness explains much of the FID gap but not the
+  class-identity gap, so the next steps target the residual and the rollout.
+- Per the declared plan, F (and E as runner-up) are candidates for confirmation at
+  10,000 random-class samples × 3 seeds with the ADM reference; not yet run.
+
 **Reveal schedule.** With 64 steps for 64 tokens, upstream's clamps (at least one token per
 step, at most masked − 1) make every step reveal exactly one token, so the cosine schedule
 has no effect: the rollout is linear. Asserted on every sampled batch.
