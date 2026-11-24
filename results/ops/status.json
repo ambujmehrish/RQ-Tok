@@ -14,10 +14,7 @@
   }
  },
  "cluster": {
-  "counts": {
-   "PENDING": 1,
-   "RUNNING": 1
-  },
+  "counts": {},
   "ended_24h": [
    {
     "elapsed": "05:32:50",
@@ -204,6 +201,22 @@
     "state": "COMPLETED"
    },
    {
+    "elapsed": "00:03:07",
+    "end": "2026-11-24T16:41:14",
+    "exit": "0:0",
+    "jobid": "1508407",
+    "name": "class-acc",
+    "state": "COMPLETED"
+   },
+   {
+    "elapsed": "00:03:04",
+    "end": "2026-11-24T16:44:18",
+    "exit": "0:0",
+    "jobid": "1508408",
+    "name": "class-acc",
+    "state": "COMPLETED"
+   },
+   {
     "elapsed": "00:23:59",
     "end": "2026-11-24T15:02:26",
     "exit": "0:0",
@@ -276,28 +289,7 @@
     "state": "COMPLETED"
    }
   ],
-  "squeue": [
-   {
-    "elapsed": "0:00",
-    "jobid": "1508408",
-    "name": "class-acc",
-    "nodes": "1",
-    "reason_or_nodelist": "(Resources)",
-    "start": "2026-11-24T18:38:07",
-    "state": "PENDING",
-    "time_limit": "2:00:00"
-   },
-   {
-    "elapsed": "1:58",
-    "jobid": "1508407",
-    "name": "class-acc",
-    "nodes": "1",
-    "reason_or_nodelist": "vhpc15",
-    "start": "2026-11-24T16:38:07",
-    "state": "RUNNING",
-    "time_limit": "2:00:00"
-   }
-  ]
+  "squeue": []
  },
  "queue": [
   "2026-11-18-watch-flux1024",
@@ -1525,28 +1517,28 @@
    "waiting_for": null
   },
   "2026-11-24-classacc-perclass-adarq_F-adarq_E": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-24T16:45:22",
+   "finished": "2026-11-24T16:45:22",
    "invalid": null,
    "jobid": "1508407",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "RUNNING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-24T14:38:27",
    "waiting_for": null
   },
   "2026-11-24-classacc-perclass-bifrost-adarq": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-24T16:45:22",
+   "finished": "2026-11-24T16:45:22",
    "invalid": null,
    "jobid": "1508408",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-24T14:38:27",
@@ -1623,5 +1615,5 @@
    "waiting_for": null
   }
  },
- "updated": "2026-11-24T16:40:04"
+ "updated": "2026-11-24T16:45:22"
 }

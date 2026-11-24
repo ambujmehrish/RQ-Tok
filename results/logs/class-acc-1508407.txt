@@ -2,3 +2,5 @@ top-1 0.5788  top-5 0.8309  (10000 images) -> /home/ambuj.mehrish/work/levelb/sa
 top-1 0.5792  top-5 0.8308  (10000 images) -> /home/ambuj.mehrish/work/levelb/samples/adarq_F_seed1/samples_10000.clsclass.metrics.json
 top-1 0.5815  top-5 0.8215  (10000 images) -> /home/ambuj.mehrish/work/levelb/samples/adarq_F_seed2/samples_10000.clsclass.metrics.json
 top-1 0.5018  top-5 0.7557  (10000 images) -> /home/ambuj.mehrish/work/levelb/samples/adarq_E_seed0/samples_10000.clsclass.metrics.json
+top-1 0.4951  top-5 0.7569  (10000 images) -> /home/ambuj.mehrish/work/levelb/samples/adarq_E_seed1/samples_10000.clsclass.metrics.json
+top-1 0.4938  top-5 0.7530  (10000 images) -> /home/ambuj.mehrish/work/levelb/samples/adarq_E_seed2/samples_10000.clsclass.metrics.json

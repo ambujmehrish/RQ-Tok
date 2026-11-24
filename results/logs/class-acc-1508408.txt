@@ -1,0 +1,6 @@
+top-1 0.8946  top-5 0.9891  (10000 images) -> /home/ambuj.mehrish/work/levelb/samples/bifrost_seed0/samples_10000.clsclass.metrics.json
+top-1 0.8892  top-5 0.9900  (10000 images) -> /home/ambuj.mehrish/work/levelb/samples/bifrost_seed1/samples_10000.clsclass.metrics.json
+top-1 0.8913  top-5 0.9901  (10000 images) -> /home/ambuj.mehrish/work/levelb/samples/bifrost_seed2/samples_10000.clsclass.metrics.json
+top-1 0.4394  top-5 0.6941  (10000 images) -> /home/ambuj.mehrish/work/levelb/samples/adarq_seed0/samples_10000.clsclass.metrics.json
+top-1 0.4218  top-5 0.6810  (10000 images) -> /home/ambuj.mehrish/work/levelb/samples/adarq_seed1/samples_10000.clsclass.metrics.json
+top-1 0.4345  top-5 0.6882  (10000 images) -> /home/ambuj.mehrish/work/levelb/samples/adarq_seed2/samples_10000.clsclass.metrics.json
