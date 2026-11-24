@@ -3,6 +3,7 @@
 # Requested-class top-1/top-5 accuracy (torchvision ResNet-50 IMAGENET1K_V2) on one H200.
 #
 #   sbatch --qos=gpulongjobs --export=ALL,SAMPLES=<samples_N.npz> scripts/levelb/class_accuracy.sbatch
+#   SAMPLES=<a.npz>,<b.npz> PER_CLASS=1 sbatch --qos=gpulongjobs --export=ALL scripts/levelb/class_accuracy.sbatch
 #   sbatch --qos=gpulongjobs --export=ALL,HELDOUT_N=2000 scripts/levelb/class_accuracy.sbatch  # ceiling
 # =====================================================================================
 #SBATCH --job-name=class-acc
@@ -36,7 +37,10 @@ if [ -n "${HELDOUT_N:-}" ]; then
   python -m levelb.class_accuracy --heldout "$LEVELB_ROOT/imagenet256" --n "$HELDOUT_N" \
     --out "results/levelb/class_accuracy_heldout_${HELDOUT_N}.json"
 else
-  SAMPLES="${SAMPLES:?set SAMPLES=<samples_N.npz> (merged; run the scoring job first) or HELDOUT_N}"
-  [ -f "$SAMPLES" ] || die "$SAMPLES missing"
-  python -m levelb.class_accuracy --samples "$SAMPLES"
+  SAMPLES="${SAMPLES:?set SAMPLES=<samples_N.npz>[,...] (merged; run the scoring job first) or HELDOUT_N}"
+  IFS=, read -r -a LIST <<< "$SAMPLES"
+  for s in "${LIST[@]}"; do [ -f "$s" ] || die "$s missing"; done
+  # PER_CLASS=1: per requested class as well (<stem>.clsclass.metrics.json)
+  PC=(); [ "${PER_CLASS:-0}" = 1 ] && PC=(--per-class)
+  for s in "${LIST[@]}"; do python -m levelb.class_accuracy --samples "$s" "${PC[@]+"${PC[@]}"}"; done
 fi

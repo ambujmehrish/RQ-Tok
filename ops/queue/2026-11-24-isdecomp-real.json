@@ -1,0 +1,9 @@
+{
+ "id": "2026-11-24-isdecomp-real",
+ "what": "IS decomposition of the ADM reference batch (10,000 real ImageNet images): the real-image anchor",
+ "script": "scripts/bench/is_decomp.sbatch",
+ "env": {
+  "REAL": "1"
+ },
+ "collect": true
+}

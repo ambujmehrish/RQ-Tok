@@ -8,7 +8,9 @@ IS rewards confident predictions of *some* class; this measures whether an image
 class it was generated for. Classifier: torchvision ResNet-50, weights IMAGENET1K_V2, with
 its own preprocessing (resize 232, centre crop 224, ImageNet normalisation), fixed for every
 arm. The ceiling is the same classifier on real held-out training crops of the same classes.
-Writes <samples stem>.cls.metrics.json (or the --out path).
+Writes <samples stem>.cls.metrics.json (or the --out path); with --per-class,
+<samples stem>.clsclass.metrics.json, adding per requested class: top-1 hits, mean
+probability of the requested class and mean prediction entropy.
 """
 
 from __future__ import annotations
@@ -31,24 +33,62 @@ def topk_hits(logits: torch.Tensor, labels: torch.Tensor, ks=(1, 5)) -> dict[int
 
 
 @torch.no_grad()
-def classify(images: np.ndarray, labels: np.ndarray, device: str, batch: int = 100) -> dict:
+def classify(
+    images: np.ndarray, labels: np.ndarray, device: str, batch: int = 100, per_class: bool = False
+) -> dict:
     from torchvision.models import ResNet50_Weights, resnet50
 
     weights = getattr(ResNet50_Weights, WEIGHTS)
     model = resnet50(weights=weights).eval().to(device)
     prep = weights.transforms()
     hits, n = {1: 0, 5: 0}, 0
+    top1_img, p_req, ent = [], [], []
     for s in range(0, len(images), batch):
         x = torch.from_numpy(np.ascontiguousarray(images[s : s + batch])).permute(0, 3, 1, 2)
         y = torch.from_numpy(np.asarray(labels[s : s + batch], dtype=np.int64)).to(device)
-        out = topk_hits(model(prep(x).to(device)), y)
+        logits = model(prep(x).to(device))
+        out = topk_hits(logits, y)
         hits = {k: hits[k] + out[k] for k in hits}
         n += len(y)
-    return {
+        if per_class:
+            lp = logits.float().log_softmax(-1)
+            top1_img.append((logits.argmax(-1) == y).cpu().numpy())
+            p_req.append(lp.gather(1, y[:, None])[:, 0].exp().cpu().numpy())
+            ent.append((-(lp.exp() * lp).sum(-1)).cpu().numpy())
+    res = {
         "top1": hits[1] / n,
         "top5": hits[5] / n,
         "n": n,
         "classifier": f"torchvision resnet50 {WEIGHTS}",
+    }
+    if per_class:
+        res |= per_class_summary(
+            np.asarray(labels), np.concatenate(top1_img), np.concatenate(p_req), np.concatenate(ent)
+        )
+    return res
+
+
+def per_class_summary(
+    labels: np.ndarray, top1: np.ndarray, p_req: np.ndarray, ent: np.ndarray
+) -> dict:
+    """Per requested class: images, top-1 hits, mean requested-class probability, mean
+    entropy (all as lists over the classes present, in label order)."""
+    labels = np.asarray(labels, dtype=np.int64)
+    cls = np.unique(labels)
+    idx = np.searchsorted(cls, labels)
+    cnt = np.bincount(idx, minlength=len(cls))
+    return {
+        "p_req_mean": float(p_req.mean()),
+        "entropy_mean": float(ent.mean()),
+        "per_class": {
+            "label": cls.tolist(),
+            "n": cnt.tolist(),
+            "hits": np.bincount(idx, weights=top1.astype(np.float64), minlength=len(cls))
+            .astype(int)
+            .tolist(),
+            "p_req": (np.bincount(idx, weights=p_req, minlength=len(cls)) / cnt).tolist(),
+            "entropy": (np.bincount(idx, weights=ent, minlength=len(cls)) / cnt).tolist(),
+        },
     }
 
 
@@ -58,17 +98,23 @@ def main() -> None:
     ap.add_argument("--heldout", default=None, help="imagenet256 dir: real held-out ceiling")
     ap.add_argument("--n", type=int, default=2000, help="--heldout: images, class-balanced")
     ap.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
+    ap.add_argument(
+        "--per-class",
+        action="store_true",
+        help="--samples: also per requested class, to <stem>.clsclass.metrics.json",
+    )
     ap.add_argument("--out", default=None)
     args = ap.parse_args()
+    if args.per_class and not args.samples:
+        raise SystemExit("--per-class needs --samples")
     if (args.samples is None) == (args.heldout is None):
         raise SystemExit("give exactly one of --samples or --heldout")
     if args.samples:
         path = pathlib.Path(args.samples)
         with np.load(path) as z:
             images, labels = z["arr_0"], np.asarray(z["labels"])
-        out = (
-            pathlib.Path(args.out) if args.out else path.with_name(path.stem + ".cls.metrics.json")
-        )
+        suffix = ".clsclass.metrics.json" if args.per_class else ".cls.metrics.json"
+        out = pathlib.Path(args.out) if args.out else path.with_name(path.stem + suffix)
         source = str(path)
     else:
         root = pathlib.Path(args.heldout)
@@ -89,7 +135,7 @@ def main() -> None:
         labels = np.asarray(np.load(root / "labels_train.npy", mmap_mode="r")[pick])
         out = pathlib.Path(args.out) if args.out else root / f"heldout_{args.n}.cls.metrics.json"
         source = f"held-out training crops, {per} per class"
-    res = classify(images, labels, args.device) | {"source": source}
+    res = classify(images, labels, args.device, per_class=args.per_class) | {"source": source}
     out.write_text(json.dumps(res, indent=2))
     print(f"top-1 {res['top1']:.4f}  top-5 {res['top5']:.4f}  ({res['n']} images) -> {out}")
 

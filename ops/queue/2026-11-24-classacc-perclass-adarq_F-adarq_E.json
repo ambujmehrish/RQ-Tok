@@ -1,0 +1,10 @@
+{
+ "id": "2026-11-24-classacc-perclass-adarq_F-adarq_E",
+ "what": "TEST diagnostic: per-class ResNet-50 top-1, requested-class probability, entropy: adarq_F, adarq_E, seeds 0-2",
+ "script": "scripts/levelb/class_accuracy.sbatch",
+ "env": {
+  "SAMPLES": "${LEVELB_ROOT}/samples/adarq_F_seed0/samples_10000.npz,${LEVELB_ROOT}/samples/adarq_F_seed1/samples_10000.npz,${LEVELB_ROOT}/samples/adarq_F_seed2/samples_10000.npz,${LEVELB_ROOT}/samples/adarq_E_seed0/samples_10000.npz,${LEVELB_ROOT}/samples/adarq_E_seed1/samples_10000.npz,${LEVELB_ROOT}/samples/adarq_E_seed2/samples_10000.npz",
+  "PER_CLASS": "1"
+ },
+ "collect": true
+}

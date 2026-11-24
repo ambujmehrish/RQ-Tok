@@ -1,0 +1,9 @@
+{
+ "id": "2026-11-24-isdecomp-adarq_F",
+ "what": "TEST diagnostic: IS decomposition (class spread vs per-image uncertainty, per class) for AdaRQ-Flow F, seeds 0-2",
+ "script": "scripts/bench/is_decomp.sbatch",
+ "env": {
+  "SAMPLES": "${LEVELB_ROOT}/samples/adarq_F_seed0/samples_10000.npz,${LEVELB_ROOT}/samples/adarq_F_seed1/samples_10000.npz,${LEVELB_ROOT}/samples/adarq_F_seed2/samples_10000.npz"
+ },
+ "collect": true
+}

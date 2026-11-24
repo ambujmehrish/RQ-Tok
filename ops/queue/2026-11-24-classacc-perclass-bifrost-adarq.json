@@ -1,0 +1,10 @@
+{
+ "id": "2026-11-24-classacc-perclass-bifrost-adarq",
+ "what": "TEST diagnostic: per-class ResNet-50 top-1, requested-class probability, entropy: bifrost, adarq, seeds 0-2",
+ "script": "scripts/levelb/class_accuracy.sbatch",
+ "env": {
+  "SAMPLES": "${LEVELB_ROOT}/samples/bifrost_seed0/samples_10000.npz,${LEVELB_ROOT}/samples/bifrost_seed1/samples_10000.npz,${LEVELB_ROOT}/samples/bifrost_seed2/samples_10000.npz,${LEVELB_ROOT}/samples/adarq_seed0/samples_10000.npz,${LEVELB_ROOT}/samples/adarq_seed1/samples_10000.npz,${LEVELB_ROOT}/samples/adarq_seed2/samples_10000.npz",
+  "PER_CLASS": "1"
+ },
+ "collect": true
+}

@@ -1,0 +1,9 @@
+{
+ "id": "2026-11-24-isdecomp-bifrost",
+ "what": "TEST diagnostic: IS decomposition (class spread vs per-image uncertainty, per class) for Bifrost-1, seeds 0-2",
+ "script": "scripts/bench/is_decomp.sbatch",
+ "env": {
+  "SAMPLES": "${LEVELB_ROOT}/samples/bifrost_seed0/samples_10000.npz,${LEVELB_ROOT}/samples/bifrost_seed1/samples_10000.npz,${LEVELB_ROOT}/samples/bifrost_seed2/samples_10000.npz"
+ },
+ "collect": true
+}
