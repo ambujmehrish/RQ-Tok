@@ -884,5 +884,5 @@ Stated in advance, so it is a decision rather than a negotiation:
 Mixed result on test: F beats Bifrost-1 on FID (−1.5, ~10 seed s.d.), sFID and recall, and
 loses on IS (91 vs 267), precision and class accuracy (0.58 vs 0.89). Validation pilots ranked
 F behind Bifrost-1 on FID (32.04 vs 29.83); the test reversed that, as the rule above warns.
-ImageNet-val FID (secondary) for F still scoring. Validation α pilots, class top-1: α 1 0.572,
+ImageNet-val FID (secondary): Bifrost-1 19.20 ± 0.14, default 24.92 ± 0.30, F 13.65 ± 0.08, E 18.63 ± 0.16. F/E were scored on H200 nodes (OpenBLAS SkylakeX), Bifrost-1 on the CPU partition; the H200 cross-check of Bifrost-1 seed 0 matched (16.991 vs 16.99). Validation α pilots, class top-1: α 1 0.572,
 0.8 0.615, 0.6 0.641 (α = 0.6 not yet run on test).
