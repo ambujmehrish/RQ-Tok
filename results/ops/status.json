@@ -14,26 +14,8 @@
   }
  },
  "cluster": {
-  "counts": {
-   "RUNNING": 1
-  },
+  "counts": {},
   "ended_24h": [
-   {
-    "elapsed": "01:10:56",
-    "end": "2026-11-23T08:44:38",
-    "exit": "0:0",
-    "jobid": "1508239",
-    "name": "levelb-sample",
-    "state": "COMPLETED"
-   },
-   {
-    "elapsed": "01:10:33",
-    "end": "2026-11-23T08:44:15",
-    "exit": "0:0",
-    "jobid": "1508240",
-    "name": "levelb-sample",
-    "state": "COMPLETED"
-   },
    {
     "elapsed": "01:12:07",
     "end": "2026-11-23T08:46:35",
@@ -363,6 +345,14 @@
     "state": "COMPLETED"
    },
    {
+    "elapsed": "01:52:44",
+    "end": "2026-11-24T08:40:57",
+    "exit": "0:0",
+    "jobid": "1508328",
+    "name": "adm-score",
+    "state": "COMPLETED"
+   },
+   {
     "elapsed": "00:00:19",
     "end": "2026-11-24T03:17:08",
     "exit": "0:0",
@@ -395,18 +385,7 @@
     "state": "COMPLETED"
    }
   ],
-  "squeue": [
-   {
-    "elapsed": "1:16:40",
-    "jobid": "1508328",
-    "name": "adm-score",
-    "nodes": "1",
-    "reason_or_nodelist": "vhpc13",
-    "start": "2026-11-24T06:48:13",
-    "state": "RUNNING",
-    "time_limit": "12:00:00"
-   }
-  ]
+  "squeue": []
  },
  "queue": [
   "2026-11-18-watch-flux1024",
@@ -1613,19 +1592,19 @@
    "waiting_for": null
   },
   "2026-11-23-test-score-adarq_F-seed2-val": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-24T08:45:17",
+   "finished": "2026-11-24T08:45:17",
    "invalid": null,
    "jobid": "1508328",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "RUNNING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-23T14:53:51",
    "waiting_for": null
   }
  },
- "updated": "2026-11-24T08:04:52"
+ "updated": "2026-11-24T08:45:17"
 }
