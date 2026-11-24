@@ -16,7 +16,7 @@
  "cluster": {
   "counts": {
    "PENDING": 4,
-   "RUNNING": 2
+   "RUNNING": 1
   },
   "ended_24h": [
    {
@@ -282,19 +282,17 @@
     "jobid": "1508416",
     "name": "bsro-lyrics",
     "state": "FAILED"
+   },
+   {
+    "elapsed": "00:04:52",
+    "end": "2026-11-24T15:34:45",
+    "exit": "0:0",
+    "jobid": "1508417",
+    "name": "bsro-lyrics",
+    "state": "COMPLETED"
    }
   ],
   "squeue": [
-   {
-    "elapsed": "4:12",
-    "jobid": "1508417",
-    "name": "bsro-lyrics",
-    "nodes": "1",
-    "reason_or_nodelist": "vhpc24",
-    "start": "2026-11-24T15:29:53",
-    "state": "RUNNING",
-    "time_limit": "1:00:00"
-   },
    {
     "elapsed": "0:00",
     "jobid": "1508413",
@@ -336,7 +334,7 @@
     "time_limit": "2:00:00"
    },
    {
-    "elapsed": "1:18",
+    "elapsed": "6:28",
     "jobid": "1508411",
     "name": "is-decomp",
     "nodes": "1",
@@ -1671,5 +1669,5 @@
    "waiting_for": null
   }
  },
- "updated": "2026-11-24T15:34:05"
+ "updated": "2026-11-24T15:39:15"
 }
