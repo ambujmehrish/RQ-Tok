@@ -266,8 +266,8 @@
     "jobid": "1508330",
     "name": "class-acc",
     "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "2026-11-24T21:54:37",
+    "reason_or_nodelist": "(Resources)",
+    "start": "2026-11-24T21:45:50",
     "state": "PENDING",
     "time_limit": "2:00:00"
    },
@@ -276,8 +276,8 @@
     "jobid": "1508329",
     "name": "class-acc",
     "nodes": "1",
-    "reason_or_nodelist": "(Resources)",
-    "start": "2026-11-24T21:45:50",
+    "reason_or_nodelist": "(Priority)",
+    "start": "2026-11-24T21:54:37",
     "state": "PENDING",
     "time_limit": "2:00:00"
    },
@@ -422,7 +422,7 @@
     "time_limit": "2:00:00"
    },
    {
-    "elapsed": "2:59:00",
+    "elapsed": "3:59:32",
     "jobid": "1508316",
     "name": "levelb-sample",
     "nodes": "1",
@@ -432,7 +432,7 @@
     "time_limit": "1-00:00:00"
    },
    {
-    "elapsed": "4:05:36",
+    "elapsed": "5:06:08",
     "jobid": "1508315",
     "name": "levelb-sample",
     "nodes": "1",
@@ -442,7 +442,7 @@
     "time_limit": "1-00:00:00"
    },
    {
-    "elapsed": "4:14:23",
+    "elapsed": "5:14:55",
     "jobid": "1508314",
     "name": "levelb-sample",
     "nodes": "1",
@@ -1672,5 +1672,5 @@
    "waiting_for": null
   }
  },
- "updated": "2026-11-24T02:00:13"
+ "updated": "2026-11-24T03:00:45"
 }
