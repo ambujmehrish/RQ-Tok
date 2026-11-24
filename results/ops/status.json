@@ -15,7 +15,7 @@
  },
  "cluster": {
   "counts": {
-   "RUNNING": 3
+   "RUNNING": 2
   },
   "ended_24h": [
    {
@@ -339,6 +339,14 @@
     "state": "COMPLETED"
    },
    {
+    "elapsed": "01:29:16",
+    "end": "2026-11-24T07:25:42",
+    "exit": "0:0",
+    "jobid": "1508324",
+    "name": "adm-score",
+    "state": "COMPLETED"
+   },
+   {
     "elapsed": "00:21:41",
     "end": "2026-11-24T04:24:18",
     "exit": "0:0",
@@ -389,7 +397,7 @@
   ],
   "squeue": [
    {
-    "elapsed": "57:54",
+    "elapsed": "1:23:12",
     "jobid": "1508326",
     "name": "adm-score",
     "nodes": "1",
@@ -399,17 +407,7 @@
     "time_limit": "12:00:00"
    },
    {
-    "elapsed": "1:07:40",
-    "jobid": "1508324",
-    "name": "adm-score",
-    "nodes": "1",
-    "reason_or_nodelist": "vhpc14",
-    "start": "2026-11-24T05:56:26",
-    "state": "RUNNING",
-    "time_limit": "12:00:00"
-   },
-   {
-    "elapsed": "15:53",
+    "elapsed": "41:11",
     "jobid": "1508328",
     "name": "adm-score",
     "nodes": "1",
@@ -1569,14 +1567,14 @@
    "waiting_for": null
   },
   "2026-11-23-test-score-adarq_F-seed0-val": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-24T07:29:24",
+   "finished": "2026-11-24T07:29:24",
    "invalid": null,
    "jobid": "1508324",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "RUNNING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-23T14:53:51",
@@ -1639,5 +1637,5 @@
    "waiting_for": null
   }
  },
- "updated": "2026-11-24T07:04:06"
+ "updated": "2026-11-24T07:29:24"
 }
