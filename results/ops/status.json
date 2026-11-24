@@ -15,7 +15,7 @@
  },
  "cluster": {
   "counts": {
-   "PENDING": 13,
+   "PENDING": 12,
    "RUNNING": 3
   },
   "ended_24h": [
@@ -268,6 +268,14 @@
     "state": "COMPLETED"
    },
    {
+    "elapsed": "05:37:27",
+    "end": "2026-11-24T03:32:04",
+    "exit": "0:0",
+    "jobid": "1508315",
+    "name": "levelb-sample",
+    "state": "COMPLETED"
+   },
+   {
     "elapsed": "00:00:19",
     "end": "2026-11-24T03:17:08",
     "exit": "0:0",
@@ -287,7 +295,7 @@
   "squeue": [
    {
     "elapsed": "0:00",
-    "jobid": "1508319",
+    "jobid": "1508321",
     "name": "adm-score",
     "nodes": "1",
     "reason_or_nodelist": "(Resources)",
@@ -297,11 +305,11 @@
    },
    {
     "elapsed": "0:00",
-    "jobid": "1508321",
+    "jobid": "1508325",
     "name": "adm-score",
     "nodes": "1",
     "reason_or_nodelist": "(Priority)",
-    "start": "2026-11-24T21:54:37",
+    "start": "2026-11-24T23:01:13",
     "state": "PENDING",
     "time_limit": "12:00:00"
    },
@@ -311,7 +319,7 @@
     "name": "adm-score",
     "nodes": "1",
     "reason_or_nodelist": "(Priority)",
-    "start": "2026-11-24T23:01:13",
+    "start": "2026-11-24T15:32:04",
     "state": "PENDING",
     "time_limit": "12:00:00"
    },
@@ -338,16 +346,6 @@
    {
     "elapsed": "0:00",
     "jobid": "1508326",
-    "name": "adm-score",
-    "nodes": "1",
-    "reason_or_nodelist": "(Dependency)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "12:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508325",
     "name": "adm-score",
     "nodes": "1",
     "reason_or_nodelist": "(Dependency)",
@@ -416,7 +414,7 @@
     "time_limit": "2:00:00"
    },
    {
-    "elapsed": "4:19:46",
+    "elapsed": "4:35:00",
     "jobid": "1508316",
     "name": "levelb-sample",
     "nodes": "1",
@@ -426,7 +424,17 @@
     "time_limit": "1-00:00:00"
    },
    {
-    "elapsed": "3:34",
+    "elapsed": "4:09",
+    "jobid": "1508319",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "vhpc13",
+    "start": "2026-11-24T03:32:04",
+    "state": "RUNNING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "18:48",
     "jobid": "1508317",
     "name": "adm-score",
     "nodes": "1",
@@ -434,16 +442,6 @@
     "start": "2026-11-24T03:17:25",
     "state": "RUNNING",
     "time_limit": "12:00:00"
-   },
-   {
-    "elapsed": "5:26:22",
-    "jobid": "1508315",
-    "name": "levelb-sample",
-    "nodes": "1",
-    "reason_or_nodelist": "vhpc13",
-    "start": "2026-11-23T21:54:37",
-    "state": "RUNNING",
-    "time_limit": "1-00:00:00"
    }
   ]
  },
@@ -1470,14 +1468,14 @@
    "waiting_for": null
   },
   "2026-11-23-test-sample-adarq_F-seed1": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-24T03:36:13",
+   "finished": "2026-11-24T03:36:13",
    "invalid": null,
    "jobid": "1508315",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "RUNNING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-23T14:53:51",
@@ -1533,7 +1531,7 @@
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "RUNNING"
    ],
    "submit_error": null,
    "submitted": "2026-11-23T14:53:51",
@@ -1666,5 +1664,5 @@
    "waiting_for": null
   }
  },
- "updated": "2026-11-24T03:20:59"
+ "updated": "2026-11-24T03:36:13"
 }

@@ -503,3 +503,31 @@ vision_denoising_type:  mar
   7728/10000 images
   7744/10000 images
   7760/10000 images
+  7776/10000 images
+  7792/10000 images
+  7808/10000 images
+  7824/10000 images
+  7840/10000 images
+  7856/10000 images
+  7872/10000 images
+  7888/10000 images
+  7904/10000 images
+  7920/10000 images
+  7936/10000 images
+  7952/10000 images
+  7968/10000 images
+  7984/10000 images
+  8000/10000 images
+  8016/10000 images
+  8032/10000 images
+  8048/10000 images
+  8064/10000 images
+  8080/10000 images
+  8096/10000 images
+  8112/10000 images
+  8128/10000 images
+  8144/10000 images
+  8160/10000 images
+  8176/10000 images
+  8192/10000 images
+  8208/10000 images
