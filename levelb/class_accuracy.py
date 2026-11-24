@@ -92,6 +92,23 @@ def per_class_summary(
     }
 
 
+def heldout_rows(root: pathlib.Path, n: int) -> np.ndarray:
+    """Row indices (sorted) of a class-balanced validation set: the first n/1000 held-out
+    images of every class. Shared with levelb.oracle_render, so both see the same images."""
+    held = np.sort(np.load(root / "split_seed0.npz")["heldout"])
+    lab = np.asarray(np.load(root / "labels_train.npy", mmap_mode="r")[held])
+    per = n // 1000
+    if per < 1 or n % 1000:
+        raise SystemExit("--n must be a positive multiple of 1000 (class-balanced)")
+    pick = []
+    for c in range(1000):
+        rows = held[lab == c]
+        if len(rows) < per:
+            raise SystemExit(f"class {c}: only {len(rows)} held-out images, need {per}")
+        pick.extend(rows[:per].tolist())
+    return np.sort(np.asarray(pick))
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--samples", default=None, help="npz with arr_0 uint8 NHWC and labels")
@@ -118,18 +135,8 @@ def main() -> None:
         source = str(path)
     else:
         root = pathlib.Path(args.heldout)
-        held = np.sort(np.load(root / "split_seed0.npz")["heldout"])
-        lab = np.asarray(np.load(root / "labels_train.npy", mmap_mode="r")[held])
+        pick = heldout_rows(root, args.n)
         per = args.n // 1000
-        if per < 1 or args.n % 1000:
-            raise SystemExit("--n must be a positive multiple of 1000 (class-balanced)")
-        pick = []
-        for c in range(1000):
-            rows = held[lab == c]
-            if len(rows) < per:
-                raise SystemExit(f"class {c}: only {len(rows)} held-out images, need {per}")
-            pick.extend(rows[:per].tolist())
-        pick = np.sort(np.asarray(pick))
         crops = np.load(root / "crops_train.npy", mmap_mode="r")
         images = np.asarray(crops[pick])
         labels = np.asarray(np.load(root / "labels_train.npy", mmap_mode="r")[pick])

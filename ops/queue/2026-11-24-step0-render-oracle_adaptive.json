@@ -1,0 +1,11 @@
+{
+ "id": "2026-11-24-step0-render-oracle_adaptive",
+ "what": "VALIDATION oracle render of 2,000 real held-out images: codes only, adaptive depth (mean 2), residual dropped",
+ "script": "scripts/levelb/oracle_render.sbatch",
+ "env": {
+  "MODE": "adaptive",
+  "N": "2000",
+  "SEED": "100"
+ },
+ "collect": true
+}

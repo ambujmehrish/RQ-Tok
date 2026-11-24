@@ -930,3 +930,20 @@ Bifrost-1 (2508.05954). Weaknesses of AdaRQ-Flow as built, each tied to a fact o
    capacity 3M → 94M moves FID 2.88 → 1.94; independent prediction is far worse.
 5. **Mask-ratio mismatch (≤ 19 visible in training, up to 63 at sampling) is standard MAR
    practice** and works there; downgraded from prime suspect to a secondary one.
+
+### Step 0 (queued 2026-11-24): where is class information lost? Validation only, H200 only
+
+No training. All on the validation setup of the sweep (2,000 class-balanced images, seed 100,
+held-out reference, ResNet-50 class accuracy). Requests `2026-11-24-step0-*`.
+
+- **Oracle renders** (`levelb/oracle_render.py`): the latents of 2,000 real held-out images
+  (2 per class; the rows of `class_accuracy --heldout`, real-pixel top-1 0.9145) through the
+  same ControlNet + FLUX, with no MLLM and no trained head: `latent` (true z; renderer
+  ceiling), `adaptive` (Stage-0 codes at mean depth 2, residual dropped), `depth4`, `depth1`.
+  Their FID is against a reference that contains the same images, so it is comparable between
+  oracle modes only; class accuracy and IS are the read-outs.
+- **Residual-noise sweep, completed**: sampler F with α = 0.4, 0.2, 0 (1, 0.8, 0.6 done).
+
+Reading: if code-only renders lose the class that true-latent renders keep, the tokenizer
+is the bottleneck and no sampler or guidance can recover it; if they keep it, the loss is in
+generation (weakness 1: no guidance). If α = 0 is best, the residual head adds only noise.

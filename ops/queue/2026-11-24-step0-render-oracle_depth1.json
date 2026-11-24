@@ -1,0 +1,11 @@
+{
+ "id": "2026-11-24-step0-render-oracle_depth1",
+ "what": "VALIDATION oracle render of 2,000 real held-out images: codes only, depth 1",
+ "script": "scripts/levelb/oracle_render.sbatch",
+ "env": {
+  "MODE": "depth1",
+  "N": "2000",
+  "SEED": "100"
+ },
+ "collect": true
+}

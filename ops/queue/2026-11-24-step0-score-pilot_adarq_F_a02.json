@@ -1,0 +1,14 @@
+{
+ "id": "2026-11-24-step0-score-pilot_adarq_F_a02",
+ "what": "VALIDATION pilot alpha 0.2: FID/sFID/IS/P/R vs held-out reference (2,000)",
+ "script": "scripts/bench/adm_score.sbatch",
+ "env": {
+  "SAMPLES": "${LEVELB_ROOT}/samples/pilot_adarq_F_a02_seed100",
+  "REF": "heldout",
+  "NSAMPLES": "2000"
+ },
+ "after": [
+  "2026-11-24-step0-sample-pilot_adarq_F_a02"
+ ],
+ "collect": true
+}
