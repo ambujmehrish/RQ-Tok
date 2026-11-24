@@ -302,11 +302,21 @@
   "squeue": [
    {
     "elapsed": "0:00",
+    "jobid": "1508426",
+    "name": "levelb-sample",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "1-00:00:00"
+   },
+   {
+    "elapsed": "0:00",
     "jobid": "1508425",
     "name": "levelb-sample",
     "nodes": "1",
     "reason_or_nodelist": "(Priority)",
-    "start": "2026-11-25T21:58:56",
+    "start": "N/A",
     "state": "PENDING",
     "time_limit": "1-00:00:00"
    },
@@ -316,7 +326,7 @@
     "name": "levelb-sample",
     "nodes": "1",
     "reason_or_nodelist": "(Priority)",
-    "start": "2026-11-25T21:54:43",
+    "start": "N/A",
     "state": "PENDING",
     "time_limit": "1-00:00:00"
    },
@@ -325,20 +335,10 @@
     "jobid": "1508423",
     "name": "oracle-render",
     "nodes": "1",
-    "reason_or_nodelist": "(Resources)",
-    "start": "2026-11-25T17:48:12",
-    "state": "PENDING",
-    "time_limit": "6:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508426",
-    "name": "levelb-sample",
-    "nodes": "1",
     "reason_or_nodelist": "(Priority)",
     "start": "N/A",
     "state": "PENDING",
-    "time_limit": "1-00:00:00"
+    "time_limit": "6:00:00"
    },
    {
     "elapsed": "0:00",
@@ -2111,5 +2111,5 @@
    "waiting_for": null
   }
  },
- "updated": "2026-11-24T23:10:12"
+ "updated": "2026-11-25T00:10:52"
 }
