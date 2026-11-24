@@ -15,8 +15,7 @@
  },
  "cluster": {
   "counts": {
-   "PENDING": 17,
-   "RUNNING": 1
+   "PENDING": 17
   },
   "ended_24h": [
    {
@@ -292,6 +291,14 @@
     "state": "COMPLETED"
    },
    {
+    "elapsed": "00:42:10",
+    "end": "2026-11-24T21:58:56",
+    "exit": "0:0",
+    "jobid": "1508422",
+    "name": "oracle-render",
+    "state": "COMPLETED"
+   },
+   {
     "elapsed": "00:11:43",
     "end": "2026-11-24T21:16:46",
     "exit": "0:0",
@@ -301,6 +308,16 @@
    }
   ],
   "squeue": [
+   {
+    "elapsed": "0:00",
+    "jobid": "1508425",
+    "name": "levelb-sample",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "2026-11-25T21:58:56",
+    "state": "PENDING",
+    "time_limit": "1-00:00:00"
+   },
    {
     "elapsed": "0:00",
     "jobid": "1508424",
@@ -333,13 +350,13 @@
    },
    {
     "elapsed": "0:00",
-    "jobid": "1508425",
-    "name": "levelb-sample",
+    "jobid": "1508429",
+    "name": "adm-score",
     "nodes": "1",
     "reason_or_nodelist": "(Priority)",
     "start": "N/A",
     "state": "PENDING",
-    "time_limit": "1-00:00:00"
+    "time_limit": "12:00:00"
    },
    {
     "elapsed": "0:00",
@@ -384,16 +401,6 @@
    {
     "elapsed": "0:00",
     "jobid": "1508430",
-    "name": "adm-score",
-    "nodes": "1",
-    "reason_or_nodelist": "(Dependency)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "12:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508429",
     "name": "adm-score",
     "nodes": "1",
     "reason_or_nodelist": "(Dependency)",
@@ -470,16 +477,6 @@
     "start": "N/A",
     "state": "PENDING",
     "time_limit": "2:00:00"
-   },
-   {
-    "elapsed": "42:01",
-    "jobid": "1508422",
-    "name": "oracle-render",
-    "nodes": "1",
-    "reason_or_nodelist": "vhpc14",
-    "start": "2026-11-24T21:16:46",
-    "state": "RUNNING",
-    "time_limit": "6:00:00"
    }
   ]
  },
@@ -1954,14 +1951,14 @@
    "waiting_for": null
   },
   "2026-11-24-step0-render-oracle_depth4": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-24T22:03:59",
+   "finished": "2026-11-24T22:03:59",
    "invalid": null,
    "jobid": "1508422",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "RUNNING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
@@ -2122,5 +2119,5 @@
    "waiting_for": null
   }
  },
- "updated": "2026-11-24T21:58:47"
+ "updated": "2026-11-24T22:03:59"
 }
