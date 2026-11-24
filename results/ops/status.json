@@ -15,7 +15,8 @@
  },
  "cluster": {
   "counts": {
-   "PENDING": 7
+   "PENDING": 5,
+   "RUNNING": 1
   },
   "ended_24h": [
    {
@@ -241,6 +242,30 @@
     "jobid": "1508406",
     "name": "bsro-separate",
     "state": "COMPLETED"
+   },
+   {
+    "elapsed": "00:23:59",
+    "end": "2026-11-24T15:02:26",
+    "exit": "0:0",
+    "jobid": "1508409",
+    "name": "is-decomp",
+    "state": "COMPLETED"
+   },
+   {
+    "elapsed": "00:00:00",
+    "end": "2026-11-24T14:47:34",
+    "exit": "0:0",
+    "jobid": "1508414",
+    "name": "bsro-separate",
+    "state": "CANCELLED"
+   },
+   {
+    "elapsed": "00:04:40",
+    "end": "2026-11-24T14:52:14",
+    "exit": "0:0",
+    "jobid": "1508415",
+    "name": "bsro-separate",
+    "state": "COMPLETED"
    }
   ],
   "squeue": [
@@ -250,7 +275,7 @@
     "name": "is-decomp",
     "nodes": "1",
     "reason_or_nodelist": "(Priority)",
-    "start": "N/A",
+    "start": "2026-11-25T13:33:15",
     "state": "PENDING",
     "time_limit": "8:00:00"
    },
@@ -260,7 +285,7 @@
     "name": "is-decomp",
     "nodes": "1",
     "reason_or_nodelist": "(Priority)",
-    "start": "N/A",
+    "start": "2026-11-25T07:02:00",
     "state": "PENDING",
     "time_limit": "8:00:00"
    },
@@ -269,28 +294,8 @@
     "jobid": "1508411",
     "name": "is-decomp",
     "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "8:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508410",
-    "name": "is-decomp",
-    "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "8:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508409",
-    "name": "is-decomp",
-    "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "N/A",
+    "reason_or_nodelist": "(Resources)",
+    "start": "2026-11-24T23:02:26",
     "state": "PENDING",
     "time_limit": "8:00:00"
    },
@@ -300,7 +305,7 @@
     "name": "class-acc",
     "nodes": "1",
     "reason_or_nodelist": "(Priority)",
-    "start": "N/A",
+    "start": "2026-11-25T15:02:00",
     "state": "PENDING",
     "time_limit": "2:00:00"
    },
@@ -310,9 +315,19 @@
     "name": "class-acc",
     "nodes": "1",
     "reason_or_nodelist": "(Priority)",
-    "start": "N/A",
+    "start": "2026-11-25T13:33:55",
     "state": "PENDING",
     "time_limit": "2:00:00"
+   },
+   {
+    "elapsed": "1:19",
+    "jobid": "1508410",
+    "name": "is-decomp",
+    "nodes": "1",
+    "reason_or_nodelist": "vhpc15",
+    "start": "2026-11-24T15:02:26",
+    "state": "RUNNING",
+    "time_limit": "8:00:00"
    }
   ]
  },
@@ -1548,7 +1563,9 @@
    "jobid": "1508407",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "PENDING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-24T14:38:27",
    "waiting_for": null
@@ -1560,19 +1577,23 @@
    "jobid": "1508408",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "PENDING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-24T14:38:27",
    "waiting_for": null
   },
   "2026-11-24-isdecomp-adarq": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-24T15:03:45",
+   "finished": "2026-11-24T15:03:45",
    "invalid": null,
    "jobid": "1508409",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "COMPLETED"
+   ],
    "submit_error": null,
    "submitted": "2026-11-24T14:38:27",
    "waiting_for": null
@@ -1584,7 +1605,9 @@
    "jobid": "1508410",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "RUNNING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-24T14:38:27",
    "waiting_for": null
@@ -1596,7 +1619,9 @@
    "jobid": "1508411",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "PENDING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-24T14:38:27",
    "waiting_for": null
@@ -1608,7 +1633,9 @@
    "jobid": "1508412",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "PENDING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-24T14:38:27",
    "waiting_for": null
@@ -1620,11 +1647,13 @@
    "jobid": "1508413",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "PENDING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-24T14:38:27",
    "waiting_for": null
   }
  },
- "updated": "2026-11-24T14:38:27"
+ "updated": "2026-11-24T15:03:45"
 }
