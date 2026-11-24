@@ -389,7 +389,7 @@
   ],
   "squeue": [
    {
-    "elapsed": "42:41",
+    "elapsed": "57:54",
     "jobid": "1508326",
     "name": "adm-score",
     "nodes": "1",
@@ -399,7 +399,7 @@
     "time_limit": "12:00:00"
    },
    {
-    "elapsed": "52:27",
+    "elapsed": "1:07:40",
     "jobid": "1508324",
     "name": "adm-score",
     "nodes": "1",
@@ -409,7 +409,7 @@
     "time_limit": "12:00:00"
    },
    {
-    "elapsed": "0:40",
+    "elapsed": "15:53",
     "jobid": "1508328",
     "name": "adm-score",
     "nodes": "1",
@@ -1639,5 +1639,5 @@
    "waiting_for": null
   }
  },
- "updated": "2026-11-24T06:48:53"
+ "updated": "2026-11-24T07:04:06"
 }
