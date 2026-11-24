@@ -15,7 +15,7 @@
  },
  "cluster": {
   "counts": {
-   "PENDING": 4,
+   "PENDING": 3,
    "RUNNING": 3
   },
   "ended_24h": [
@@ -308,6 +308,14 @@
     "state": "COMPLETED"
    },
    {
+    "elapsed": "01:52:34",
+    "end": "2026-11-24T06:19:27",
+    "exit": "0:0",
+    "jobid": "1508320",
+    "name": "adm-score",
+    "state": "COMPLETED"
+   },
+   {
     "elapsed": "00:22:43",
     "end": "2026-11-24T04:02:37",
     "exit": "0:0",
@@ -359,20 +367,10 @@
   "squeue": [
    {
     "elapsed": "0:00",
-    "jobid": "1508327",
-    "name": "adm-score",
-    "nodes": "1",
-    "reason_or_nodelist": "(Resources)",
-    "start": "2026-11-24T16:26:53",
-    "state": "PENDING",
-    "time_limit": "12:00:00"
-   },
-   {
-    "elapsed": "0:00",
     "jobid": "1508331",
     "name": "class-acc",
     "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
+    "reason_or_nodelist": "(Resources)",
     "start": "2026-11-24T17:56:26",
     "state": "PENDING",
     "time_limit": "2:00:00"
@@ -398,7 +396,17 @@
     "time_limit": "12:00:00"
    },
    {
-    "elapsed": "2:11",
+    "elapsed": "4:09",
+    "jobid": "1508327",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "vhpc13",
+    "start": "2026-11-24T06:19:27",
+    "state": "RUNNING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "17:24",
     "jobid": "1508326",
     "name": "adm-score",
     "nodes": "1",
@@ -408,22 +416,12 @@
     "time_limit": "12:00:00"
    },
    {
-    "elapsed": "11:57",
+    "elapsed": "27:10",
     "jobid": "1508324",
     "name": "adm-score",
     "nodes": "1",
     "reason_or_nodelist": "vhpc14",
     "start": "2026-11-24T05:56:26",
-    "state": "RUNNING",
-    "time_limit": "12:00:00"
-   },
-   {
-    "elapsed": "1:41:30",
-    "jobid": "1508320",
-    "name": "adm-score",
-    "nodes": "1",
-    "reason_or_nodelist": "vhpc13",
-    "start": "2026-11-24T04:26:53",
     "state": "RUNNING",
     "time_limit": "12:00:00"
    }
@@ -1522,14 +1520,14 @@
    "waiting_for": null
   },
   "2026-11-23-test-score-adarq_E-seed1-val": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-24T06:23:36",
+   "finished": "2026-11-24T06:23:36",
    "invalid": null,
    "jobid": "1508320",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "RUNNING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-23T14:53:51",
@@ -1627,7 +1625,7 @@
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "RUNNING"
    ],
    "submit_error": null,
    "submitted": "2026-11-23T14:53:51",
@@ -1648,5 +1646,5 @@
    "waiting_for": null
   }
  },
- "updated": "2026-11-24T06:08:23"
+ "updated": "2026-11-24T06:23:36"
 }
