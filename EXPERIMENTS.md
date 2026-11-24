@@ -871,3 +871,18 @@ Stated in advance, so it is a decision rather than a negotiation:
   wins on validation, that setting gets its own full test run before any claim. Requests
   `2026-11-23-alpha-*`.
 
+
+### Test results 2026-11-24: sampler F (primary) and E (ADM reference, 3 × 10,000, seeds 0–2)
+
+| arm | FID | sFID | IS | P | R | top-1 / top-5 (seed 0) |
+|---|---|---|---|---|---|---|
+| Bifrost-1 | 16.98 ± 0.09 | 28.30 | 266.5 | 0.938 | 0.246 | 0.895 / 0.989 |
+| AdaRQ-Flow, default sampler | 28.38 ± 0.33 | 28.61 | 56.1 | 0.616 | 0.649 | — |
+| AdaRQ-Flow, F (greedy codes) | **15.50 ± 0.13** | **24.35** | 90.7 | 0.719 | 0.604 | 0.579 / 0.831 |
+| AdaRQ-Flow, E | 21.36 ± 0.15 | 26.08 | 70.5 | 0.671 | 0.629 | 0.502 / 0.756 |
+
+Mixed result on test: F beats Bifrost-1 on FID (−1.5, ~10 seed s.d.), sFID and recall, and
+loses on IS (91 vs 267), precision and class accuracy (0.58 vs 0.89). Validation pilots ranked
+F behind Bifrost-1 on FID (32.04 vs 29.83); the test reversed that, as the rule above warns.
+ImageNet-val FID (secondary) for F still scoring. Validation α pilots, class top-1: α 1 0.572,
+0.8 0.615, 0.6 0.641 (α = 0.6 not yet run on test).
