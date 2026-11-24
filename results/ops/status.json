@@ -15,7 +15,6 @@
  },
  "cluster": {
   "counts": {
-   "PENDING": 3,
    "RUNNING": 3
   },
   "ended_24h": [
@@ -348,6 +347,14 @@
     "state": "COMPLETED"
    },
    {
+    "elapsed": "00:27:26",
+    "end": "2026-11-24T06:46:53",
+    "exit": "0:0",
+    "jobid": "1508327",
+    "name": "adm-score",
+    "state": "COMPLETED"
+   },
+   {
     "elapsed": "00:00:19",
     "end": "2026-11-24T03:17:08",
     "exit": "0:0",
@@ -362,51 +369,27 @@
     "jobid": "1508330",
     "name": "class-acc",
     "state": "COMPLETED"
+   },
+   {
+    "elapsed": "00:00:42",
+    "end": "2026-11-24T06:47:35",
+    "exit": "0:0",
+    "jobid": "1508331",
+    "name": "class-acc",
+    "state": "COMPLETED"
+   },
+   {
+    "elapsed": "00:00:38",
+    "end": "2026-11-24T06:48:13",
+    "exit": "0:0",
+    "jobid": "1508332",
+    "name": "class-acc",
+    "state": "COMPLETED"
    }
   ],
   "squeue": [
    {
-    "elapsed": "0:00",
-    "jobid": "1508331",
-    "name": "class-acc",
-    "nodes": "1",
-    "reason_or_nodelist": "(Resources)",
-    "start": "2026-11-24T17:56:26",
-    "state": "PENDING",
-    "time_limit": "2:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508332",
-    "name": "class-acc",
-    "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "2026-11-24T18:06:12",
-    "state": "PENDING",
-    "time_limit": "2:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508328",
-    "name": "adm-score",
-    "nodes": "1",
-    "reason_or_nodelist": "(Dependency)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "12:00:00"
-   },
-   {
-    "elapsed": "4:09",
-    "jobid": "1508327",
-    "name": "adm-score",
-    "nodes": "1",
-    "reason_or_nodelist": "vhpc13",
-    "start": "2026-11-24T06:19:27",
-    "state": "RUNNING",
-    "time_limit": "12:00:00"
-   },
-   {
-    "elapsed": "17:24",
+    "elapsed": "42:41",
     "jobid": "1508326",
     "name": "adm-score",
     "nodes": "1",
@@ -416,12 +399,22 @@
     "time_limit": "12:00:00"
    },
    {
-    "elapsed": "27:10",
+    "elapsed": "52:27",
     "jobid": "1508324",
     "name": "adm-score",
     "nodes": "1",
     "reason_or_nodelist": "vhpc14",
     "start": "2026-11-24T05:56:26",
+    "state": "RUNNING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:40",
+    "jobid": "1508328",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "vhpc13",
+    "start": "2026-11-24T06:48:13",
     "state": "RUNNING",
     "time_limit": "12:00:00"
    }
@@ -1352,28 +1345,28 @@
    "waiting_for": null
   },
   "2026-11-23-test-classacc-adarq_E-seed0": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-24T06:48:53",
+   "finished": "2026-11-24T06:48:53",
    "invalid": null,
    "jobid": "1508331",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-23T14:53:51",
    "waiting_for": null
   },
   "2026-11-23-test-classacc-adarq_F-seed0": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-24T06:48:53",
+   "finished": "2026-11-24T06:48:53",
    "invalid": null,
    "jobid": "1508332",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-23T14:53:51",
@@ -1618,14 +1611,14 @@
    "waiting_for": null
   },
   "2026-11-23-test-score-adarq_F-seed2-adm": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-24T06:48:53",
+   "finished": "2026-11-24T06:48:53",
    "invalid": null,
    "jobid": "1508327",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "RUNNING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-23T14:53:51",
@@ -1639,12 +1632,12 @@
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "RUNNING"
    ],
    "submit_error": null,
    "submitted": "2026-11-23T14:53:51",
    "waiting_for": null
   }
  },
- "updated": "2026-11-24T06:23:36"
+ "updated": "2026-11-24T06:48:53"
 }

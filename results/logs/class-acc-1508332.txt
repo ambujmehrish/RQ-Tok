@@ -1,0 +1,1 @@
+top-1 0.5788  top-5 0.8309  (10000 images) -> /home/ambuj.mehrish/work/levelb/samples/adarq_F_seed0/samples_10000.cls.metrics.json

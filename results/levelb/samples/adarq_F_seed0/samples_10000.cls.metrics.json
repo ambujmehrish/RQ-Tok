@@ -1,0 +1,7 @@
+{
+  "top1": 0.5788,
+  "top5": 0.8309,
+  "n": 10000,
+  "classifier": "torchvision resnet50 IMAGENET1K_V2",
+  "source": "/home/ambuj.mehrish/work/levelb/samples/adarq_F_seed0/samples_10000.npz"
+}
