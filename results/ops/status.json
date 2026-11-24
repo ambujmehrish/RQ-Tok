@@ -15,7 +15,7 @@
  },
  "cluster": {
   "counts": {
-   "PENDING": 2,
+   "PENDING": 1,
    "RUNNING": 1
   },
   "ended_24h": [
@@ -236,6 +236,14 @@
     "state": "COMPLETED"
    },
    {
+    "elapsed": "00:08:47",
+    "end": "2026-11-24T16:38:07",
+    "exit": "0:0",
+    "jobid": "1508413",
+    "name": "is-decomp",
+    "state": "COMPLETED"
+   },
+   {
     "elapsed": "00:00:00",
     "end": "2026-11-24T14:47:34",
     "exit": "0:0",
@@ -274,30 +282,20 @@
     "jobid": "1508408",
     "name": "class-acc",
     "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "2026-11-25T02:29:00",
+    "reason_or_nodelist": "(Resources)",
+    "start": "2026-11-24T18:38:07",
     "state": "PENDING",
     "time_limit": "2:00:00"
    },
    {
-    "elapsed": "0:00",
+    "elapsed": "1:58",
     "jobid": "1508407",
     "name": "class-acc",
     "nodes": "1",
-    "reason_or_nodelist": "(Resources)",
-    "start": "2026-11-25T00:29:20",
-    "state": "PENDING",
-    "time_limit": "2:00:00"
-   },
-   {
-    "elapsed": "0:31",
-    "jobid": "1508413",
-    "name": "is-decomp",
-    "nodes": "1",
     "reason_or_nodelist": "vhpc15",
-    "start": "2026-11-24T16:29:20",
+    "start": "2026-11-24T16:38:07",
     "state": "RUNNING",
-    "time_limit": "8:00:00"
+    "time_limit": "2:00:00"
    }
   ]
  },
@@ -1534,7 +1532,7 @@
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "RUNNING"
    ],
    "submit_error": null,
    "submitted": "2026-11-24T14:38:27",
@@ -1611,19 +1609,19 @@
    "waiting_for": null
   },
   "2026-11-24-isdecomp-real": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-24T16:40:04",
+   "finished": "2026-11-24T16:40:04",
    "invalid": null,
    "jobid": "1508413",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "RUNNING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-24T14:38:27",
    "waiting_for": null
   }
  },
- "updated": "2026-11-24T16:29:51"
+ "updated": "2026-11-24T16:40:04"
 }
