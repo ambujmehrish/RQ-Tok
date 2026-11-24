@@ -15,34 +15,10 @@
  },
  "cluster": {
   "counts": {
-   "PENDING": 3,
+   "PENDING": 2,
    "RUNNING": 1
   },
   "ended_24h": [
-   {
-    "elapsed": "00:14:00",
-    "end": "2026-11-23T16:16:39",
-    "exit": "0:0",
-    "jobid": "1508308",
-    "name": "adm-score",
-    "state": "COMPLETED"
-   },
-   {
-    "elapsed": "00:11:06",
-    "end": "2026-11-23T16:12:20",
-    "exit": "0:0",
-    "jobid": "1508309",
-    "name": "adm-score",
-    "state": "COMPLETED"
-   },
-   {
-    "elapsed": "00:00:40",
-    "end": "2026-11-23T16:13:00",
-    "exit": "0:0",
-    "jobid": "1508310",
-    "name": "class-acc",
-    "state": "COMPLETED"
-   },
    {
     "elapsed": "05:32:50",
     "end": "2026-11-23T21:45:50",
@@ -252,6 +228,14 @@
     "state": "COMPLETED"
    },
    {
+    "elapsed": "00:27:25",
+    "end": "2026-11-24T16:29:20",
+    "exit": "0:0",
+    "jobid": "1508412",
+    "name": "is-decomp",
+    "state": "COMPLETED"
+   },
+   {
     "elapsed": "00:00:00",
     "end": "2026-11-24T14:47:34",
     "exit": "0:0",
@@ -287,21 +271,11 @@
   "squeue": [
    {
     "elapsed": "0:00",
-    "jobid": "1508413",
-    "name": "is-decomp",
-    "nodes": "1",
-    "reason_or_nodelist": "(Resources)",
-    "start": "2026-11-25T00:01:55",
-    "state": "PENDING",
-    "time_limit": "8:00:00"
-   },
-   {
-    "elapsed": "0:00",
     "jobid": "1508408",
     "name": "class-acc",
     "nodes": "1",
     "reason_or_nodelist": "(Priority)",
-    "start": "2026-11-25T10:01:00",
+    "start": "2026-11-25T02:29:00",
     "state": "PENDING",
     "time_limit": "2:00:00"
    },
@@ -310,18 +284,18 @@
     "jobid": "1508407",
     "name": "class-acc",
     "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "2026-11-25T08:01:00",
+    "reason_or_nodelist": "(Resources)",
+    "start": "2026-11-25T00:29:20",
     "state": "PENDING",
     "time_limit": "2:00:00"
    },
    {
-    "elapsed": "2:37",
-    "jobid": "1508412",
+    "elapsed": "0:31",
+    "jobid": "1508413",
     "name": "is-decomp",
     "nodes": "1",
     "reason_or_nodelist": "vhpc15",
-    "start": "2026-11-24T16:01:55",
+    "start": "2026-11-24T16:29:20",
     "state": "RUNNING",
     "time_limit": "8:00:00"
    }
@@ -1623,14 +1597,14 @@
    "waiting_for": null
   },
   "2026-11-24-isdecomp-bifrost": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-24T16:29:51",
+   "finished": "2026-11-24T16:29:51",
    "invalid": null,
    "jobid": "1508412",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "RUNNING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-24T14:38:27",
@@ -1644,12 +1618,12 @@
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "RUNNING"
    ],
    "submit_error": null,
    "submitted": "2026-11-24T14:38:27",
    "waiting_for": null
   }
  },
- "updated": "2026-11-24T16:04:32"
+ "updated": "2026-11-24T16:29:51"
 }
