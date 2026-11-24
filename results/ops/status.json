@@ -15,8 +15,7 @@
  },
  "cluster": {
   "counts": {
-   "PENDING": 20,
-   "RUNNING": 1
+   "PENDING": 20
   },
   "ended_24h": [
    {
@@ -290,9 +289,27 @@
     "jobid": "1508417",
     "name": "bsro-lyrics",
     "state": "COMPLETED"
+   },
+   {
+    "elapsed": "00:42:32",
+    "end": "2026-11-24T17:48:12",
+    "exit": "0:0",
+    "jobid": "1508420",
+    "name": "oracle-render",
+    "state": "COMPLETED"
    }
   ],
   "squeue": [
+   {
+    "elapsed": "0:00",
+    "jobid": "1508427",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Resources)",
+    "start": "2026-11-25T13:33:15",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
    {
     "elapsed": "0:00",
     "jobid": "1508433",
@@ -355,13 +372,63 @@
    },
    {
     "elapsed": "0:00",
-    "jobid": "1508427",
-    "name": "adm-score",
+    "jobid": "1508422",
+    "name": "oracle-render",
     "nodes": "1",
-    "reason_or_nodelist": "(Dependency)",
+    "reason_or_nodelist": "(Priority)",
+    "start": "2026-11-25T17:48:12",
+    "state": "PENDING",
+    "time_limit": "6:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508421",
+    "name": "oracle-render",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "2026-11-25T13:33:55",
+    "state": "PENDING",
+    "time_limit": "6:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508426",
+    "name": "levelb-sample",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
     "start": "N/A",
     "state": "PENDING",
-    "time_limit": "12:00:00"
+    "time_limit": "1-00:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508425",
+    "name": "levelb-sample",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "1-00:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508424",
+    "name": "levelb-sample",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "1-00:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508423",
+    "name": "oracle-render",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "6:00:00"
    },
    {
     "elapsed": "0:00",
@@ -432,76 +499,6 @@
     "start": "N/A",
     "state": "PENDING",
     "time_limit": "2:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508426",
-    "name": "levelb-sample",
-    "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "1-00:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508425",
-    "name": "levelb-sample",
-    "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "1-00:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508424",
-    "name": "levelb-sample",
-    "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "1-00:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508423",
-    "name": "oracle-render",
-    "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "6:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508422",
-    "name": "oracle-render",
-    "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "6:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508421",
-    "name": "oracle-render",
-    "nodes": "1",
-    "reason_or_nodelist": "(Resources)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "6:00:00"
-   },
-   {
-    "elapsed": "0:01",
-    "jobid": "1508420",
-    "name": "oracle-render",
-    "nodes": "1",
-    "reason_or_nodelist": "vhpc15",
-    "start": "2026-11-24T17:05:40",
-    "state": "RUNNING",
-    "time_limit": "6:00:00"
    }
   ]
  },
@@ -1856,7 +1853,9 @@
    "jobid": "1508434",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "PENDING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
    "waiting_for": null
@@ -1868,7 +1867,9 @@
    "jobid": "1508435",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "PENDING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
    "waiting_for": null
@@ -1880,7 +1881,9 @@
    "jobid": "1508436",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "PENDING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
    "waiting_for": null
@@ -1892,7 +1895,9 @@
    "jobid": "1508437",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "PENDING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
    "waiting_for": null
@@ -1904,7 +1909,9 @@
    "jobid": "1508438",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "PENDING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
    "waiting_for": null
@@ -1916,7 +1923,9 @@
    "jobid": "1508439",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "PENDING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
    "waiting_for": null
@@ -1928,20 +1937,22 @@
    "jobid": "1508440",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "PENDING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
    "waiting_for": null
   },
   "2026-11-24-step0-render-oracle_adaptive": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-24T17:51:09",
+   "finished": "2026-11-24T17:51:09",
    "invalid": null,
    "jobid": "1508420",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
@@ -1954,7 +1965,9 @@
    "jobid": "1508421",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "PENDING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
    "waiting_for": null
@@ -1966,7 +1979,9 @@
    "jobid": "1508422",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "PENDING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
    "waiting_for": null
@@ -1978,7 +1993,9 @@
    "jobid": "1508423",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "PENDING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
    "waiting_for": null
@@ -1990,7 +2007,9 @@
    "jobid": "1508424",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "PENDING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
    "waiting_for": null
@@ -2002,7 +2021,9 @@
    "jobid": "1508425",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "PENDING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
    "waiting_for": null
@@ -2014,7 +2035,9 @@
    "jobid": "1508426",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "PENDING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
    "waiting_for": null
@@ -2026,7 +2049,9 @@
    "jobid": "1508427",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "PENDING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
    "waiting_for": null
@@ -2038,7 +2063,9 @@
    "jobid": "1508428",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "PENDING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
    "waiting_for": null
@@ -2050,7 +2077,9 @@
    "jobid": "1508429",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "PENDING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
    "waiting_for": null
@@ -2062,7 +2091,9 @@
    "jobid": "1508430",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "PENDING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
    "waiting_for": null
@@ -2074,7 +2105,9 @@
    "jobid": "1508431",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "PENDING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
    "waiting_for": null
@@ -2086,7 +2119,9 @@
    "jobid": "1508432",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "PENDING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
    "waiting_for": null
@@ -2098,11 +2133,13 @@
    "jobid": "1508433",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "PENDING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
    "waiting_for": null
   }
  },
- "updated": "2026-11-24T17:05:40"
+ "updated": "2026-11-24T17:51:09"
 }
