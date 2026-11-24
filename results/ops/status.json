@@ -14,7 +14,9 @@
   }
  },
  "cluster": {
-  "counts": {},
+  "counts": {
+   "PENDING": 7
+  },
   "ended_24h": [
    {
     "elapsed": "01:08:47",
@@ -231,9 +233,88 @@
     "jobid": "1508332",
     "name": "class-acc",
     "state": "COMPLETED"
+   },
+   {
+    "elapsed": "00:01:09",
+    "end": "2026-11-24T14:36:51",
+    "exit": "0:0",
+    "jobid": "1508406",
+    "name": "bsro-separate",
+    "state": "COMPLETED"
    }
   ],
-  "squeue": []
+  "squeue": [
+   {
+    "elapsed": "0:00",
+    "jobid": "1508413",
+    "name": "is-decomp",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "8:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508412",
+    "name": "is-decomp",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "8:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508411",
+    "name": "is-decomp",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "8:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508410",
+    "name": "is-decomp",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "8:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508409",
+    "name": "is-decomp",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "8:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508408",
+    "name": "class-acc",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "2:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508407",
+    "name": "class-acc",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "2:00:00"
+   }
+  ]
  },
  "queue": [
   "2026-11-18-watch-flux1024",
@@ -316,7 +397,14 @@
   "2026-11-23-test-score-adarq_F-seed1-adm",
   "2026-11-23-test-score-adarq_F-seed1-val",
   "2026-11-23-test-score-adarq_F-seed2-adm",
-  "2026-11-23-test-score-adarq_F-seed2-val"
+  "2026-11-23-test-score-adarq_F-seed2-val",
+  "2026-11-24-classacc-perclass-adarq_F-adarq_E",
+  "2026-11-24-classacc-perclass-bifrost-adarq",
+  "2026-11-24-isdecomp-adarq",
+  "2026-11-24-isdecomp-adarq_E",
+  "2026-11-24-isdecomp-adarq_F",
+  "2026-11-24-isdecomp-bifrost",
+  "2026-11-24-isdecomp-real"
  ],
  "requests": {
   "2026-11-18-watch-flux1024": {
@@ -1452,7 +1540,91 @@
    "submit_error": null,
    "submitted": "2026-11-23T14:53:51",
    "waiting_for": null
+  },
+  "2026-11-24-classacc-perclass-adarq_F-adarq_E": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508407",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [],
+   "submit_error": null,
+   "submitted": "2026-11-24T14:38:27",
+   "waiting_for": null
+  },
+  "2026-11-24-classacc-perclass-bifrost-adarq": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508408",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [],
+   "submit_error": null,
+   "submitted": "2026-11-24T14:38:27",
+   "waiting_for": null
+  },
+  "2026-11-24-isdecomp-adarq": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508409",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [],
+   "submit_error": null,
+   "submitted": "2026-11-24T14:38:27",
+   "waiting_for": null
+  },
+  "2026-11-24-isdecomp-adarq_E": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508410",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [],
+   "submit_error": null,
+   "submitted": "2026-11-24T14:38:27",
+   "waiting_for": null
+  },
+  "2026-11-24-isdecomp-adarq_F": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508411",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [],
+   "submit_error": null,
+   "submitted": "2026-11-24T14:38:27",
+   "waiting_for": null
+  },
+  "2026-11-24-isdecomp-bifrost": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508412",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [],
+   "submit_error": null,
+   "submitted": "2026-11-24T14:38:27",
+   "waiting_for": null
+  },
+  "2026-11-24-isdecomp-real": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508413",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [],
+   "submit_error": null,
+   "submitted": "2026-11-24T14:38:27",
+   "waiting_for": null
   }
  },
- "updated": "2026-11-24T14:08:06"
+ "updated": "2026-11-24T14:38:27"
 }
