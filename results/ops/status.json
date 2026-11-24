@@ -397,7 +397,7 @@
   ],
   "squeue": [
    {
-    "elapsed": "51:23",
+    "elapsed": "1:16:40",
     "jobid": "1508328",
     "name": "adm-score",
     "nodes": "1",
@@ -1627,5 +1627,5 @@
    "waiting_for": null
   }
  },
- "updated": "2026-11-24T07:39:35"
+ "updated": "2026-11-24T08:04:52"
 }
