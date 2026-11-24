@@ -886,3 +886,47 @@ loses on IS (91 vs 267), precision and class accuracy (0.58 vs 0.89). Validation
 F behind Bifrost-1 on FID (32.04 vs 29.83); the test reversed that, as the rule above warns.
 ImageNet-val FID (secondary): Bifrost-1 19.20 ± 0.14, default 24.92 ± 0.30, F 13.65 ± 0.08, E 18.63 ± 0.16. F/E were scored on H200 nodes (OpenBLAS SkylakeX), Bifrost-1 on the CPU partition; the H200 cross-check of Bifrost-1 seed 0 matched (16.991 vs 16.99). Validation α pilots, class top-1: α 1 0.572,
 0.8 0.615, 0.6 0.641 (α = 0.6 not yet run on test).
+
+### IS decomposition on the test samples (2026-11-24; `levelb/is_decomp.py`, seeds 0–2)
+
+ln IS = H(p(y)) − E[H(p(y|x))], with the evaluator's own Inception network; every job
+reproduced the IS on record. ResNet-50 columns from `class_accuracy --per-class`.
+
+| arm | IS | H(p(y)) | eff. classes | E[H(p(y\|x))] | top prob > 0.5 | same-class argmax agreement | ResNet top-1 | p(requested) |
+|---|---|---|---|---|---|---|---|---|
+| real (ADM reference batch) | 337.85 | 6.826 | 922 | 1.004 | 0.910 | — | — | — |
+| Bifrost-1 | 266.55 | 6.822 | 918 | 1.237 | 0.879 | 0.895 | 0.892 | 0.386 |
+| AdaRQ-Flow F | 90.75 | 6.814 | 910 | 2.306 | 0.595 | 0.587 | 0.580 | 0.222 |
+| AdaRQ-Flow E | 70.50 | 6.798 | 896 | 2.543 | 0.528 | 0.514 | 0.497 | 0.188 |
+| AdaRQ-Flow default | 56.09 | 6.775 | 876 | 2.748 | 0.476 | 0.447 | 0.432 | 0.158 |
+
+- Class spread is equal across arms (and equal to real images); the whole IS gap is
+  per-image uncertainty (F vs Bifrost-1: 1.069 of the 1.077 nats).
+- The deficit is spread over classes: F is below Bifrost-1 in 95% (ResNet top-1) / 98.6%
+  (Inception KL) of the 1,000 classes; the worst 10% of classes carry ~21% of the gap; per-class
+  correlation between the arms is 0.55–0.57.
+
+### Diagnosis against the closest literature (2026-11-24)
+
+Closest work: HART (2410.10812; discrete tokens + residual diffusion MLP), MAR (2406.11838),
+TokenBridge (2503.16430), BLIP3-o (2505.09568; flow matching vs MSE on CLIP features),
+Bifrost-1 (2508.05954). Weaknesses of AdaRQ-Flow as built, each tied to a fact on record:
+
+1. **Unguided sampling against a mean regressor.** Both arms run `cfg_weight = 1.0` and train
+   with prompt dropout 0 (upstream's settings). Bifrost-1's MSE head outputs the conditional
+   mean, which needs no guidance; AdaRQ-Flow samples. Sampled class-conditional token models
+   without guidance score IS 60–200 and 220–290 with it (MAR Table 1: AR+CE 60.8 → 227.3,
+   MAR+CE 146 → 278); AdaRQ-Flow's 56–91 is in the unguided range. Guidance cannot be
+   switched on for the existing checkpoint: it never saw an empty prompt.
+2. **The codes do not carry "the big picture".** Stage 0 leaves a mean relative residual of
+   0.699 at mean depth 2: about half the latent's energy is in the residual. HART's premise is
+   the opposite (discrete tokens alone decode well; the residual is detail, so a 37M MLP with 8
+   steps is enough).
+3. **Residual head too small for its job.** A per-token MLP (width 1024, 3 blocks; MAR's head
+   for 16-dim VAE tokens) models a 2048-dim residual holding half the signal. BLIP3-o models
+   64 CLIP tokens jointly with a 1.4B diffusion transformer and reports capacity matters.
+   Consistent with the α pilots: less residual noise is monotonically better (α 1 → 0.6).
+4. **Shallow depth-autoregressive code head** (one linear readout per level). TokenBridge: head
+   capacity 3M → 94M moves FID 2.88 → 1.94; independent prediction is far worse.
+5. **Mask-ratio mismatch (≤ 19 visible in training, up to 63 at sampling) is standard MAR
+   practice** and works there; downgraded from prime suspect to a secondary one.
