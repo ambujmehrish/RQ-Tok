@@ -15,26 +15,10 @@
  },
  "cluster": {
   "counts": {
-   "PENDING": 4,
+   "PENDING": 3,
    "RUNNING": 1
   },
   "ended_24h": [
-   {
-    "elapsed": "01:08:47",
-    "end": "2026-11-23T16:02:38",
-    "exit": "0:0",
-    "jobid": "1508306",
-    "name": "levelb-sample",
-    "state": "COMPLETED"
-   },
-   {
-    "elapsed": "01:07:22",
-    "end": "2026-11-23T16:01:14",
-    "exit": "0:0",
-    "jobid": "1508307",
-    "name": "levelb-sample",
-    "state": "COMPLETED"
-   },
    {
     "elapsed": "00:14:00",
     "end": "2026-11-23T16:16:39",
@@ -260,6 +244,14 @@
     "state": "COMPLETED"
    },
    {
+    "elapsed": "00:29:08",
+    "end": "2026-11-24T16:01:55",
+    "exit": "0:0",
+    "jobid": "1508411",
+    "name": "is-decomp",
+    "state": "COMPLETED"
+   },
+   {
     "elapsed": "00:00:00",
     "end": "2026-11-24T14:47:34",
     "exit": "0:0",
@@ -298,18 +290,8 @@
     "jobid": "1508413",
     "name": "is-decomp",
     "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "2026-11-25T07:32:00",
-    "state": "PENDING",
-    "time_limit": "8:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508412",
-    "name": "is-decomp",
-    "nodes": "1",
     "reason_or_nodelist": "(Resources)",
-    "start": "2026-11-24T23:32:47",
+    "start": "2026-11-25T00:01:55",
     "state": "PENDING",
     "time_limit": "8:00:00"
    },
@@ -319,7 +301,7 @@
     "name": "class-acc",
     "nodes": "1",
     "reason_or_nodelist": "(Priority)",
-    "start": "2026-11-25T13:33:55",
+    "start": "2026-11-25T10:01:00",
     "state": "PENDING",
     "time_limit": "2:00:00"
    },
@@ -329,17 +311,17 @@
     "name": "class-acc",
     "nodes": "1",
     "reason_or_nodelist": "(Priority)",
-    "start": "2026-11-25T13:33:15",
+    "start": "2026-11-25T08:01:00",
     "state": "PENDING",
     "time_limit": "2:00:00"
    },
    {
-    "elapsed": "6:28",
-    "jobid": "1508411",
+    "elapsed": "2:37",
+    "jobid": "1508412",
     "name": "is-decomp",
     "nodes": "1",
     "reason_or_nodelist": "vhpc15",
-    "start": "2026-11-24T15:32:47",
+    "start": "2026-11-24T16:01:55",
     "state": "RUNNING",
     "time_limit": "8:00:00"
    }
@@ -1627,14 +1609,14 @@
    "waiting_for": null
   },
   "2026-11-24-isdecomp-adarq_F": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-24T16:04:32",
+   "finished": "2026-11-24T16:04:32",
    "invalid": null,
    "jobid": "1508411",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "RUNNING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-24T14:38:27",
@@ -1648,7 +1630,7 @@
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "RUNNING"
    ],
    "submit_error": null,
    "submitted": "2026-11-24T14:38:27",
@@ -1669,5 +1651,5 @@
    "waiting_for": null
   }
  },
- "updated": "2026-11-24T15:39:15"
+ "updated": "2026-11-24T16:04:32"
 }
