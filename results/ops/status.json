@@ -15,7 +15,7 @@
  },
  "cluster": {
   "counts": {
-   "PENDING": 14,
+   "PENDING": 13,
    "RUNNING": 2
   },
   "ended_24h": [
@@ -33,14 +33,6 @@
     "exit": "0:0",
     "jobid": "1508408",
     "name": "class-acc",
-    "state": "COMPLETED"
-   },
-   {
-    "elapsed": "00:30:21",
-    "end": "2026-11-24T15:32:47",
-    "exit": "0:0",
-    "jobid": "1508410",
-    "name": "is-decomp",
     "state": "COMPLETED"
    },
    {
@@ -65,22 +57,6 @@
     "exit": "0:0",
     "jobid": "1508413",
     "name": "is-decomp",
-    "state": "COMPLETED"
-   },
-   {
-    "elapsed": "00:01:06",
-    "end": "2026-11-24T15:23:28",
-    "exit": "1:0",
-    "jobid": "1508416",
-    "name": "bsro-lyrics",
-    "state": "FAILED"
-   },
-   {
-    "elapsed": "00:04:52",
-    "end": "2026-11-24T15:34:45",
-    "exit": "0:0",
-    "jobid": "1508417",
-    "name": "bsro-lyrics",
     "state": "COMPLETED"
    },
    {
@@ -116,6 +92,14 @@
     "state": "COMPLETED"
    },
    {
+    "elapsed": "01:08:53",
+    "end": "2026-11-25T15:59:05",
+    "exit": "0:0",
+    "jobid": "1508424",
+    "name": "levelb-sample",
+    "state": "COMPLETED"
+   },
+   {
     "elapsed": "00:11:43",
     "end": "2026-11-24T21:16:46",
     "exit": "0:0",
@@ -127,21 +111,11 @@
   "squeue": [
    {
     "elapsed": "0:00",
-    "jobid": "1508426",
-    "name": "levelb-sample",
-    "nodes": "1",
-    "reason_or_nodelist": "(Resources)",
-    "start": "2026-11-26T13:12:09",
-    "state": "PENDING",
-    "time_limit": "1-00:00:00"
-   },
-   {
-    "elapsed": "0:00",
     "jobid": "1508428",
     "name": "adm-score",
     "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "2026-11-26T14:50:12",
+    "reason_or_nodelist": "(Resources)",
+    "start": "2026-11-26T13:12:09",
     "state": "PENDING",
     "time_limit": "12:00:00"
    },
@@ -161,7 +135,7 @@
     "name": "class-acc",
     "nodes": "1",
     "reason_or_nodelist": "(Priority)",
-    "start": "N/A",
+    "start": "2026-11-26T15:59:05",
     "state": "PENDING",
     "time_limit": "2:00:00"
    },
@@ -171,7 +145,17 @@
     "name": "adm-score",
     "nodes": "1",
     "reason_or_nodelist": "(Priority)",
-    "start": "N/A",
+    "start": "2026-11-26T15:59:05",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508431",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "2026-11-26T15:59:05",
     "state": "PENDING",
     "time_limit": "12:00:00"
    },
@@ -188,16 +172,6 @@
    {
     "elapsed": "0:00",
     "jobid": "1508432",
-    "name": "adm-score",
-    "nodes": "1",
-    "reason_or_nodelist": "(Dependency)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "12:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508431",
     "name": "adm-score",
     "nodes": "1",
     "reason_or_nodelist": "(Dependency)",
@@ -266,17 +240,17 @@
     "time_limit": "2:00:00"
    },
    {
-    "elapsed": "29:26",
-    "jobid": "1508424",
+    "elapsed": "1:00",
+    "jobid": "1508426",
     "name": "levelb-sample",
     "nodes": "1",
     "reason_or_nodelist": "vhpc13",
-    "start": "2026-11-25T14:50:12",
+    "start": "2026-11-25T15:59:05",
     "state": "RUNNING",
     "time_limit": "1-00:00:00"
    },
    {
-    "elapsed": "0:54",
+    "elapsed": "41:21",
     "jobid": "1508425",
     "name": "levelb-sample",
     "nodes": "1",
@@ -1786,14 +1760,14 @@
    "waiting_for": null
   },
   "2026-11-24-step0-sample-pilot_adarq_F_a0": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-25T16:00:04",
+   "finished": "2026-11-25T16:00:04",
    "invalid": null,
    "jobid": "1508424",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "RUNNING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
@@ -1821,7 +1795,7 @@
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "RUNNING"
    ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
@@ -1926,5 +1900,5 @@
    "waiting_for": null
   }
  },
- "updated": "2026-11-25T15:19:38"
+ "updated": "2026-11-25T16:00:04"
 }
