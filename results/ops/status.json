@@ -19,22 +19,6 @@
   },
   "ended_24h": [
    {
-    "elapsed": "01:29:16",
-    "end": "2026-11-24T07:25:42",
-    "exit": "0:0",
-    "jobid": "1508324",
-    "name": "adm-score",
-    "state": "COMPLETED"
-   },
-   {
-    "elapsed": "01:29:37",
-    "end": "2026-11-24T07:35:49",
-    "exit": "0:0",
-    "jobid": "1508326",
-    "name": "adm-score",
-    "state": "COMPLETED"
-   },
-   {
     "elapsed": "01:52:44",
     "end": "2026-11-24T08:40:57",
     "exit": "0:0",
@@ -1983,5 +1967,5 @@
    "waiting_for": null
   }
  },
- "updated": "2026-11-25T07:14:56"
+ "updated": "2026-11-25T08:15:30"
 }
