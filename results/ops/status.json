@@ -158,7 +158,17 @@
   "squeue": [
    {
     "elapsed": "0:00",
-    "jobid": "1508426",
+    "jobid": "1508425",
+    "name": "levelb-sample",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "2026-11-26T13:19:16",
+    "state": "PENDING",
+    "time_limit": "1-00:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508424",
     "name": "levelb-sample",
     "nodes": "1",
     "reason_or_nodelist": "(Priority)",
@@ -168,21 +178,11 @@
    },
    {
     "elapsed": "0:00",
-    "jobid": "1508425",
+    "jobid": "1508426",
     "name": "levelb-sample",
     "nodes": "1",
     "reason_or_nodelist": "(Priority)",
-    "start": "2026-11-26T06:24:18",
-    "state": "PENDING",
-    "time_limit": "1-00:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508424",
-    "name": "levelb-sample",
-    "nodes": "1",
-    "reason_or_nodelist": "(Resources)",
-    "start": "2026-11-25T16:12:12",
+    "start": "N/A",
     "state": "PENDING",
     "time_limit": "1-00:00:00"
    },
@@ -1957,5 +1957,5 @@
    "waiting_for": null
   }
  },
- "updated": "2026-11-25T13:18:31"
+ "updated": "2026-11-25T14:19:05"
 }
