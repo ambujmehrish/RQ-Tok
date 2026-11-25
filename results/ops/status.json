@@ -65,14 +65,6 @@
     "state": "COMPLETED"
    },
    {
-    "elapsed": "00:11:43",
-    "end": "2026-11-24T21:16:46",
-    "exit": "0:0",
-    "jobid": "1508427",
-    "name": "adm-score",
-    "state": "COMPLETED"
-   },
-   {
     "elapsed": "00:12:09",
     "end": "2026-11-25T16:40:04",
     "exit": "0:0",
@@ -1818,5 +1810,5 @@
    "waiting_for": null
   }
  },
- "updated": "2026-11-25T20:23:46"
+ "updated": "2026-11-25T21:24:17"
 }
