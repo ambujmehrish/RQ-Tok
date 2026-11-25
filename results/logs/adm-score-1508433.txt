@@ -1,0 +1,11 @@
+  node vhpc14 | Intel(R) Xeon(R) 6760P | 8 threads | OpenBLAS core SkylakeX
+  merged 1 shard(s) -> /home/ambuj.mehrish/work/levelb/samples/pilot_adarq_F_a04_seed100/samples_2000.npz
+  2000 samples at 256 px
+2026-11-25 17:20:59.273444: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX512F AVX512_VNNI AVX512_BF16 AVX_VNNI AMX_TILE AMX_INT8 AMX_BF16 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2026-11-25 17:21:07.706238: W tensorflow/core/framework/op_def_util.cc:369] Op BatchNormWithGlobalNormalization is deprecated. It will cease to work in GraphDef version 9. Use tf.nn.batch_normalization().
+warming up TensorFlow...
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-25 17:21:09.506838: I tensorflow/compiler/mlir/mlir_graph_optimization_pass.cc:388] MLIR V1 optimization pass is not enabled
+100%|██████████| 1/1 [00:02<00:00,  2.58s/it]100%|██████████| 1/1 [00:02<00:00,  2.58s/it]
+computing reference batch activations...
+  0%|          | 0/157 [00:00<?, ?it/s]  1%|          | 1/157 [00:04<10:48,  4.15s/it]  1%|▏         | 2/157 [00:07<09:55,  3.84s/it]  2%|▏         | 3/157 [00:11<10:02,  3.92s/it]  3%|▎         | 4/157 [00:15<10:04,  3.95s/it]  3%|▎         | 5/157 [00:19<09:36,  3.79s/it]  4%|▍         | 6/157 [00:23<09:39,  3.84s/it]  4%|▍         | 7/157 [00:27<09:45,  3.91s/it]
