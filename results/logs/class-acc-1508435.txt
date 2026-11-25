@@ -1,0 +1,1 @@
+top-1 0.5560  top-5 0.8045  (2000 images) -> /home/ambuj.mehrish/work/levelb/samples/oracle_depth1_seed100/samples_2000.cls.metrics.json
