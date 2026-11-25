@@ -17,14 +17,6 @@
   "counts": {},
   "ended_24h": [
    {
-    "elapsed": "00:42:32",
-    "end": "2026-11-24T17:48:12",
-    "exit": "0:0",
-    "jobid": "1508420",
-    "name": "oracle-render",
-    "state": "COMPLETED"
-   },
-   {
     "elapsed": "00:43:06",
     "end": "2026-11-24T21:54:43",
     "exit": "0:0",
@@ -1826,5 +1818,5 @@
    "waiting_for": null
   }
  },
- "updated": "2026-11-25T17:37:07"
+ "updated": "2026-11-25T18:22:33"
 }
