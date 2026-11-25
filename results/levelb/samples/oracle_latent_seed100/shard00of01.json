@@ -1,0 +1,29 @@
+{
+  "mode": "latent",
+  "tok": "/home/ambuj.mehrish/work/levelb/adarq_tok",
+  "controlnet": "/home/ambuj.mehrish/work/levelb/controlnet/final_controlnet.pt",
+  "data": "/home/ambuj.mehrish/work/levelb/imagenet256",
+  "flux": "black-forest-labs/FLUX.1-dev",
+  "n": 2000,
+  "seed": 100,
+  "shard": 0,
+  "nshards": 1,
+  "batch": 16,
+  "steps": 28,
+  "cn_scale": 0.7,
+  "guidance": 3.5,
+  "res": 256,
+  "device": "cuda",
+  "out": "/home/ambuj.mehrish/work/levelb/samples/oracle_latent_seed100",
+  "arm": "oracle:latent",
+  "range": [
+    0,
+    2000
+  ],
+  "source": "real held-out latents, class-balanced (class_accuracy --heldout rows)",
+  "mean_relative_residual": 0.0,
+  "energy_unexplained": 0.0,
+  "mean_depth": null,
+  "depth_hist": null,
+  "stored_code_agreement": null
+}

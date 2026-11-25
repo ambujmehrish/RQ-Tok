@@ -15,8 +15,7 @@
  },
  "cluster": {
   "counts": {
-   "PENDING": 16,
-   "RUNNING": 1
+   "PENDING": 16
   },
   "ended_24h": [
    {
@@ -140,6 +139,14 @@
     "state": "COMPLETED"
    },
    {
+    "elapsed": "00:41:52",
+    "end": "2026-11-25T09:44:18",
+    "exit": "0:0",
+    "jobid": "1508423",
+    "name": "oracle-render",
+    "state": "COMPLETED"
+   },
+   {
     "elapsed": "00:11:43",
     "end": "2026-11-24T21:16:46",
     "exit": "0:0",
@@ -174,14 +181,14 @@
     "jobid": "1508424",
     "name": "levelb-sample",
     "nodes": "1",
-    "reason_or_nodelist": "(Resources)",
-    "start": "2026-11-25T15:02:26",
+    "reason_or_nodelist": "(Priority)",
+    "start": "2026-11-25T21:44:00",
     "state": "PENDING",
     "time_limit": "1-00:00:00"
    },
    {
     "elapsed": "0:00",
-    "jobid": "1508429",
+    "jobid": "1508428",
     "name": "adm-score",
     "nodes": "1",
     "reason_or_nodelist": "(Priority)",
@@ -191,7 +198,7 @@
    },
    {
     "elapsed": "0:00",
-    "jobid": "1508428",
+    "jobid": "1508429",
     "name": "adm-score",
     "nodes": "1",
     "reason_or_nodelist": "(Priority)",
@@ -244,7 +251,7 @@
     "jobid": "1508430",
     "name": "adm-score",
     "nodes": "1",
-    "reason_or_nodelist": "(Dependency)",
+    "reason_or_nodelist": "(Priority)",
     "start": "N/A",
     "state": "PENDING",
     "time_limit": "12:00:00"
@@ -308,16 +315,6 @@
     "start": "N/A",
     "state": "PENDING",
     "time_limit": "2:00:00"
-   },
-   {
-    "elapsed": "13:39",
-    "jobid": "1508423",
-    "name": "oracle-render",
-    "nodes": "1",
-    "reason_or_nodelist": "vhpc15",
-    "start": "2026-11-25T09:02:26",
-    "state": "RUNNING",
-    "time_limit": "6:00:00"
    }
   ]
  },
@@ -1806,14 +1803,14 @@
    "waiting_for": null
   },
   "2026-11-24-step0-render-oracle_latent": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-25T09:46:27",
+   "finished": "2026-11-25T09:46:27",
    "invalid": null,
    "jobid": "1508423",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "RUNNING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
@@ -1960,5 +1957,5 @@
    "waiting_for": null
   }
  },
- "updated": "2026-11-25T09:16:05"
+ "updated": "2026-11-25T09:46:27"
 }
