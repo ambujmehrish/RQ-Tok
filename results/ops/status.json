@@ -14,10 +14,7 @@
   }
  },
  "cluster": {
-  "counts": {
-   "PENDING": 1,
-   "RUNNING": 1
-  },
+  "counts": {},
   "ended_24h": [
    {
     "elapsed": "00:42:32",
@@ -124,6 +121,14 @@
     "state": "COMPLETED"
    },
    {
+    "elapsed": "00:14:26",
+    "end": "2026-11-25T17:35:14",
+    "exit": "0:0",
+    "jobid": "1508433",
+    "name": "adm-score",
+    "state": "COMPLETED"
+   },
+   {
     "elapsed": "00:00:19",
     "end": "2026-11-25T16:53:44",
     "exit": "0:0",
@@ -170,30 +175,17 @@
     "jobid": "1508439",
     "name": "class-acc",
     "state": "COMPLETED"
-   }
-  ],
-  "squeue": [
-   {
-    "elapsed": "0:00",
-    "jobid": "1508440",
-    "name": "class-acc",
-    "nodes": "1",
-    "reason_or_nodelist": "(Dependency)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "2:00:00"
    },
    {
-    "elapsed": "6:07",
-    "jobid": "1508433",
-    "name": "adm-score",
-    "nodes": "1",
-    "reason_or_nodelist": "vhpc14",
-    "start": "2026-11-25T17:20:48",
-    "state": "RUNNING",
-    "time_limit": "12:00:00"
+    "elapsed": "00:00:18",
+    "end": "2026-11-25T17:35:32",
+    "exit": "0:0",
+    "jobid": "1508440",
+    "name": "class-acc",
+    "state": "COMPLETED"
    }
-  ]
+  ],
+  "squeue": []
  },
  "queue": [
   "2026-11-18-watch-flux1024",
@@ -1624,14 +1616,14 @@
    "waiting_for": null
   },
   "2026-11-24-step0-classacc-pilot_adarq_F_a04": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-25T17:37:07",
+   "finished": "2026-11-25T17:37:07",
    "invalid": null,
    "jobid": "1508440",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
@@ -1820,19 +1812,19 @@
    "waiting_for": null
   },
   "2026-11-24-step0-score-pilot_adarq_F_a04": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-25T17:37:07",
+   "finished": "2026-11-25T17:37:07",
    "invalid": null,
    "jobid": "1508433",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "RUNNING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
    "waiting_for": null
   }
  },
- "updated": "2026-11-25T17:26:55"
+ "updated": "2026-11-25T17:37:07"
 }
