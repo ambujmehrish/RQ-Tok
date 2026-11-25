@@ -15,17 +15,10 @@
  },
  "cluster": {
   "counts": {
-   "PENDING": 17
+   "PENDING": 16,
+   "RUNNING": 1
   },
   "ended_24h": [
-   {
-    "elapsed": "01:52:44",
-    "end": "2026-11-24T08:40:57",
-    "exit": "0:0",
-    "jobid": "1508328",
-    "name": "adm-score",
-    "state": "COMPLETED"
-   },
    {
     "elapsed": "00:01:09",
     "end": "2026-11-24T14:36:51",
@@ -162,7 +155,7 @@
     "name": "levelb-sample",
     "nodes": "1",
     "reason_or_nodelist": "(Priority)",
-    "start": "2026-11-26T07:10:00",
+    "start": "2026-11-26T06:24:18",
     "state": "PENDING",
     "time_limit": "1-00:00:00"
    },
@@ -172,7 +165,7 @@
     "name": "levelb-sample",
     "nodes": "1",
     "reason_or_nodelist": "(Priority)",
-    "start": "2026-11-26T06:24:18",
+    "start": "2026-11-26T05:32:37",
     "state": "PENDING",
     "time_limit": "1-00:00:00"
    },
@@ -181,20 +174,10 @@
     "jobid": "1508424",
     "name": "levelb-sample",
     "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "2026-11-26T05:32:37",
+    "reason_or_nodelist": "(Resources)",
+    "start": "2026-11-25T15:02:26",
     "state": "PENDING",
     "time_limit": "1-00:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508423",
-    "name": "oracle-render",
-    "nodes": "1",
-    "reason_or_nodelist": "(Resources)",
-    "start": "2026-11-26T01:10:59",
-    "state": "PENDING",
-    "time_limit": "6:00:00"
    },
    {
     "elapsed": "0:00",
@@ -325,6 +308,16 @@
     "start": "N/A",
     "state": "PENDING",
     "time_limit": "2:00:00"
+   },
+   {
+    "elapsed": "13:39",
+    "jobid": "1508423",
+    "name": "oracle-render",
+    "nodes": "1",
+    "reason_or_nodelist": "vhpc15",
+    "start": "2026-11-25T09:02:26",
+    "state": "RUNNING",
+    "time_limit": "6:00:00"
    }
   ]
  },
@@ -1820,7 +1813,7 @@
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "RUNNING"
    ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
@@ -1967,5 +1960,5 @@
    "waiting_for": null
   }
  },
- "updated": "2026-11-25T08:15:30"
+ "updated": "2026-11-25T09:16:05"
 }
