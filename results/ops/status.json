@@ -19,14 +19,6 @@
   },
   "ended_24h": [
    {
-    "elapsed": "01:52:34",
-    "end": "2026-11-24T06:19:27",
-    "exit": "0:0",
-    "jobid": "1508320",
-    "name": "adm-score",
-    "state": "COMPLETED"
-   },
-   {
     "elapsed": "01:29:16",
     "end": "2026-11-24T07:25:42",
     "exit": "0:0",
@@ -43,35 +35,11 @@
     "state": "COMPLETED"
    },
    {
-    "elapsed": "00:27:26",
-    "end": "2026-11-24T06:46:53",
-    "exit": "0:0",
-    "jobid": "1508327",
-    "name": "adm-score",
-    "state": "COMPLETED"
-   },
-   {
     "elapsed": "01:52:44",
     "end": "2026-11-24T08:40:57",
     "exit": "0:0",
     "jobid": "1508328",
     "name": "adm-score",
-    "state": "COMPLETED"
-   },
-   {
-    "elapsed": "00:00:42",
-    "end": "2026-11-24T06:47:35",
-    "exit": "0:0",
-    "jobid": "1508331",
-    "name": "class-acc",
-    "state": "COMPLETED"
-   },
-   {
-    "elapsed": "00:00:38",
-    "end": "2026-11-24T06:48:13",
-    "exit": "0:0",
-    "jobid": "1508332",
-    "name": "class-acc",
     "state": "COMPLETED"
    },
    {
@@ -206,6 +174,26 @@
   "squeue": [
    {
     "elapsed": "0:00",
+    "jobid": "1508426",
+    "name": "levelb-sample",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "2026-11-26T07:10:00",
+    "state": "PENDING",
+    "time_limit": "1-00:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508425",
+    "name": "levelb-sample",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "2026-11-26T06:24:18",
+    "state": "PENDING",
+    "time_limit": "1-00:00:00"
+   },
+   {
+    "elapsed": "0:00",
     "jobid": "1508424",
     "name": "levelb-sample",
     "nodes": "1",
@@ -219,30 +207,10 @@
     "jobid": "1508423",
     "name": "oracle-render",
     "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
+    "reason_or_nodelist": "(Resources)",
     "start": "2026-11-26T01:10:59",
     "state": "PENDING",
     "time_limit": "6:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508426",
-    "name": "levelb-sample",
-    "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "1-00:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508425",
-    "name": "levelb-sample",
-    "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "1-00:00:00"
    },
    {
     "elapsed": "0:00",
@@ -2015,5 +1983,5 @@
    "waiting_for": null
   }
  },
- "updated": "2026-11-25T06:14:20"
+ "updated": "2026-11-25T07:14:56"
 }
