@@ -10,3 +10,47 @@ Using a slow image processor as `use_fast` is unset and a slow processor was sav
 vision_denoising_type:  mar
 Fetching 3 files:   0%|          | 0/3 [00:00<?, ?it/s]Fetching 3 files: 100%|██████████| 3/3 [00:00<00:00, 818.03it/s]
 Loading checkpoint shards:   0%|          | 0/3 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 3/3 [00:00<00:00, 38.15it/s]
+/home/ambuj.mehrish/projects/RQ-Tok/levelb/sample.py:209: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  cn.load_state_dict(torch.load(controlnet_ckpt, map_location="cpu"))
+Loading pipeline components...:   0%|          | 0/7 [00:00<?, ?it/s]You set `add_prefix_space`. The tokenizer needs to be converted from the slow tokenizers
+Loading pipeline components...:  29%|██▊       | 2/7 [00:00<00:01,  3.29it/s]Loading pipeline components...:  57%|█████▋    | 4/7 [00:00<00:00,  5.35it/s]Loading pipeline components...:  71%|███████▏  | 5/7 [00:00<00:00,  6.10it/s]
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  6.12it/s][A
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  6.16it/s][ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  6.15it/s]
+Loading pipeline components...:  86%|████████▌ | 6/7 [00:01<00:00,  4.50it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:01<00:00,  5.42it/s]
+  16/2000 images
+  32/2000 images
+  48/2000 images
+  64/2000 images
+  80/2000 images
+  96/2000 images
+  112/2000 images
+  128/2000 images
+  144/2000 images
+  160/2000 images
+  176/2000 images
+  192/2000 images
+  208/2000 images
+  224/2000 images
+  240/2000 images
+  256/2000 images
+  272/2000 images
+  288/2000 images
+  304/2000 images
+  320/2000 images
+  336/2000 images
+  352/2000 images
+  368/2000 images
+  384/2000 images
+  400/2000 images
+  416/2000 images
+  432/2000 images
+  448/2000 images
+  464/2000 images
+  480/2000 images
+  496/2000 images
+  512/2000 images
+  528/2000 images
+  544/2000 images
+  560/2000 images
+  576/2000 images

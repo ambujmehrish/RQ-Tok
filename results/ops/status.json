@@ -36,14 +36,6 @@
     "state": "COMPLETED"
    },
    {
-    "elapsed": "00:29:08",
-    "end": "2026-11-24T16:01:55",
-    "exit": "0:0",
-    "jobid": "1508411",
-    "name": "is-decomp",
-    "state": "COMPLETED"
-   },
-   {
     "elapsed": "00:27:25",
     "end": "2026-11-24T16:29:20",
     "exit": "0:0",
@@ -145,7 +137,7 @@
     "name": "adm-score",
     "nodes": "1",
     "reason_or_nodelist": "(Priority)",
-    "start": "2026-11-26T15:59:05",
+    "start": "N/A",
     "state": "PENDING",
     "time_limit": "12:00:00"
    },
@@ -155,7 +147,7 @@
     "name": "adm-score",
     "nodes": "1",
     "reason_or_nodelist": "(Priority)",
-    "start": "2026-11-26T15:59:05",
+    "start": "N/A",
     "state": "PENDING",
     "time_limit": "12:00:00"
    },
@@ -240,7 +232,7 @@
     "time_limit": "2:00:00"
    },
    {
-    "elapsed": "1:00",
+    "elapsed": "21:17",
     "jobid": "1508426",
     "name": "levelb-sample",
     "nodes": "1",
@@ -250,7 +242,7 @@
     "time_limit": "1-00:00:00"
    },
    {
-    "elapsed": "41:21",
+    "elapsed": "1:01:38",
     "jobid": "1508425",
     "name": "levelb-sample",
     "nodes": "1",
@@ -1900,5 +1892,5 @@
    "waiting_for": null
   }
  },
- "updated": "2026-11-25T16:00:04"
+ "updated": "2026-11-25T16:20:22"
 }
