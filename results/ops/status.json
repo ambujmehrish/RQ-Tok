@@ -48,10 +48,7 @@
   }
  },
  "cluster": {
-  "counts": {
-   "PENDING": 1,
-   "RUNNING": 1
-  },
+  "counts": {},
   "ended_24h": [
    {
     "elapsed": "00:01:24",
@@ -278,6 +275,14 @@
     "state": "COMPLETED"
    },
    {
+    "elapsed": "00:13:25",
+    "end": "2026-11-26T22:20:08",
+    "exit": "0:0",
+    "jobid": "1508573",
+    "name": "adm-score",
+    "state": "COMPLETED"
+   },
+   {
     "elapsed": "00:00:17",
     "end": "2026-11-26T22:08:08",
     "exit": "0:0",
@@ -340,6 +345,14 @@
     "jobid": "1508581",
     "name": "class-acc",
     "state": "COMPLETED"
+   },
+   {
+    "elapsed": "00:00:21",
+    "end": "2026-11-26T22:20:29",
+    "exit": "0:0",
+    "jobid": "1508582",
+    "name": "class-acc",
+    "state": "COMPLETED"
    }
   ],
   "gpu_nodes": [
@@ -377,7 +390,7 @@
     "gres": "gpu:h200:1",
     "in_service": true,
     "node": "vhpc13",
-    "state": "mixed"
+    "state": "idle"
    },
    {
     "gres": "gpu:h200:1",
@@ -428,28 +441,7 @@
     "state": "drained"
    }
   ],
-  "squeue": [
-   {
-    "elapsed": "0:00",
-    "jobid": "1508582",
-    "name": "class-acc",
-    "nodes": "1",
-    "reason_or_nodelist": "(Dependency)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "2:00:00"
-   },
-   {
-    "elapsed": "7:28",
-    "jobid": "1508573",
-    "name": "adm-score",
-    "nodes": "1",
-    "reason_or_nodelist": "vhpc13",
-    "start": "2026-11-26T22:06:43",
-    "state": "RUNNING",
-    "time_limit": "12:00:00"
-   }
-  ]
+  "squeue": []
  },
  "queue": [
   "2026-11-18-watch-flux1024",
@@ -2795,14 +2787,14 @@
    "waiting_for_nodes": null
   },
   "2026-11-26-p1b-classacc-bifrost_n131": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-26T22:24:23",
+   "finished": "2026-11-26T22:24:23",
    "invalid": null,
    "jobid": "1508582",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-26T11:31:51",
@@ -3080,14 +3072,14 @@
    "waiting_for_nodes": null
   },
   "2026-11-26-p1b-score-bifrost_n131": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-26T22:24:23",
+   "finished": "2026-11-26T22:24:23",
    "invalid": null,
    "jobid": "1508573",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "RUNNING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-26T11:31:51",
@@ -3095,5 +3087,5 @@
    "waiting_for_nodes": null
   }
  },
- "updated": "2026-11-26T22:14:11"
+ "updated": "2026-11-26T22:24:23"
 }
