@@ -48,7 +48,9 @@
   }
  },
  "cluster": {
-  "counts": {},
+  "counts": {
+   "PENDING": 28
+  },
   "ended_24h": [
    {
     "elapsed": "01:08:53",
@@ -259,7 +261,374 @@
     "state": "CANCELLED"
    }
   ],
-  "squeue": []
+  "gpu_nodes": [
+   {
+    "gres": "gpu:tesla:2",
+    "in_service": true,
+    "node": "vhpc2",
+    "state": "idle"
+   },
+   {
+    "gres": "gpu:a40:1",
+    "in_service": false,
+    "node": "vhpc3",
+    "state": "draining"
+   },
+   {
+    "gres": "gpu:a40:1",
+    "in_service": false,
+    "node": "vhpc4",
+    "state": "drained"
+   },
+   {
+    "gres": "gpu:h200:1",
+    "in_service": false,
+    "node": "vhpc11",
+    "state": "draining"
+   },
+   {
+    "gres": "gpu:h200:1",
+    "in_service": false,
+    "node": "vhpc12",
+    "state": "draining"
+   },
+   {
+    "gres": "gpu:h200:1",
+    "in_service": true,
+    "node": "vhpc13",
+    "state": "idle"
+   },
+   {
+    "gres": "gpu:h200:1",
+    "in_service": true,
+    "node": "vhpc14",
+    "state": "idle"
+   },
+   {
+    "gres": "gpu:h200:1",
+    "in_service": true,
+    "node": "vhpc15",
+    "state": "idle"
+   },
+   {
+    "gres": "gpu:rtx6000:2",
+    "in_service": true,
+    "node": "vhpc23",
+    "state": "idle"
+   },
+   {
+    "gres": "gpu:a40:3",
+    "in_service": false,
+    "node": "vhpc24",
+    "state": "drained*"
+   },
+   {
+    "gres": "gpu:h200:1",
+    "in_service": false,
+    "node": "vhpc25",
+    "state": "draining"
+   },
+   {
+    "gres": "gpu:h200:1",
+    "in_service": false,
+    "node": "vhpc26",
+    "state": "draining"
+   },
+   {
+    "gres": "gpu:h200:1",
+    "in_service": false,
+    "node": "vhpc27",
+    "state": "drained"
+   },
+   {
+    "gres": "gpu:h200:1",
+    "in_service": false,
+    "node": "vhpc28",
+    "state": "drained"
+   }
+  ],
+  "squeue": [
+   {
+    "elapsed": "0:00",
+    "jobid": "1508573",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508572",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508571",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508570",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508569",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508568",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508567",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508566",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508565",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508582",
+    "name": "class-acc",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "2:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508581",
+    "name": "class-acc",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "2:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508580",
+    "name": "class-acc",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "2:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508579",
+    "name": "class-acc",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "2:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508578",
+    "name": "class-acc",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "2:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508577",
+    "name": "class-acc",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "2:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508576",
+    "name": "class-acc",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "2:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508575",
+    "name": "class-acc",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "2:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508574",
+    "name": "class-acc",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "2:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508564",
+    "name": "levelb-sample",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "1-00:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508563",
+    "name": "levelb-sample",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "1-00:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508562",
+    "name": "levelb-sample",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "1-00:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508561",
+    "name": "levelb-sample",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "1-00:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508560",
+    "name": "levelb-sample",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "1-00:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508559",
+    "name": "levelb-sample",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "1-00:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508558",
+    "name": "levelb-sample",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "1-00:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508557",
+    "name": "levelb-sample",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "1-00:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508556",
+    "name": "levelb-sample",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "1-00:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508555",
+    "name": "latent-stats",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "4:00:00"
+   }
+  ]
  },
  "queue": [
   "2026-11-18-watch-flux1024",
@@ -398,7 +767,35 @@
   "2026-11-26-p1-score-adarq_gS_w30",
   "2026-11-26-p1-score-bifrost_n033",
   "2026-11-26-p1-score-bifrost_n066",
-  "2026-11-26-p1-score-bifrost_n131"
+  "2026-11-26-p1-score-bifrost_n131",
+  "2026-11-26-p1b-classacc-adarq_gF_w15",
+  "2026-11-26-p1b-classacc-adarq_gF_w20",
+  "2026-11-26-p1b-classacc-adarq_gF_w30",
+  "2026-11-26-p1b-classacc-adarq_gS_w15",
+  "2026-11-26-p1b-classacc-adarq_gS_w20",
+  "2026-11-26-p1b-classacc-adarq_gS_w30",
+  "2026-11-26-p1b-classacc-bifrost_n033",
+  "2026-11-26-p1b-classacc-bifrost_n066",
+  "2026-11-26-p1b-classacc-bifrost_n131",
+  "2026-11-26-p1b-latent-stats",
+  "2026-11-26-p1b-sample-adarq_gF_w15",
+  "2026-11-26-p1b-sample-adarq_gF_w20",
+  "2026-11-26-p1b-sample-adarq_gF_w30",
+  "2026-11-26-p1b-sample-adarq_gS_w15",
+  "2026-11-26-p1b-sample-adarq_gS_w20",
+  "2026-11-26-p1b-sample-adarq_gS_w30",
+  "2026-11-26-p1b-sample-bifrost_n033",
+  "2026-11-26-p1b-sample-bifrost_n066",
+  "2026-11-26-p1b-sample-bifrost_n131",
+  "2026-11-26-p1b-score-adarq_gF_w15",
+  "2026-11-26-p1b-score-adarq_gF_w20",
+  "2026-11-26-p1b-score-adarq_gF_w30",
+  "2026-11-26-p1b-score-adarq_gS_w15",
+  "2026-11-26-p1b-score-adarq_gS_w20",
+  "2026-11-26-p1b-score-adarq_gS_w30",
+  "2026-11-26-p1b-score-bifrost_n033",
+  "2026-11-26-p1b-score-bifrost_n066",
+  "2026-11-26-p1b-score-bifrost_n131"
  ],
  "requests": {
   "2026-11-18-watch-flux1024": {
@@ -413,7 +810,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-18T17:14:12",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-18-watch-seed12-scores": {
    "collected": "2026-11-18T21:15:08",
@@ -427,7 +825,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-18T17:14:12",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-18-watch-soft": {
    "collected": "2026-11-20T21:13:59",
@@ -441,7 +840,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-18T17:14:12",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-18-watch-tuned-samples": {
    "collected": "2026-11-19T23:13:10",
@@ -455,7 +855,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-18T17:14:12",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-19-eval-refs": {
    "collected": "2026-11-19T13:02:26",
@@ -469,7 +870,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-19T12:47:19",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-19-sample-grid-seed0": {
    "collected": "2026-11-19T14:18:27",
@@ -483,7 +885,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-19T14:13:24",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-19-score-flux-adm128": {
    "collected": "2026-11-19T13:22:51",
@@ -497,7 +900,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-19T12:47:19",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-19-score-flux-adm512": {
    "collected": "2026-11-19T13:12:36",
@@ -511,7 +915,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-19T12:47:19",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-19-score-flux-adm64": {
    "collected": "2026-11-19T13:17:44",
@@ -525,7 +930,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-19T12:47:19",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-19-score-flux-heldout": {
    "collected": "2026-11-19T13:17:44",
@@ -539,7 +945,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-19T12:47:19",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-19-score-flux-val": {
    "collected": "2026-11-19T14:28:37",
@@ -553,7 +960,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-19T12:47:19",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-19-score-flux-valsquash": {
    "collected": "2026-11-19T14:33:50",
@@ -567,7 +975,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-19T12:47:19",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-19-soft-p3": {
    "collected": "2026-11-21T12:06:23",
@@ -581,7 +990,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-19T12:47:19",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-21-adm-diag-h200": {
    "collected": "2026-11-22T00:48:10",
@@ -595,7 +1005,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-21T23:47:29",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-21-adm-recalibrate-h200": {
    "collected": "2026-11-21T16:33:31",
@@ -609,7 +1020,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-21T15:27:59",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-21-soft-sample-seed0": {
    "collected": "2026-11-21T21:06:06",
@@ -623,7 +1035,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-21T15:27:59",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-21-soft-sample-seed1": {
    "collected": "2026-11-21T21:06:06",
@@ -637,7 +1050,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-21T15:27:59",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-21-soft-sample-seed2": {
    "collected": "2026-11-21T22:11:41",
@@ -651,7 +1065,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-21T15:27:59",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-21-soft-score-adm-seed0": {
    "collected": "2026-11-21T23:52:37",
@@ -665,7 +1080,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-21T15:27:59",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-21-soft-score-adm-seed1": {
    "collected": "2026-11-21T23:52:37",
@@ -679,7 +1095,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-21T15:27:59",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-21-soft-score-adm-seed2": {
    "collected": "2026-11-21T23:52:37",
@@ -693,7 +1110,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-21T15:27:59",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-21-soft-score-val-seed0": {
    "collected": "2026-11-21T23:52:37",
@@ -707,7 +1125,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-21T15:27:59",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-21-soft-score-val-seed1": {
    "collected": "2026-11-21T23:52:37",
@@ -721,7 +1140,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-21T15:27:59",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-21-soft-score-val-seed2": {
    "collected": "2026-11-21T23:47:29",
@@ -735,7 +1155,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-21T15:27:59",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-22-adm-recalibrate-h200-skylakex": {
    "collected": "2026-11-22T11:43:30",
@@ -749,7 +1170,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-22T09:57:37",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-22-crosscheck-bifrost-seed0-h200": {
    "collected": "2026-11-22T16:41:07",
@@ -763,7 +1185,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-22T12:18:56",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-22-soft-score-adm-seed0": {
    "collected": "2026-11-22T17:01:21",
@@ -777,7 +1200,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-22T12:18:56",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-22-soft-score-adm-seed1": {
    "collected": "2026-11-22T17:01:21",
@@ -791,7 +1215,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-22T12:18:56",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-22-soft-score-adm-seed2": {
    "collected": "2026-11-22T17:21:35",
@@ -805,7 +1230,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-22T12:18:56",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-22-soft-score-val-seed0": {
    "collected": "2026-11-22T18:52:28",
@@ -819,7 +1245,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-22T12:18:56",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-22-soft-score-val-seed1": {
    "collected": "2026-11-22T18:52:28",
@@ -833,7 +1260,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-22T12:18:56",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-22-soft-score-val-seed2": {
    "collected": "2026-11-22T19:32:56",
@@ -847,7 +1275,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-22T12:18:56",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-alpha-classacc-pilot_adarq_F_a06": {
    "collected": "2026-11-24T03:20:59",
@@ -861,7 +1290,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T14:53:51",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-alpha-classacc-pilot_adarq_F_a08": {
    "collected": "2026-11-24T03:20:59",
@@ -875,7 +1305,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T14:53:51",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-alpha-sample-pilot_adarq_F_a06": {
    "collected": "2026-11-23T16:04:34",
@@ -889,7 +1320,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T14:53:51",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-alpha-sample-pilot_adarq_F_a08": {
    "collected": "2026-11-23T16:04:34",
@@ -903,7 +1335,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T14:53:51",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-alpha-score-pilot_adarq_F_a06": {
    "collected": "2026-11-23T16:19:52",
@@ -917,7 +1350,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T14:53:51",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-alpha-score-pilot_adarq_F_a08": {
    "collected": "2026-11-23T16:14:44",
@@ -931,7 +1365,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T14:53:51",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-sweep-classacc-adarq_A": {
    "collected": "2026-11-23T10:05:30",
@@ -945,7 +1380,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T07:33:41",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-sweep-classacc-adarq_B": {
    "collected": "2026-11-23T10:15:40",
@@ -959,7 +1395,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T07:33:41",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-sweep-classacc-adarq_C": {
    "collected": "2026-11-23T10:25:50",
@@ -973,7 +1410,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T07:33:41",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-sweep-classacc-adarq_D": {
    "collected": "2026-11-23T10:36:00",
@@ -987,7 +1425,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T07:33:41",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-sweep-classacc-adarq_E": {
    "collected": "2026-11-23T10:46:22",
@@ -1001,7 +1440,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T07:33:41",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-sweep-classacc-adarq_F": {
    "collected": "2026-11-23T13:33:00",
@@ -1015,7 +1455,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T07:33:41",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-sweep-classacc-bifrost": {
    "collected": "2026-11-23T13:33:00",
@@ -1029,7 +1470,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T07:33:41",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-sweep-classacc-ceiling": {
    "collected": "2026-11-23T07:38:50",
@@ -1043,7 +1485,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T07:33:41",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-sweep-sample-adarq_A": {
    "collected": "2026-11-23T08:49:36",
@@ -1057,7 +1500,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T07:33:41",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-sweep-sample-adarq_B": {
    "collected": "2026-11-23T08:44:28",
@@ -1071,7 +1515,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T07:33:41",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-sweep-sample-adarq_C": {
    "collected": "2026-11-23T08:49:36",
@@ -1085,7 +1530,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T07:33:41",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-sweep-sample-adarq_D": {
    "collected": "2026-11-23T09:55:14",
@@ -1099,7 +1545,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T07:33:41",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-sweep-sample-adarq_E": {
    "collected": "2026-11-23T09:55:14",
@@ -1113,7 +1560,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T07:33:41",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-sweep-sample-adarq_F": {
    "collected": "2026-11-23T10:00:22",
@@ -1127,7 +1575,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T07:33:41",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-sweep-sample-bifrost": {
    "collected": "2026-11-23T10:56:33",
@@ -1141,7 +1590,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T07:33:41",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-sweep-score-adarq_A": {
    "collected": "2026-11-23T10:05:30",
@@ -1155,7 +1605,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T07:33:41",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-sweep-score-adarq_B": {
    "collected": "2026-11-23T10:15:40",
@@ -1169,7 +1620,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T07:33:41",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-sweep-score-adarq_C": {
    "collected": "2026-11-23T10:25:50",
@@ -1183,7 +1635,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T07:33:41",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-sweep-score-adarq_D": {
    "collected": "2026-11-23T10:36:00",
@@ -1197,7 +1650,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T07:33:41",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-sweep-score-adarq_E": {
    "collected": "2026-11-23T10:41:14",
@@ -1211,7 +1665,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T07:33:41",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-sweep-score-adarq_F": {
    "collected": "2026-11-23T13:17:47",
@@ -1225,7 +1680,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T07:33:41",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-sweep-score-bifrost": {
    "collected": "2026-11-23T13:33:00",
@@ -1239,7 +1695,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T07:33:41",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-test-classacc-adarq_E-seed0": {
    "collected": "2026-11-24T06:48:53",
@@ -1253,7 +1710,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T14:53:51",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-test-classacc-adarq_F-seed0": {
    "collected": "2026-11-24T06:48:53",
@@ -1267,7 +1725,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T14:53:51",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-test-classacc-bifrost-seed0": {
    "collected": "2026-11-23T16:14:44",
@@ -1281,7 +1740,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T14:53:51",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-test-sample-adarq_E-seed0": {
    "collected": "2026-11-23T21:47:45",
@@ -1295,7 +1755,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T14:53:51",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-test-sample-adarq_E-seed1": {
    "collected": "2026-11-23T21:57:56",
@@ -1309,7 +1770,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T14:53:51",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-test-sample-adarq_E-seed2": {
    "collected": "2026-11-23T23:03:43",
@@ -1323,7 +1785,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T14:53:51",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-test-sample-adarq_F-seed0": {
    "collected": "2026-11-24T03:20:59",
@@ -1337,7 +1800,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T14:53:51",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-test-sample-adarq_F-seed1": {
    "collected": "2026-11-24T03:36:13",
@@ -1351,7 +1815,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T14:53:51",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-test-sample-adarq_F-seed2": {
    "collected": "2026-11-24T04:37:17",
@@ -1365,7 +1830,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T14:53:51",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-test-score-adarq_E-seed0-adm": {
    "collected": "2026-11-24T03:41:21",
@@ -1379,7 +1845,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T14:53:51",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-test-score-adarq_E-seed0-val": {
    "collected": "2026-11-24T05:58:05",
@@ -1393,7 +1860,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T14:53:51",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-test-score-adarq_E-seed1-adm": {
    "collected": "2026-11-24T04:01:36",
@@ -1407,7 +1875,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T14:53:51",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-test-score-adarq_E-seed1-val": {
    "collected": "2026-11-24T06:23:36",
@@ -1421,7 +1890,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T14:53:51",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-test-score-adarq_E-seed2-adm": {
    "collected": "2026-11-24T04:06:51",
@@ -1435,7 +1905,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T14:53:51",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-test-score-adarq_E-seed2-val": {
    "collected": "2026-11-24T06:08:23",
@@ -1449,7 +1920,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T14:53:51",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-test-score-adarq_F-seed0-adm": {
    "collected": "2026-11-24T04:27:06",
@@ -1463,7 +1935,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T14:53:51",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-test-score-adarq_F-seed0-val": {
    "collected": "2026-11-24T07:29:24",
@@ -1477,7 +1950,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T14:53:51",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-test-score-adarq_F-seed1-adm": {
    "collected": "2026-11-24T04:27:06",
@@ -1491,7 +1965,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T14:53:51",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-test-score-adarq_F-seed1-val": {
    "collected": "2026-11-24T07:39:35",
@@ -1505,7 +1980,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T14:53:51",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-test-score-adarq_F-seed2-adm": {
    "collected": "2026-11-24T06:48:53",
@@ -1519,7 +1995,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T14:53:51",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-23-test-score-adarq_F-seed2-val": {
    "collected": "2026-11-24T08:45:17",
@@ -1533,7 +2010,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-23T14:53:51",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-24-classacc-perclass-adarq_F-adarq_E": {
    "collected": "2026-11-24T16:45:22",
@@ -1547,7 +2025,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-24T14:38:27",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-24-classacc-perclass-bifrost-adarq": {
    "collected": "2026-11-24T16:45:22",
@@ -1561,7 +2040,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-24T14:38:27",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-24-isdecomp-adarq": {
    "collected": "2026-11-24T15:03:45",
@@ -1575,7 +2055,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-24T14:38:27",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-24-isdecomp-adarq_E": {
    "collected": "2026-11-24T15:34:05",
@@ -1589,7 +2070,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-24T14:38:27",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-24-isdecomp-adarq_F": {
    "collected": "2026-11-24T16:04:32",
@@ -1603,7 +2085,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-24T14:38:27",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-24-isdecomp-bifrost": {
    "collected": "2026-11-24T16:29:51",
@@ -1617,7 +2100,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-24T14:38:27",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-24-isdecomp-real": {
    "collected": "2026-11-24T16:40:04",
@@ -1631,7 +2115,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-24T14:38:27",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-24-step0-classacc-oracle_adaptive": {
    "collected": "2026-11-25T16:56:12",
@@ -1645,7 +2130,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-24-step0-classacc-oracle_depth1": {
    "collected": "2026-11-25T17:26:55",
@@ -1659,7 +2145,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-24-step0-classacc-oracle_depth4": {
    "collected": "2026-11-25T17:26:55",
@@ -1673,7 +2160,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-24-step0-classacc-oracle_latent": {
    "collected": "2026-11-25T17:26:55",
@@ -1687,7 +2175,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-24-step0-classacc-pilot_adarq_F_a0": {
    "collected": "2026-11-25T17:26:55",
@@ -1701,7 +2190,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-24-step0-classacc-pilot_adarq_F_a02": {
    "collected": "2026-11-25T17:26:55",
@@ -1715,7 +2205,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-24-step0-classacc-pilot_adarq_F_a04": {
    "collected": "2026-11-25T17:37:07",
@@ -1729,7 +2220,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-24-step0-render-oracle_adaptive": {
    "collected": "2026-11-24T17:51:09",
@@ -1743,7 +2235,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-24-step0-render-oracle_depth1": {
    "collected": "2026-11-24T21:58:47",
@@ -1757,7 +2250,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-24-step0-render-oracle_depth4": {
    "collected": "2026-11-24T22:03:59",
@@ -1771,7 +2265,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-24-step0-render-oracle_latent": {
    "collected": "2026-11-25T09:46:27",
@@ -1785,7 +2280,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-24-step0-sample-pilot_adarq_F_a0": {
    "collected": "2026-11-25T16:00:04",
@@ -1799,7 +2295,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-24-step0-sample-pilot_adarq_F_a02": {
    "collected": "2026-11-25T16:30:34",
@@ -1813,7 +2310,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-24-step0-sample-pilot_adarq_F_a04": {
    "collected": "2026-11-25T17:11:26",
@@ -1827,7 +2325,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-24-step0-score-oracle_adaptive": {
    "collected": "2026-11-24T21:18:20",
@@ -1841,7 +2340,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-24-step0-score-oracle_depth1": {
    "collected": "2026-11-25T16:40:46",
@@ -1855,7 +2355,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-24-step0-score-oracle_depth4": {
    "collected": "2026-11-25T16:56:12",
@@ -1869,7 +2370,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-24-step0-score-oracle_latent": {
    "collected": "2026-11-25T17:11:26",
@@ -1883,7 +2385,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-24-step0-score-pilot_adarq_F_a0": {
    "collected": "2026-11-25T17:21:38",
@@ -1897,7 +2400,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-24-step0-score-pilot_adarq_F_a02": {
    "collected": "2026-11-25T17:26:55",
@@ -1911,7 +2415,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-24-step0-score-pilot_adarq_F_a04": {
    "collected": "2026-11-25T17:37:07",
@@ -1925,7 +2430,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-24T17:05:40",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-26-p1-classacc-adarq_gF_w15": {
    "collected": "2026-11-26T11:21:30",
@@ -1939,7 +2445,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-26T11:16:19",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-26-p1-classacc-adarq_gF_w20": {
    "collected": "2026-11-26T11:21:30",
@@ -1953,7 +2460,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-26T11:16:19",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-26-p1-classacc-adarq_gF_w30": {
    "collected": "2026-11-26T11:21:30",
@@ -1967,7 +2475,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-26T11:16:19",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-26-p1-classacc-adarq_gS_w15": {
    "collected": "2026-11-26T11:21:30",
@@ -1981,7 +2490,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-26T11:16:19",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-26-p1-classacc-adarq_gS_w20": {
    "collected": "2026-11-26T11:21:30",
@@ -1995,7 +2505,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-26T11:16:19",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-26-p1-classacc-adarq_gS_w30": {
    "collected": "2026-11-26T11:26:40",
@@ -2009,7 +2520,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-26T11:16:19",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-26-p1-classacc-bifrost_n033": {
    "collected": "2026-11-26T11:21:30",
@@ -2023,7 +2535,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-26T11:16:19",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-26-p1-classacc-bifrost_n066": {
    "collected": "2026-11-26T11:21:30",
@@ -2037,7 +2550,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-26T11:16:19",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-26-p1-classacc-bifrost_n131": {
    "collected": "2026-11-26T11:21:30",
@@ -2051,7 +2565,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-26T11:16:19",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-26-p1-latent-stats": {
    "collected": "2026-11-26T11:21:30",
@@ -2065,7 +2580,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-26T11:16:19",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-26-p1-sample-adarq_gF_w15": {
    "collected": "2026-11-26T11:21:30",
@@ -2079,7 +2595,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-26T11:16:19",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-26-p1-sample-adarq_gF_w20": {
    "collected": "2026-11-26T11:21:30",
@@ -2093,7 +2610,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-26T11:16:19",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-26-p1-sample-adarq_gF_w30": {
    "collected": "2026-11-26T11:21:30",
@@ -2107,7 +2625,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-26T11:16:19",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-26-p1-sample-adarq_gS_w15": {
    "collected": "2026-11-26T11:21:30",
@@ -2121,7 +2640,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-26T11:16:19",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-26-p1-sample-adarq_gS_w20": {
    "collected": "2026-11-26T11:21:30",
@@ -2135,7 +2655,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-26T11:16:19",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-26-p1-sample-adarq_gS_w30": {
    "collected": "2026-11-26T11:26:40",
@@ -2149,7 +2670,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-26T11:16:19",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-26-p1-sample-bifrost_n033": {
    "collected": "2026-11-26T11:21:30",
@@ -2163,7 +2685,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-26T11:16:19",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-26-p1-sample-bifrost_n066": {
    "collected": "2026-11-26T11:26:40",
@@ -2177,7 +2700,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-26T11:16:19",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-26-p1-sample-bifrost_n131": {
    "collected": "2026-11-26T11:21:30",
@@ -2191,7 +2715,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-26T11:16:19",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-26-p1-score-adarq_gF_w15": {
    "collected": "2026-11-26T11:26:40",
@@ -2205,7 +2730,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-26T11:16:19",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-26-p1-score-adarq_gF_w20": {
    "collected": "2026-11-26T11:21:30",
@@ -2219,7 +2745,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-26T11:16:19",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-26-p1-score-adarq_gF_w30": {
    "collected": "2026-11-26T11:21:30",
@@ -2233,7 +2760,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-26T11:16:19",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-26-p1-score-adarq_gS_w15": {
    "collected": "2026-11-26T11:21:30",
@@ -2247,7 +2775,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-26T11:16:19",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-26-p1-score-adarq_gS_w20": {
    "collected": "2026-11-26T11:26:40",
@@ -2261,7 +2790,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-26T11:16:19",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-26-p1-score-adarq_gS_w30": {
    "collected": "2026-11-26T11:26:40",
@@ -2275,7 +2805,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-26T11:16:19",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-26-p1-score-bifrost_n033": {
    "collected": "2026-11-26T11:26:40",
@@ -2289,7 +2820,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-26T11:16:19",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-26-p1-score-bifrost_n066": {
    "collected": "2026-11-26T11:21:30",
@@ -2303,7 +2835,8 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-26T11:16:19",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
   },
   "2026-11-26-p1-score-bifrost_n131": {
    "collected": "2026-11-26T11:26:40",
@@ -2317,8 +2850,373 @@
    ],
    "submit_error": null,
    "submitted": "2026-11-26T11:16:19",
-   "waiting_for": null
+   "waiting_for": null,
+   "waiting_for_nodes": null
+  },
+  "2026-11-26-p1b-classacc-adarq_gF_w15": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508574",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [],
+   "submit_error": null,
+   "submitted": "2026-11-26T11:31:51",
+   "waiting_for": null,
+   "waiting_for_nodes": null
+  },
+  "2026-11-26-p1b-classacc-adarq_gF_w20": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508575",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [],
+   "submit_error": null,
+   "submitted": "2026-11-26T11:31:51",
+   "waiting_for": null,
+   "waiting_for_nodes": null
+  },
+  "2026-11-26-p1b-classacc-adarq_gF_w30": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508576",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [],
+   "submit_error": null,
+   "submitted": "2026-11-26T11:31:51",
+   "waiting_for": null,
+   "waiting_for_nodes": null
+  },
+  "2026-11-26-p1b-classacc-adarq_gS_w15": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508577",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [],
+   "submit_error": null,
+   "submitted": "2026-11-26T11:31:51",
+   "waiting_for": null,
+   "waiting_for_nodes": null
+  },
+  "2026-11-26-p1b-classacc-adarq_gS_w20": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508578",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [],
+   "submit_error": null,
+   "submitted": "2026-11-26T11:31:51",
+   "waiting_for": null,
+   "waiting_for_nodes": null
+  },
+  "2026-11-26-p1b-classacc-adarq_gS_w30": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508579",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [],
+   "submit_error": null,
+   "submitted": "2026-11-26T11:31:51",
+   "waiting_for": null,
+   "waiting_for_nodes": null
+  },
+  "2026-11-26-p1b-classacc-bifrost_n033": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508580",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [],
+   "submit_error": null,
+   "submitted": "2026-11-26T11:31:51",
+   "waiting_for": null,
+   "waiting_for_nodes": null
+  },
+  "2026-11-26-p1b-classacc-bifrost_n066": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508581",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [],
+   "submit_error": null,
+   "submitted": "2026-11-26T11:31:51",
+   "waiting_for": null,
+   "waiting_for_nodes": null
+  },
+  "2026-11-26-p1b-classacc-bifrost_n131": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508582",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [],
+   "submit_error": null,
+   "submitted": "2026-11-26T11:31:51",
+   "waiting_for": null,
+   "waiting_for_nodes": null
+  },
+  "2026-11-26-p1b-latent-stats": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508555",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [],
+   "submit_error": null,
+   "submitted": "2026-11-26T11:31:51",
+   "waiting_for": null,
+   "waiting_for_nodes": null
+  },
+  "2026-11-26-p1b-sample-adarq_gF_w15": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508556",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [],
+   "submit_error": null,
+   "submitted": "2026-11-26T11:31:51",
+   "waiting_for": null,
+   "waiting_for_nodes": null
+  },
+  "2026-11-26-p1b-sample-adarq_gF_w20": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508557",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [],
+   "submit_error": null,
+   "submitted": "2026-11-26T11:31:51",
+   "waiting_for": null,
+   "waiting_for_nodes": null
+  },
+  "2026-11-26-p1b-sample-adarq_gF_w30": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508558",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [],
+   "submit_error": null,
+   "submitted": "2026-11-26T11:31:51",
+   "waiting_for": null,
+   "waiting_for_nodes": null
+  },
+  "2026-11-26-p1b-sample-adarq_gS_w15": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508559",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [],
+   "submit_error": null,
+   "submitted": "2026-11-26T11:31:51",
+   "waiting_for": null,
+   "waiting_for_nodes": null
+  },
+  "2026-11-26-p1b-sample-adarq_gS_w20": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508560",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [],
+   "submit_error": null,
+   "submitted": "2026-11-26T11:31:51",
+   "waiting_for": null,
+   "waiting_for_nodes": null
+  },
+  "2026-11-26-p1b-sample-adarq_gS_w30": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508561",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [],
+   "submit_error": null,
+   "submitted": "2026-11-26T11:31:51",
+   "waiting_for": null,
+   "waiting_for_nodes": null
+  },
+  "2026-11-26-p1b-sample-bifrost_n033": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508562",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [],
+   "submit_error": null,
+   "submitted": "2026-11-26T11:31:51",
+   "waiting_for": null,
+   "waiting_for_nodes": null
+  },
+  "2026-11-26-p1b-sample-bifrost_n066": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508563",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [],
+   "submit_error": null,
+   "submitted": "2026-11-26T11:31:51",
+   "waiting_for": null,
+   "waiting_for_nodes": null
+  },
+  "2026-11-26-p1b-sample-bifrost_n131": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508564",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [],
+   "submit_error": null,
+   "submitted": "2026-11-26T11:31:51",
+   "waiting_for": null,
+   "waiting_for_nodes": null
+  },
+  "2026-11-26-p1b-score-adarq_gF_w15": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508565",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [],
+   "submit_error": null,
+   "submitted": "2026-11-26T11:31:51",
+   "waiting_for": null,
+   "waiting_for_nodes": null
+  },
+  "2026-11-26-p1b-score-adarq_gF_w20": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508566",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [],
+   "submit_error": null,
+   "submitted": "2026-11-26T11:31:51",
+   "waiting_for": null,
+   "waiting_for_nodes": null
+  },
+  "2026-11-26-p1b-score-adarq_gF_w30": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508567",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [],
+   "submit_error": null,
+   "submitted": "2026-11-26T11:31:51",
+   "waiting_for": null,
+   "waiting_for_nodes": null
+  },
+  "2026-11-26-p1b-score-adarq_gS_w15": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508568",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [],
+   "submit_error": null,
+   "submitted": "2026-11-26T11:31:51",
+   "waiting_for": null,
+   "waiting_for_nodes": null
+  },
+  "2026-11-26-p1b-score-adarq_gS_w20": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508569",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [],
+   "submit_error": null,
+   "submitted": "2026-11-26T11:31:51",
+   "waiting_for": null,
+   "waiting_for_nodes": null
+  },
+  "2026-11-26-p1b-score-adarq_gS_w30": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508570",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [],
+   "submit_error": null,
+   "submitted": "2026-11-26T11:31:51",
+   "waiting_for": null,
+   "waiting_for_nodes": null
+  },
+  "2026-11-26-p1b-score-bifrost_n033": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508571",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [],
+   "submit_error": null,
+   "submitted": "2026-11-26T11:31:51",
+   "waiting_for": null,
+   "waiting_for_nodes": null
+  },
+  "2026-11-26-p1b-score-bifrost_n066": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508572",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [],
+   "submit_error": null,
+   "submitted": "2026-11-26T11:31:51",
+   "waiting_for": null,
+   "waiting_for_nodes": null
+  },
+  "2026-11-26-p1b-score-bifrost_n131": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508573",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [],
+   "submit_error": null,
+   "submitted": "2026-11-26T11:31:51",
+   "waiting_for": null,
+   "waiting_for_nodes": null
   }
  },
- "updated": "2026-11-26T11:26:40"
+ "updated": "2026-11-26T11:31:51"
 }
