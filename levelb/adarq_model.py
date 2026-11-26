@@ -76,14 +76,20 @@ class FlowHead(nn.Module):
 
 
 class AdaRQHeads(nn.Module):
-    def __init__(self, dim: int, codebooks: torch.Tensor, res_rms: float,
-                 flow_width: int = 1024, flow_depth: int = 3) -> None:
+    def __init__(
+        self,
+        dim: int,
+        codebooks: torch.Tensor,
+        res_rms: float,
+        flow_width: int = 1024,
+        flow_depth: int = 3,
+    ) -> None:
         super().__init__()
         depth, k, d = codebooks.shape
         if d != dim:
             raise ValueError(f"codebook width {d} != hidden width {dim}")
         self.K, self.D = k, depth
-        self.register_buffer("books", codebooks.clone(), persistent=True)   # frozen Stage 0
+        self.register_buffer("books", codebooks.clone(), persistent=True)  # frozen Stage 0
         self.res_rms = float(res_rms)
         self.prefix = nn.Linear(dim, dim)
         self.level = nn.Parameter(torch.zeros(depth, dim))
@@ -99,19 +105,23 @@ class AdaRQHeads(nn.Module):
     def prefixes(self, codes: torch.Tensor) -> torch.Tensor:
         """zhat^(k) for k = 0..D: [..., D + 1, d] (halted levels add nothing)."""
         live = codes != self.K
-        parts = [torch.zeros(*codes.shape[:-1], self.books.shape[-1], device=codes.device,
-                             dtype=self.books.dtype)]
+        parts = [
+            torch.zeros(
+                *codes.shape[:-1], self.books.shape[-1], device=codes.device, dtype=self.books.dtype
+            )
+        ]
         for lvl in range(self.D):
             c = codes[..., lvl].clamp_max(self.K - 1)
             parts.append(parts[-1] + self.books[lvl][c] * live[..., lvl, None])
         return torch.stack(parts, dim=-2)
 
-    def code_logits(self, h: torch.Tensor, prefix: torch.Tensor, lvl: int,
-                    forbid_halt: bool = True) -> torch.Tensor:
+    def code_logits(
+        self, h: torch.Tensor, prefix: torch.Tensor, lvl: int, forbid_halt: bool = True
+    ) -> torch.Tensor:
         x = self.norm(h + self.prefix(prefix.to(h.dtype)) + self.level[lvl])
         logits = self.code_out[lvl](x).float()
         if lvl == 0 and forbid_halt:
-            logits[..., self.K] = float("-inf")          # level 1 never halts
+            logits[..., self.K] = float("-inf")  # level 1 never halts
         return logits
 
     @torch.no_grad()
@@ -130,8 +140,12 @@ class AdaRQHeads(nn.Module):
         return torch.softmax(-(d2 - d2.min(-1, keepdim=True).values) / self.soft_temps[lvl], -1)
 
     # -- losses -----------------------------------------------------------------------
-    def counts(self, codes: torch.Tensor, masked: torch.Tensor, flow_reps: int = 4,
-               ) -> tuple[int, int]:
+    def counts(
+        self,
+        codes: torch.Tensor,
+        masked: torch.Tensor,
+        flow_reps: int = 4,
+    ) -> tuple[int, int]:
         """(code targets, flow elements) in a batch: the denominators of its mean losses,
         so a batch split into micro-batches optimises exactly the full-batch objective."""
         depth = (codes[masked] != self.K).sum(-1)
@@ -139,19 +153,25 @@ class AdaRQHeads(nn.Module):
         n_flow = int(masked.sum()) * flow_reps * self.books.shape[-1]
         return n_ce, n_flow
 
-    def loss(self, h: torch.Tensor, z: torch.Tensor, codes: torch.Tensor,
-             masked: torch.Tensor, flow_reps: int = 4,
-             totals: tuple[int, int] | None = None) -> dict[str, torch.Tensor]:
+    def loss(
+        self,
+        h: torch.Tensor,
+        z: torch.Tensor,
+        codes: torch.Tensor,
+        masked: torch.Tensor,
+        flow_reps: int = 4,
+        totals: tuple[int, int] | None = None,
+    ) -> dict[str, torch.Tensor]:
         """h, z: [B, N, d]; codes: [B, N, D]; masked: [B, N] bool (positions to learn).
         ``totals`` (from ``counts`` on the whole batch) normalises the sums when this is one
         micro-batch of a larger batch; without it the means are over this call only."""
         h, z, codes = h[masked], z[masked].float(), codes[masked].long()
-        pre = self.prefixes(codes)                                   # [M, D+1, d]
-        depth = (codes != self.K).sum(-1)                            # [M]
+        pre = self.prefixes(codes)  # [M, D+1, d]
+        depth = (codes != self.K).sum(-1)  # [M]
         ce, n_ce = h.new_zeros((), dtype=torch.float32), 0
         ce_hard = h.new_zeros((), dtype=torch.float32)
         for lvl in range(self.D):
-            valid = lvl <= depth                    # codes 1..D_i, then the first <halt>
+            valid = lvl <= depth  # codes 1..D_i, then the first <halt>
             valid = valid & (lvl < self.D)
             if not valid.any():
                 continue
@@ -169,7 +189,7 @@ class AdaRQHeads(nn.Module):
                     ce = ce + F.cross_entropy(logit[~code], y[~code], reduction="sum")
                 if code.any():
                     q = self.soft_targets(z[valid][code], pre[valid, lvl][code], lvl)
-                    logp = torch.log_softmax(logit[code], dim=-1)[:, :self.K]
+                    logp = torch.log_softmax(logit[code], dim=-1)[:, : self.K]
                     ce = ce - (q * logp).sum()
             n_ce += int(valid.sum())
         denom = totals[0] if totals else max(n_ce, 1)
@@ -185,12 +205,24 @@ class AdaRQHeads(nn.Module):
         v = self.flow(x_t.to(h.dtype), t, cond).float()
         sq = (v - (rho - eps)).pow(2).sum()
         l_flow = sq / (totals[1] if totals else (v.numel()))
-        return {"loss": l_code + l_flow, "code_ce": l_code.detach(), "flow": l_flow.detach(),
-                "code_ce_hard": (ce_hard / denom).detach()}
+        return {
+            "loss": l_code + l_flow,
+            "code_ce": l_code.detach(),
+            "flow": l_flow.detach(),
+            "code_ce_hard": (ce_hard / denom).detach(),
+        }
 
     # -- sampling ---------------------------------------------------------------------
-    def sample_level(self, lg: torch.Tensor, lvl: int, temp: float, top_p: float | None,
-                     greedy: bool, u_halt: torch.Tensor, u_code: torch.Tensor) -> torch.Tensor:
+    def sample_level(
+        self,
+        lg: torch.Tensor,
+        lvl: int,
+        temp: float,
+        top_p: float | None,
+        greedy: bool,
+        u_halt: torch.Tensor,
+        u_code: torch.Tensor,
+    ) -> torch.Tensor:
         """One level of code sampling from guided raw logits ``lg`` [M, K+1] -> symbols [M].
 
         Gated: halt-vs-continue is decided first from the ORIGINAL (untempered, unfiltered)
@@ -211,7 +243,7 @@ class AdaRQHeads(nn.Module):
             probs = torch.softmax(code / temp, dim=-1)
             if top_p is not None and top_p < 1.0:
                 sp, idx = probs.sort(dim=-1, descending=True)
-                keep = (sp.cumsum(-1) - sp) < top_p        # smallest prefix with mass >= top_p
+                keep = (sp.cumsum(-1) - sp) < top_p  # smallest prefix with mass >= top_p
                 probs = torch.zeros_like(probs).scatter(-1, idx, sp * keep)
             cdf = probs.cumsum(-1)
             q = torch.searchsorted(cdf, (u_code * cdf[:, -1]).unsqueeze(-1), right=True)
@@ -219,10 +251,20 @@ class AdaRQHeads(nn.Module):
         return torch.where(halt, torch.full_like(q, k), q)
 
     @torch.no_grad()
-    def sample(self, h_c, h_u=None, cfg_weight: float = 1.0, code_temps=None,
-               top_p: float | None = None, greedy: bool = False, residual_scale: float = 1.0,
-               flow_steps: int = 32, generators=None, temperature: float | None = None,
-               generator: torch.Generator | None = None):
+    def sample(
+        self,
+        h_c,
+        h_u=None,
+        cfg_weight: float = 1.0,
+        code_temps=None,
+        top_p: float | None = None,
+        greedy: bool = False,
+        residual_scale: float = 1.0,
+        flow_steps: int = 32,
+        generators=None,
+        temperature: float | None = None,
+        generator: torch.Generator | None = None,
+    ):
         """One latent per row of h: codes depth by depth (guided logits, gated halting, see
         ``sample_level``), then the residual by Euler integration of the guided velocity from
         ``residual_scale`` x N(0, I). ``generators``: {"code", "halt", "res"} torch generators
@@ -234,7 +276,7 @@ class AdaRQHeads(nn.Module):
             raise ValueError(f"code_temps needs {self.D} values (one per level), got {temps}")
         g = generators if generators is not None else generator
         gc, gh, gr = (g["code"], g["halt"], g["res"]) if isinstance(g, dict) else (g, g, g)
-        h_c = h_c.float()                       # heads run in fp32 (backbone may be bf16)
+        h_c = h_c.float()  # heads run in fp32 (backbone may be bf16)
         h_u = None if h_u is None else h_u.float()
         m, dev = h_c.shape[0], h_c.device
         codes = torch.full((m, self.D), self.K, dtype=torch.long, device=dev)
@@ -246,11 +288,11 @@ class AdaRQHeads(nn.Module):
             if h_u is not None:
                 lu = self.code_logits(h_u, zhat, lvl, forbid_halt=False)
                 lg = lu + cfg_weight * (lg - lu)
-            u_halt = torch.rand(m, device=dev, generator=gh)   # drawn every level: aligned
+            u_halt = torch.rand(m, device=dev, generator=gh)  # drawn every level: aligned
             u_code = torch.rand(m, device=dev, generator=gc)
             q = self.sample_level(lg, lvl, temps[lvl], top_p, greedy, u_halt, u_code)
             q = torch.where(alive, q, torch.full_like(q, self.K))
-            alive = alive & (q != self.K)                      # <halt> ends the patch
+            alive = alive & (q != self.K)  # <halt> ends the patch
             codes[:, lvl] = q
             zhat = zhat + self.books[lvl][q.clamp_max(self.K - 1)] * alive[:, None]
         cond_c = h_c + self.res_cond(zhat.to(h_c.dtype))
@@ -282,12 +324,16 @@ def branch_hidden(model, flow: dict, batch_size: int) -> torch.Tensor:
     text = model.vision_language_model.model.embed_tokens(flow["input_ids"][:, :-n_tok])
     emb = torch.cat((text, z_emb), dim=1)
     pos = rearrange(flow["position_ids"], "bsz k c -> k bsz c")
-    out = model.vision_language_model(inputs_embeds=emb.to(model.dtype), use_cache=None,
-                                      attention_mask=flow["attention_mask"].to(model.dtype),
-                                      past_key_values=None, return_dict=True,
-                                      position_ids=pos,
-                                      image_position_mask=flow["image_position_mask"],
-                                      t_emb=None)
+    out = model.vision_language_model(
+        inputs_embeds=emb.to(model.dtype),
+        use_cache=None,
+        attention_mask=flow["attention_mask"].to(model.dtype),
+        past_key_values=None,
+        return_dict=True,
+        position_ids=pos,
+        image_position_mask=flow["image_position_mask"],
+        t_emb=None,
+    )
     return out["hidden_states"][:batch_size, -n_tok:]
 
 
@@ -299,6 +345,9 @@ def set_trainable_adarq(model, heads: AdaRQHeads) -> dict[str, int]:
         p.requires_grad_(False)
     n_head = sum(p.numel() for p in heads.parameters() if p.requires_grad)
     n_vh = sum(p.numel() for p in model.vision_head.parameters())
-    return {"trainable": counts["trainable"] - n_vh + n_head,
-            "frozen": counts["frozen"] + n_vh, "adarq_heads": n_head,
-            "bifrost_linear_head": n_vh}
+    return {
+        "trainable": counts["trainable"] - n_vh + n_head,
+        "frozen": counts["frozen"] + n_vh,
+        "adarq_heads": n_head,
+        "bifrost_linear_head": n_vh,
+    }

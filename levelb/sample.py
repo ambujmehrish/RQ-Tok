@@ -35,13 +35,18 @@ from .upstream import add_upstream_to_path, require_official_flux, require_offic
 
 def _mask_by_order(mask_len, order, bsz, seq_len, device):
     masking = torch.zeros(bsz, seq_len, device=device)
-    return torch.scatter(masking, dim=-1, index=order[:, :int(mask_len)],
-                         src=torch.ones(bsz, seq_len, device=device)).bool()
+    return torch.scatter(
+        masking,
+        dim=-1,
+        index=order[:, : int(mask_len)],
+        src=torch.ones(bsz, seq_len, device=device),
+    ).bool()
 
 
 @torch.no_grad()
-def mar_decode(model, conv, prompts: list[str], cfg_weight: float = 1.0,
-               np_seed: int | None = None) -> tuple[torch.Tensor, list[int]]:
+def mar_decode(
+    model, conv, prompts: list[str], cfg_weight: float = 1.0, np_seed: int | None = None
+) -> tuple[torch.Tensor, list[int]]:
     """Upstream's MAR loop. Returns tokens [B, N, d] and the number of tokens revealed per
     step (upstream's guidance slicing is only valid when it is 1 at every step)."""
     add_upstream_to_path()
@@ -51,8 +56,11 @@ def mar_decode(model, conv, prompts: list[str], cfg_weight: float = 1.0,
     bsz = len(prompts)
     dev = next(model.parameters()).device
     input_ids, _, attn, img_pos, pos_ids = conv.t2i_prompt(
-        [""] * bsz + list(prompts), img_h=bb.RESOLUTION, img_w=bb.RESOLUTION,
-        num_visual_gen_tokens=n_tok)
+        [""] * bsz + list(prompts),
+        img_h=bb.RESOLUTION,
+        img_w=bb.RESOLUTION,
+        num_visual_gen_tokens=n_tok,
+    )
     if pos_ids.shape[1] == 3:
         pos_ids = rearrange(pos_ids, "bsz k c -> k bsz c")
     text = model.vision_language_model.model.embed_tokens(input_ids[:, :-n_tok].to(dev))
@@ -69,18 +77,28 @@ def mar_decode(model, conv, prompts: list[str], cfg_weight: float = 1.0,
         mask = torch.cat([mask, mask], dim=0)
         tokens = tokens + model.learnable_pos_emb
         emb = torch.cat((text, tokens), dim=1)
-        out = model.vision_language_model(inputs_embeds=emb, use_cache=None,
-                                          attention_mask=attn.to(dev), past_key_values=None,
-                                          return_dict=True, position_ids=pos_ids.to(dev),
-                                          image_position_mask=img_pos.to(dev), t_emb=None)
+        out = model.vision_language_model(
+            inputs_embeds=emb,
+            use_cache=None,
+            attention_mask=attn.to(dev),
+            past_key_values=None,
+            return_dict=True,
+            position_ids=pos_ids.to(dev),
+            image_position_mask=img_pos.to(dev),
+            t_emb=None,
+        )
         pred = model.vision_head(out["hidden_states"][:, -n_tok:])
         ratio = np.cos(math.pi / 2.0 * (step + 1) / n_tok)
         mask_len = torch.tensor([np.floor(n_tok * ratio)], device=dev)
-        mask_len = torch.maximum(torch.tensor([1.0], device=dev),
-                                 torch.minimum(mask.sum(-1, keepdim=True) - 1, mask_len))
+        mask_len = torch.maximum(
+            torch.tensor([1.0], device=dev), torch.minimum(mask.sum(-1, keepdim=True) - 1, mask_len)
+        )
         mask_next = _mask_by_order(mask_len[0].item(), orders, bsz, n_tok, dev)
-        to_pred = mask[:bsz].bool() if step >= n_tok - 1 else torch.logical_xor(
-            mask[:bsz].bool(), mask_next)
+        to_pred = (
+            mask[:bsz].bool()
+            if step >= n_tok - 1
+            else torch.logical_xor(mask[:bsz].bool(), mask_next)
+        )
         revealed.append(int(to_pred[0].sum()))
         mask = mask_next.float()
         to_pred2 = torch.cat([to_pred, to_pred], dim=0)
@@ -92,10 +110,20 @@ def mar_decode(model, conv, prompts: list[str], cfg_weight: float = 1.0,
 
 
 @torch.no_grad()
-def mar_decode_adarq(model, heads, conv, prompts: list[str], cfg_weight: float = 1.0,
-                     np_seed: int | None = None, flow_steps: int = 32,
-                     generator=None, code_temps=None, top_p: float | None = None,
-                     greedy: bool = False, residual_scale: float = 1.0):
+def mar_decode_adarq(
+    model,
+    heads,
+    conv,
+    prompts: list[str],
+    cfg_weight: float = 1.0,
+    np_seed: int | None = None,
+    flow_steps: int = 32,
+    generator=None,
+    code_temps=None,
+    top_p: float | None = None,
+    greedy: bool = False,
+    residual_scale: float = 1.0,
+):
     """The same MAR loop as ``mar_decode`` (unconditional + conditional halves, random
     order, one token per step, cosine schedule); the revealed patch is produced by the
     AdaRQ heads instead of the linear head: codes depth by depth from guided logits, then
@@ -108,8 +136,11 @@ def mar_decode_adarq(model, heads, conv, prompts: list[str], cfg_weight: float =
     bsz = len(prompts)
     dev = next(model.parameters()).device
     input_ids, _, attn, img_pos, pos_ids = conv.t2i_prompt(
-        [""] * bsz + list(prompts), img_h=bb.RESOLUTION, img_w=bb.RESOLUTION,
-        num_visual_gen_tokens=n_tok)
+        [""] * bsz + list(prompts),
+        img_h=bb.RESOLUTION,
+        img_w=bb.RESOLUTION,
+        num_visual_gen_tokens=n_tok,
+    )
     if pos_ids.shape[1] == 3:
         pos_ids = rearrange(pos_ids, "bsz k c -> k bsz c")
     text = model.vision_language_model.model.embed_tokens(input_ids[:, :-n_tok].to(dev))
@@ -125,33 +156,58 @@ def mar_decode_adarq(model, heads, conv, prompts: list[str], cfg_weight: float =
         tokens = torch.cat([tokens, tokens], dim=0) + model.learnable_pos_emb
         mask = torch.cat([mask, mask], dim=0)
         emb = torch.cat((text, tokens), dim=1)
-        out = model.vision_language_model(inputs_embeds=emb, use_cache=None,
-                                          attention_mask=attn.to(dev), past_key_values=None,
-                                          return_dict=True, position_ids=pos_ids.to(dev),
-                                          image_position_mask=img_pos.to(dev), t_emb=None)
+        out = model.vision_language_model(
+            inputs_embeds=emb,
+            use_cache=None,
+            attention_mask=attn.to(dev),
+            past_key_values=None,
+            return_dict=True,
+            position_ids=pos_ids.to(dev),
+            image_position_mask=img_pos.to(dev),
+            t_emb=None,
+        )
         hid = out["hidden_states"][:, -n_tok:]
         ratio = np.cos(math.pi / 2.0 * (step + 1) / n_tok)
         mask_len = torch.tensor([np.floor(n_tok * ratio)], device=dev)
-        mask_len = torch.maximum(torch.tensor([1.0], device=dev),
-                                 torch.minimum(mask.sum(-1, keepdim=True) - 1, mask_len))
+        mask_len = torch.maximum(
+            torch.tensor([1.0], device=dev), torch.minimum(mask.sum(-1, keepdim=True) - 1, mask_len)
+        )
         mask_next = _mask_by_order(mask_len[0].item(), orders, bsz, n_tok, dev)
-        to_pred = mask[:bsz].bool() if step >= n_tok - 1 else torch.logical_xor(
-            mask[:bsz].bool(), mask_next)
+        to_pred = (
+            mask[:bsz].bool()
+            if step >= n_tok - 1
+            else torch.logical_xor(mask[:bsz].bool(), mask_next)
+        )
         revealed.append(int(to_pred[0].sum()))
         mask = mask_next.float()
         where = to_pred.nonzero(as_tuple=True)
-        lat, dep = heads.sample(hid[bsz:][where], hid[:bsz][where], cfg_weight=cfg_weight,
-                                code_temps=code_temps, top_p=top_p, greedy=greedy,
-                                residual_scale=residual_scale, flow_steps=flow_steps,
-                                generators=generator)
+        lat, dep = heads.sample(
+            hid[bsz:][where],
+            hid[:bsz][where],
+            cfg_weight=cfg_weight,
+            code_temps=code_temps,
+            top_p=top_p,
+            greedy=greedy,
+            residual_scale=residual_scale,
+            flow_steps=flow_steps,
+            generators=generator,
+        )
         cur[where] = lat.to(cur.dtype)
         depths[where] = dep
         tokens = cur
     return tokens, revealed, depths
 
 
-def load_adarq(vlm: str, width: int, branch_ckpt: str, heads_ckpt: str, tok_dir: str,
-               device, flow_width: int, flow_depth: int):
+def load_adarq(
+    vlm: str,
+    width: int,
+    branch_ckpt: str,
+    heads_ckpt: str,
+    tok_dir: str,
+    device,
+    flow_width: int,
+    flow_depth: int,
+):
     from .adarq_model import AdaRQHeads
     from .adarq_tokenizer import load_books
 
@@ -176,9 +232,12 @@ def load_bifrost_branch(vlm: str, width: int, ckpt: str, device):
         if n not in named:
             raise KeyError(f"{ckpt}: unknown parameter {n}")
         named[n].data.copy_(t.to(named[n].dtype))
-    expect = {n for n, _ in model.named_parameters()
-              if "vision_branch_" in n or n.startswith(("vision_head.", "mask_token",
-                                                        "learnable_pos_emb"))}
+    expect = {
+        n
+        for n, _ in model.named_parameters()
+        if "vision_branch_" in n
+        or n.startswith(("vision_head.", "mask_token", "learnable_pos_emb"))
+    }
     if set(state) != expect:
         raise KeyError(f"{ckpt} does not hold exactly the trainable branch tensors")
     return model.to(device).eval()
@@ -189,8 +248,14 @@ def load_flux_only(flux_id: str, device, dtype):
     same precomputed class-prompt embeddings as the other arms are passed in."""
     from diffusers import FluxPipeline
 
-    pipe = FluxPipeline.from_pretrained(flux_id, text_encoder=None, text_encoder_2=None,
-                                        tokenizer=None, tokenizer_2=None, torch_dtype=dtype)
+    pipe = FluxPipeline.from_pretrained(
+        flux_id,
+        text_encoder=None,
+        text_encoder_2=None,
+        tokenizer=None,
+        tokenizer_2=None,
+        torch_dtype=dtype,
+    )
     pipe.set_progress_bar_config(disable=True)
     return pipe.to(device)
 
@@ -204,35 +269,58 @@ def load_pipeline(flux_id: str, controlnet_ckpt: str, width: int, device, dtype)
 
     tr = FluxTransformer2DModel.from_pretrained(flux_id, subfolder="transformer", torch_dtype=dtype)
     trained = json.loads((pathlib.Path(controlnet_ckpt).parent / "config.json").read_text())
-    cn = build_controlnet(tr, width, num_double=int(trained["num_double"]),
-                          num_single=int(trained["num_single"]))
+    cn = build_controlnet(
+        tr, width, num_double=int(trained["num_double"]), num_single=int(trained["num_single"])
+    )
     cn.load_state_dict(torch.load(controlnet_ckpt, map_location="cpu"))
-    pipe = FluxControlNetPipeline.from_pretrained(flux_id, controlnet=cn.to(dtype),
-                                                  transformer=tr, torch_dtype=dtype)
+    pipe = FluxControlNetPipeline.from_pretrained(
+        flux_id, controlnet=cn.to(dtype), transformer=tr, torch_dtype=dtype
+    )
     pipe.set_progress_bar_config(disable=True)
     return pipe.to(device)
 
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--arm", choices=["bifrost", "adarq", "flux"], required=True,
-                    help="flux: the backbone alone (paper Table 1, row 1): class prompt -> "
-                         "FLUX.1-dev, no MLLM, no ControlNet; a training-free protocol anchor")
+    ap.add_argument(
+        "--arm",
+        choices=["bifrost", "adarq", "flux"],
+        required=True,
+        help="flux: the backbone alone (paper Table 1, row 1): class prompt -> "
+        "FLUX.1-dev, no MLLM, no ControlNet; a training-free protocol anchor",
+    )
     ap.add_argument("--heads", default=None, help="adarq: final_heads.pt")
     ap.add_argument("--tok", default=None, help="adarq: Stage-0 dir (tokenizer.pt)")
     ap.add_argument("--flow-steps", type=int, default=32)
-    ap.add_argument("--code-temps", default="1",
-                    help="adarq: code temperature per level, e.g. 0.7,0.85,1,1 (one value = all "
-                         "levels; 0 = greedy at that level). Applied to the ordinary codes only; "
-                         "halting is gated on the original halt probability")
-    ap.add_argument("--top-p", type=float, default=None,
-                    help="adarq: nucleus filter on the ordinary codes (halting unaffected)")
-    ap.add_argument("--greedy-codes", action="store_true",
-                    help="adarq: always take the most likely ordinary code (halting stays sampled)")
-    ap.add_argument("--residual-scale", type=float, default=1.0,
-                    help="adarq: initial-noise scale of the residual flow (1 = as trained)")
-    ap.add_argument("--class-balanced", action="store_true",
-                    help="every class exactly n/1000 times, in a seeded random order")
+    ap.add_argument(
+        "--code-temps",
+        default="1",
+        help="adarq: code temperature per level, e.g. 0.7,0.85,1,1 (one value = all "
+        "levels; 0 = greedy at that level). Applied to the ordinary codes only; "
+        "halting is gated on the original halt probability",
+    )
+    ap.add_argument(
+        "--top-p",
+        type=float,
+        default=None,
+        help="adarq: nucleus filter on the ordinary codes (halting unaffected)",
+    )
+    ap.add_argument(
+        "--greedy-codes",
+        action="store_true",
+        help="adarq: always take the most likely ordinary code (halting stays sampled)",
+    )
+    ap.add_argument(
+        "--residual-scale",
+        type=float,
+        default=1.0,
+        help="adarq: initial-noise scale of the residual flow (1 = as trained)",
+    )
+    ap.add_argument(
+        "--class-balanced",
+        action="store_true",
+        help="every class exactly n/1000 times, in a seeded random order",
+    )
     ap.add_argument("--branch", default=None, help="final_trainable.pt of Stage 1")
     ap.add_argument("--controlnet", default=None, help="final_controlnet.pt of Stage 2")
     ap.add_argument("--data", required=True, help="imagenet256 dir (class names, FLUX text)")
@@ -269,7 +357,8 @@ def main() -> None:
         if args.n % 1000:
             raise SystemExit("--class-balanced needs --n to be a multiple of 1000")
         classes = np.random.default_rng(args.seed).permutation(
-            np.repeat(np.arange(1000), args.n // 1000))
+            np.repeat(np.arange(1000), args.n // 1000)
+        )
     else:
         classes = np.random.default_rng(args.seed).integers(0, 1000, args.n)
     code_temps = [float(t) for t in args.code_temps.split(",")]
@@ -290,8 +379,16 @@ def main() -> None:
         if not (args.heads and args.tok):
             raise SystemExit("--arm adarq needs --heads and --tok")
         trained = json.loads((pathlib.Path(args.heads).parent / "config.json").read_text())
-        model, heads = load_adarq(args.vlm, width, args.branch, args.heads, args.tok, dev,
-                                  int(trained["flow_width"]), int(trained["flow_depth"]))
+        model, heads = load_adarq(
+            args.vlm,
+            width,
+            args.branch,
+            args.heads,
+            args.tok,
+            dev,
+            int(trained["flow_width"]),
+            int(trained["flow_depth"]),
+        )
     else:
         model = load_bifrost_branch(args.vlm, width, args.branch, dev)
     if model is not None:
@@ -303,7 +400,7 @@ def main() -> None:
 
     imgs = np.zeros((hi - lo, args.res, args.res, 3), dtype=np.uint8)
     depth_sum, depth_n = 0, 0
-    depth_hist = np.zeros(5, dtype=np.int64)            # index = sampled depth (1..4)
+    depth_hist = np.zeros(5, dtype=np.int64)  # index = sampled depth (1..4)
     for s in range(lo, hi, args.batch):
         e = min(s + args.batch, hi)
         lab = classes[s:e]
@@ -312,45 +409,79 @@ def main() -> None:
         idx = torch.from_numpy(lab.astype(np.int64))
         g = torch.Generator(device=dev).manual_seed(bseed)
         if args.arm == "flux":
-            res = pipe(prompt_embeds=t5[idx].to(dev, dtype),
-                       pooled_prompt_embeds=pooled[idx].to(dev, dtype),
-                       num_inference_steps=args.steps, guidance_scale=args.guidance,
-                       generator=g, height=args.res, width=args.res, output_type="np").images
-            imgs[s - lo:e - lo] = (np.clip(res, 0, 1) * 255).round().astype(np.uint8)
+            res = pipe(
+                prompt_embeds=t5[idx].to(dev, dtype),
+                pooled_prompt_embeds=pooled[idx].to(dev, dtype),
+                num_inference_steps=args.steps,
+                guidance_scale=args.guidance,
+                generator=g,
+                height=args.res,
+                width=args.res,
+                output_type="np",
+            ).images
+            imgs[s - lo : e - lo] = (np.clip(res, 0, 1) * 255).round().astype(np.uint8)
             print(f"  {e - lo}/{hi - lo} images", flush=True)
             continue
         if heads is None:
-            tokens, revealed = mar_decode(model, conv, names_b, cfg_weight=args.cfg_weight,
-                                          np_seed=bseed)
+            tokens, revealed = mar_decode(
+                model, conv, names_b, cfg_weight=args.cfg_weight, np_seed=bseed
+            )
         else:
             # separate streams (codes, halting, residuals); MAR orders use NumPy (np_seed)
             # and the renderer its own generator, so settings change only what they target
-            gens = {name: torch.Generator(device=dev).manual_seed(4 * bseed + off)
-                    for name, off in (("code", 1), ("halt", 2), ("res", 3))}
+            gens = {
+                name: torch.Generator(device=dev).manual_seed(4 * bseed + off)
+                for name, off in (("code", 1), ("halt", 2), ("res", 3))
+            }
             tokens, revealed, depth = mar_decode_adarq(
-                model, heads, conv, names_b, cfg_weight=args.cfg_weight, np_seed=bseed,
-                flow_steps=args.flow_steps, generator=gens, code_temps=code_temps,
-                top_p=args.top_p, greedy=args.greedy_codes,
-                residual_scale=args.residual_scale)
+                model,
+                heads,
+                conv,
+                names_b,
+                cfg_weight=args.cfg_weight,
+                np_seed=bseed,
+                flow_steps=args.flow_steps,
+                generator=gens,
+                code_temps=code_temps,
+                top_p=args.top_p,
+                greedy=args.greedy_codes,
+                residual_scale=args.residual_scale,
+            )
             depth_sum += int(depth.sum())
             depth_n += depth.numel()
             depth_hist += np.bincount(depth.flatten().cpu().numpy(), minlength=5)[:5]
         if set(revealed) != {1}:
-            raise RuntimeError(f"MAR revealed {sorted(set(revealed))} tokens per step; "
-                               "upstream's guidance slicing needs exactly 1")
-        res = pipe(prompt_embeds=t5[idx].to(dev, dtype),
-                   pooled_prompt_embeds=pooled[idx].to(dev, dtype),
-                   control_image=tokens.to(dtype), num_inference_steps=args.steps,
-                   controlnet_conditioning_scale=args.cn_scale, guidance_scale=args.guidance,
-                   generator=g, height=args.res, width=args.res, output_type="np").images
-        imgs[s - lo:e - lo] = (np.clip(res, 0, 1) * 255).round().astype(np.uint8)
+            raise RuntimeError(
+                f"MAR revealed {sorted(set(revealed))} tokens per step; "
+                "upstream's guidance slicing needs exactly 1"
+            )
+        res = pipe(
+            prompt_embeds=t5[idx].to(dev, dtype),
+            pooled_prompt_embeds=pooled[idx].to(dev, dtype),
+            control_image=tokens.to(dtype),
+            num_inference_steps=args.steps,
+            controlnet_conditioning_scale=args.cn_scale,
+            guidance_scale=args.guidance,
+            generator=g,
+            height=args.res,
+            width=args.res,
+            output_type="np",
+        ).images
+        imgs[s - lo : e - lo] = (np.clip(res, 0, 1) * 255).round().astype(np.uint8)
         print(f"  {e - lo}/{hi - lo} images", flush=True)
     np.savez(part, arr_0=imgs, labels=classes[lo:hi])
-    (out / f"shard{args.shard:02d}of{args.nshards:02d}.json").write_text(json.dumps(
-        {**vars(args), "range": [lo, hi],
-         "mean_depth": (depth_sum / depth_n) if depth_n else None,
-         "depth_hist": depth_hist[1:].tolist() if depth_n else None,
-         "revealed_per_step": "1 (asserted every batch)"}, indent=2))
+    (out / f"shard{args.shard:02d}of{args.nshards:02d}.json").write_text(
+        json.dumps(
+            {
+                **vars(args),
+                "range": [lo, hi],
+                "mean_depth": (depth_sum / depth_n) if depth_n else None,
+                "depth_hist": depth_hist[1:].tolist() if depth_n else None,
+                "revealed_per_step": "1 (asserted every batch)",
+            },
+            indent=2,
+        )
+    )
     print(f"wrote {part}")
 
 
