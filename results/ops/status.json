@@ -384,6 +384,16 @@
    },
    {
     "elapsed": "0:00",
+    "jobid": "1508577",
+    "name": "class-acc",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "2:00:00"
+   },
+   {
+    "elapsed": "0:00",
     "jobid": "1508576",
     "name": "class-acc",
     "nodes": "1",
@@ -405,16 +415,6 @@
    {
     "elapsed": "0:00",
     "jobid": "1508574",
-    "name": "class-acc",
-    "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "2:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508577",
     "name": "class-acc",
     "nodes": "1",
     "reason_or_nodelist": "(Priority)",
@@ -3118,5 +3118,5 @@
    "waiting_for_nodes": null
   }
  },
- "updated": "2026-11-26T19:37:30"
+ "updated": "2026-11-26T20:38:02"
 }
