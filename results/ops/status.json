@@ -347,8 +347,18 @@
     "jobid": "1508569",
     "name": "adm-score",
     "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
+    "reason_or_nodelist": "(Resources)",
     "start": "2026-11-27T15:28:02",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508571",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "2026-11-27T18:17:16",
     "state": "PENDING",
     "time_limit": "12:00:00"
    },
@@ -365,16 +375,6 @@
    {
     "elapsed": "0:00",
     "jobid": "1508572",
-    "name": "adm-score",
-    "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "12:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508571",
     "name": "adm-score",
     "nodes": "1",
     "reason_or_nodelist": "(Priority)",
@@ -3118,5 +3118,5 @@
    "waiting_for_nodes": null
   }
  },
- "updated": "2026-11-26T17:36:25"
+ "updated": "2026-11-26T18:36:56"
 }
