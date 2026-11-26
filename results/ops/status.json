@@ -49,7 +49,7 @@
  },
  "cluster": {
   "counts": {
-   "PENDING": 20,
+   "PENDING": 18,
    "RUNNING": 3
   },
   "ended_24h": [
@@ -300,6 +300,22 @@
     "jobid": "1508559",
     "name": "levelb-sample",
     "state": "COMPLETED"
+   },
+   {
+    "elapsed": "01:11:45",
+    "end": "2026-11-26T13:59:02",
+    "exit": "0:0",
+    "jobid": "1508560",
+    "name": "levelb-sample",
+    "state": "COMPLETED"
+   },
+   {
+    "elapsed": "01:08:58",
+    "end": "2026-11-26T13:59:34",
+    "exit": "0:0",
+    "jobid": "1508561",
+    "name": "levelb-sample",
+    "state": "COMPLETED"
    }
   ],
   "gpu_nodes": [
@@ -394,38 +410,8 @@
     "jobid": "1508565",
     "name": "adm-score",
     "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "2026-11-27T13:55:20",
-    "state": "PENDING",
-    "time_limit": "12:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508564",
-    "name": "levelb-sample",
-    "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "2026-11-27T12:50:36",
-    "state": "PENDING",
-    "time_limit": "1-00:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508563",
-    "name": "levelb-sample",
-    "nodes": "1",
     "reason_or_nodelist": "(Resources)",
-    "start": "2026-11-27T12:47:17",
-    "state": "PENDING",
-    "time_limit": "1-00:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508567",
-    "name": "adm-score",
-    "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "N/A",
+    "start": "2026-11-27T13:55:20",
     "state": "PENDING",
     "time_limit": "12:00:00"
    },
@@ -435,7 +421,17 @@
     "name": "adm-score",
     "nodes": "1",
     "reason_or_nodelist": "(Priority)",
-    "start": "N/A",
+    "start": "2026-11-27T13:59:34",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508567",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "2026-11-27T13:59:02",
     "state": "PENDING",
     "time_limit": "12:00:00"
    },
@@ -474,7 +470,7 @@
     "jobid": "1508570",
     "name": "adm-score",
     "nodes": "1",
-    "reason_or_nodelist": "(Dependency)",
+    "reason_or_nodelist": "(Priority)",
     "start": "N/A",
     "state": "PENDING",
     "time_limit": "12:00:00"
@@ -484,7 +480,7 @@
     "jobid": "1508569",
     "name": "adm-score",
     "nodes": "1",
-    "reason_or_nodelist": "(Dependency)",
+    "reason_or_nodelist": "(Priority)",
     "start": "N/A",
     "state": "PENDING",
     "time_limit": "12:00:00"
@@ -590,27 +586,27 @@
     "time_limit": "2:00:00"
    },
    {
-    "elapsed": "1:08:02",
-    "jobid": "1508561",
+    "elapsed": "4:21",
+    "jobid": "1508564",
     "name": "levelb-sample",
     "nodes": "1",
     "reason_or_nodelist": "vhpc13",
-    "start": "2026-11-26T12:50:36",
+    "start": "2026-11-26T13:59:34",
     "state": "RUNNING",
     "time_limit": "1-00:00:00"
    },
    {
-    "elapsed": "1:11:21",
-    "jobid": "1508560",
+    "elapsed": "4:53",
+    "jobid": "1508563",
     "name": "levelb-sample",
     "nodes": "1",
     "reason_or_nodelist": "vhpc15",
-    "start": "2026-11-26T12:47:17",
+    "start": "2026-11-26T13:59:02",
     "state": "RUNNING",
     "time_limit": "1-00:00:00"
    },
    {
-    "elapsed": "3:18",
+    "elapsed": "8:35",
     "jobid": "1508562",
     "name": "levelb-sample",
     "nodes": "1",
@@ -3055,14 +3051,14 @@
    "waiting_for_nodes": null
   },
   "2026-11-26-p1b-sample-adarq_gS_w20": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-26T14:03:55",
+   "finished": "2026-11-26T14:03:55",
    "invalid": null,
    "jobid": "1508560",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "RUNNING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-26T11:31:51",
@@ -3070,14 +3066,14 @@
    "waiting_for_nodes": null
   },
   "2026-11-26-p1b-sample-adarq_gS_w30": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-26T14:03:55",
+   "finished": "2026-11-26T14:03:55",
    "invalid": null,
    "jobid": "1508561",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "RUNNING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-26T11:31:51",
@@ -3107,7 +3103,7 @@
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "RUNNING"
    ],
    "submit_error": null,
    "submitted": "2026-11-26T11:31:51",
@@ -3122,7 +3118,7 @@
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "RUNNING"
    ],
    "submit_error": null,
    "submitted": "2026-11-26T11:31:51",
@@ -3265,5 +3261,5 @@
    "waiting_for_nodes": null
   }
  },
- "updated": "2026-11-26T13:58:38"
+ "updated": "2026-11-26T14:03:55"
 }
