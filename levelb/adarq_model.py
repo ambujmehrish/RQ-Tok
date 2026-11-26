@@ -264,11 +264,15 @@ class AdaRQHeads(nn.Module):
         generators=None,
         temperature: float | None = None,
         generator: torch.Generator | None = None,
+        stats: dict | None = None,
     ):
         """One latent per row of h: codes depth by depth (guided logits, gated halting, see
         ``sample_level``), then the residual by Euler integration of the guided velocity from
         ``residual_scale`` x N(0, I). ``generators``: {"code", "halt", "res"} torch generators
-        (separate streams), or one generator for all. Returns (latent [M, d], depth [M])."""
+        (separate streams), or one generator for all. Returns (latent [M, d], depth [M]).
+        ``stats`` (needs ``h_u``): filled with per-level sums over live patches, in nats, over
+        the K ordinary codes: ``kl`` = KL(conditional || negative branch), ``ent_cond`` and
+        ``ent_used`` = entropy of the conditional and of the guided distribution, ``n``."""
         temps = list(code_temps) if code_temps is not None else [temperature or 1.0] * self.D
         if len(temps) == 1:
             temps = temps * self.D
@@ -287,7 +291,19 @@ class AdaRQHeads(nn.Module):
             lg = self.code_logits(h_c, zhat, lvl, forbid_halt=False)
             if h_u is not None:
                 lu = self.code_logits(h_u, zhat, lvl, forbid_halt=False)
-                lg = lu + cfg_weight * (lg - lu)
+                lc, lg = lg, lu + cfg_weight * (lg - lu)
+                if stats is not None:
+                    pc, pu, pg = (F.log_softmax(x[:, : self.K], -1) for x in (lc, lu, lg))
+                    live = alive.float()
+                    for key, val in (
+                        ("kl", (pc.exp() * (pc - pu)).sum(-1)),
+                        ("ent_cond", -(pc.exp() * pc).sum(-1)),
+                        ("ent_used", -(pg.exp() * pg).sum(-1)),
+                        ("n", torch.ones_like(live)),
+                    ):
+                        stats.setdefault(key, torch.zeros(self.D, device=dev))[lvl] += (
+                            val * live
+                        ).sum()
             u_halt = torch.rand(m, device=dev, generator=gh)  # drawn every level: aligned
             u_code = torch.rand(m, device=dev, generator=gc)
             q = self.sample_level(lg, lvl, temps[lvl], top_p, greedy, u_halt, u_code)

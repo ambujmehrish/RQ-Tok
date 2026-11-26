@@ -42,10 +42,37 @@ def _setup(tmp, vlm, flux, tr):
 
 
 def _run(data, branch, cn, vlm, flux, out, seed=0):
-    cmd = [sys.executable, "-m", "levelb.sample", "--arm", "bifrost", "--branch", str(branch),
-           "--controlnet", str(cn), "--data", str(data), "--vlm", vlm, "--flux", flux,
-           "--n", "3", "--seed", str(seed), "--batch", "2", "--steps", "2", "--res", "32",
-           "--device", "cpu", "--out", str(out)]
+    cmd = [
+        sys.executable,
+        "-m",
+        "levelb.sample",
+        "--arm",
+        "bifrost",
+        "--branch",
+        str(branch),
+        "--controlnet",
+        str(cn),
+        "--data",
+        str(data),
+        "--vlm",
+        vlm,
+        "--flux",
+        flux,
+        "--n",
+        "3",
+        "--seed",
+        str(seed),
+        "--batch",
+        "2",
+        "--steps",
+        "2",
+        "--res",
+        "32",
+        "--device",
+        "cpu",
+        "--out",
+        str(out),
+    ]
     return subprocess.run(cmd, check=True, capture_output=True, text=True)
 
 
@@ -66,7 +93,7 @@ def test_sample_end_to_end_and_reproducible(tiny_vlm, tiny_flux, transformer, tm
     _run(data, branch, cn, tiny_vlm, tiny_flux, b)
     za, zb = np.load(a / "shard00of01.npz"), np.load(b / "shard00of01.npz")
     assert za["arr_0"].shape == (3, 32, 32, 3) and za["arr_0"].dtype == np.uint8
-    assert np.array_equal(za["arr_0"], zb["arr_0"])                       # same seed
+    assert np.array_equal(za["arr_0"], zb["arr_0"])  # same seed
     assert za["labels"].tolist() == np.random.default_rng(0).integers(0, 1000, 3).tolist()
     path = merge(str(a), nshards=1, n=3)
     assert np.load(path)["arr_0"].shape[0] == 3
@@ -79,16 +106,27 @@ def _adarq_setup(tmp, vlm):
     q = at.make_quantizer(HIDDEN, 16, 4, tau=0.5, adaptive=True)
     tok = tmp / "tok"
     tok.mkdir()
-    torch.save({"state_dict": q.state_dict(), "tau": 0.5, "res_rms": 0.1, "codebook_size": 16,
-                "max_depth": 4, "width": HIDDEN}, tok / "tokenizer.pt")
+    torch.save(
+        {
+            "state_dict": q.state_dict(),
+            "tau": 0.5,
+            "res_rms": 0.1,
+            "codebook_size": 16,
+            "max_depth": 4,
+            "width": HIDDEN,
+        },
+        tok / "tokenizer.pt",
+    )
     books, rms, _, _ = at.load_books(str(tok / "tokenizer.pt"))
     model = bb.build_model(vlm, inner_dim=HIDDEN)
     heads = am.AdaRQHeads(HIDDEN, books, rms, flow_width=32, flow_depth=2)
     am.set_trainable_adarq(model, heads)
     run = tmp / "adarq"
     run.mkdir()
-    torch.save({n: p.detach() for n, p in model.named_parameters() if p.requires_grad},
-               run / "final_trainable.pt")
+    torch.save(
+        {n: p.detach() for n, p in model.named_parameters() if p.requires_grad},
+        run / "final_trainable.pt",
+    )
     torch.save(heads.state_dict(), run / "final_heads.pt")
     (run / "config.json").write_text(json.dumps({"flow_width": 32, "flow_depth": 2}))
     return tok, run
@@ -98,11 +136,43 @@ def test_adarq_sample_end_to_end(tiny_vlm, tiny_flux, transformer, tmp_path):  #
     data, _, cn = _setup(tmp_path, tiny_vlm, tiny_flux, transformer)
     tok, run = _adarq_setup(tmp_path, tiny_vlm)
     out = tmp_path / "s"
-    cmd = [sys.executable, "-m", "levelb.sample", "--arm", "adarq",
-           "--branch", str(run / "final_trainable.pt"), "--heads", str(run / "final_heads.pt"),
-           "--tok", str(tok), "--controlnet", str(cn), "--data", str(data), "--vlm", tiny_vlm,
-           "--flux", tiny_flux, "--n", "3", "--seed", "0", "--batch", "2", "--steps", "2",
-           "--flow-steps", "2", "--res", "32", "--device", "cpu", "--out", str(out)]
+    cmd = [
+        sys.executable,
+        "-m",
+        "levelb.sample",
+        "--arm",
+        "adarq",
+        "--branch",
+        str(run / "final_trainable.pt"),
+        "--heads",
+        str(run / "final_heads.pt"),
+        "--tok",
+        str(tok),
+        "--controlnet",
+        str(cn),
+        "--data",
+        str(data),
+        "--vlm",
+        tiny_vlm,
+        "--flux",
+        tiny_flux,
+        "--n",
+        "3",
+        "--seed",
+        "0",
+        "--batch",
+        "2",
+        "--steps",
+        "2",
+        "--flow-steps",
+        "2",
+        "--res",
+        "32",
+        "--device",
+        "cpu",
+        "--out",
+        str(out),
+    ]
     subprocess.run(cmd, check=True, capture_output=True, text=True)
     z = np.load(out / "shard00of01.npz")
     meta = json.loads((out / "shard00of01.json").read_text())
@@ -124,11 +194,123 @@ def test_flux_only_arm(tiny_flux, tmp_path):  # noqa: F811
     outs = []
     for name in ("a", "b"):
         out = tmp_path / name
-        subprocess.run([sys.executable, "-m", "levelb.sample", "--arm", "flux", "--data", str(data),
-                        "--flux", tiny_flux, "--n", "3", "--seed", "0", "--batch", "2",
-                        "--steps", "2", "--res", "32", "--device", "cpu", "--out", str(out)],
-                       check=True, capture_output=True, text=True)
+        subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "levelb.sample",
+                "--arm",
+                "flux",
+                "--data",
+                str(data),
+                "--flux",
+                tiny_flux,
+                "--n",
+                "3",
+                "--seed",
+                "0",
+                "--batch",
+                "2",
+                "--steps",
+                "2",
+                "--res",
+                "32",
+                "--device",
+                "cpu",
+                "--out",
+                str(out),
+            ],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
         outs.append(np.load(out / "shard00of01.npz"))
     assert outs[0]["arr_0"].shape == (3, 32, 32, 3)
     assert np.array_equal(outs[0]["arr_0"], outs[1]["arr_0"])
     assert outs[0]["labels"].tolist() == np.random.default_rng(0).integers(0, 1000, 3).tolist()
+
+
+def test_random_other_classes_never_returns_own_class():
+    from levelb.sample import random_other_classes
+
+    names = [f"c{i}" for i in range(10)]
+    labels = np.arange(10).repeat(50)
+    neg = random_other_classes(names, labels, np.random.default_rng(0))
+    assert len(neg) == 500 and all(n != names[c] for n, c in zip(neg, labels, strict=True))
+    assert len(set(neg)) == 10  # all classes are drawn
+
+
+def test_adarq_independent_condition_guidance(tiny_vlm, tiny_flux, transformer, tmp_path):  # noqa: F811
+    """--neg-prompt random-class with a guidance weight: runs, and logs the code
+    distributions' information per decoding step and level."""
+    data, _, cn = _setup(tmp_path, tiny_vlm, tiny_flux, transformer)
+    tok, run = _adarq_setup(tmp_path, tiny_vlm)
+    out = tmp_path / "g"
+    cmd = [
+        sys.executable,
+        "-m",
+        "levelb.sample",
+        "--arm",
+        "adarq",
+        "--branch",
+        str(run / "final_trainable.pt"),
+        "--heads",
+        str(run / "final_heads.pt"),
+        "--tok",
+        str(tok),
+        "--controlnet",
+        str(cn),
+        "--data",
+        str(data),
+        "--vlm",
+        tiny_vlm,
+        "--flux",
+        tiny_flux,
+        "--n",
+        "3",
+        "--seed",
+        "0",
+        "--batch",
+        "2",
+        "--steps",
+        "2",
+        "--flow-steps",
+        "2",
+        "--res",
+        "32",
+        "--device",
+        "cpu",
+        "--out",
+        str(out),
+        "--neg-prompt",
+        "random-class",
+        "--cfg-weight",
+        "2.0",
+    ]
+    subprocess.run(cmd, check=True, capture_output=True, text=True)
+    meta = json.loads((out / "shard00of01.json").read_text())
+    info = meta["code_info_nats"]
+    kl, n = np.array(info["kl"]), np.array(info["n"])
+    assert kl.shape == (bb.NUM_TOKENS, 4) and n.shape == kl.shape
+    assert (n[:, 0] == 3).all()  # level 1: every patch, once
+    assert (kl >= -1e-4).all() and np.isfinite(np.array(info["ent_used"])).all()
+    assert (np.array(info["ent_cond"]) <= np.log(16) + 1e-3).all()  # K = 16 codes
+
+
+def test_bifrost_token_noise_is_applied_and_seeded(tiny_vlm):  # noqa: F811
+    """Checked on the tokens: the tiny ControlNet starts with zero output layers, so
+    images cannot show it."""
+    model = bb.build_model(tiny_vlm, inner_dim=HIDDEN).float().eval()
+    conv = bb.make_conversation()
+
+    def run(noise, seed=0):
+        g = torch.Generator().manual_seed(seed)
+        return mar_decode(
+            model, conv, ["tench", "goldfish"], np_seed=0, token_noise=noise, generator=g
+        )[0]
+
+    plain, noisy = run(0.0), run(0.5)
+    assert torch.equal(plain, run(0.0))  # the noise option leaves the default path unchanged
+    assert not torch.allclose(plain, noisy)
+    assert torch.equal(noisy, run(0.5))  # seeded
+    assert not torch.equal(noisy, run(0.5, seed=1))

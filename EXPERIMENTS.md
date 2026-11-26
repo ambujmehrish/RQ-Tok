@@ -989,3 +989,27 @@ Conclusions (validation; they choose what to build, they do not rank methods):
 5. The generator at α ≤ 0.6 (0.64–0.65) is above the code-only renders of real images at the
    same depth (0.589): generated codes are somewhat more typical than real ones, so the
    code-only row is not a hard cap on generation.
+
+### Phase 1 (queued 2026-11-26): no-training tests toward a guided, information-aware bridge
+
+Goal set by the user: beat Bifrost-1 on FID, sFID and IS together on test, with an efficiency
+advantage. Plan and literature: `docs/adarq_v2_options.md`. Validation only (2,000
+class-balanced images, seed 100, held-out reference, ResNet-50 class accuracy); H200 only.
+Requests `2026-11-26-p1-*`.
+
+- **Guidance on the existing AdaRQ-Flow checkpoint** (trained without prompt dropout):
+  independent condition guidance (arXiv 2407.02687), negative branch = a random other class
+  redrawn every decoding step, applied to code logits and flow velocity, weights 1.5 / 2 / 3.
+  Two samplers: `gF` (greedy codes, residual noise 0.6; control `pilot_adarq_F_a06`) and `gS`
+  (sampled codes, default sampler; control `pilot_adarq_A`). At weight 1 the negative branch
+  cancels, so the controls are exact. Shown for diffusion models only: a positive result is
+  informative, a negative one is not conclusive.
+- **Information logging in those runs:** per decoding step and code level, KL(conditional ||
+  negative branch) and the entropies of the conditional and guided code distributions (nats).
+  Guided logits are log p(x|c) + (w − 1)·PMI(x; c); these logs show where class information
+  sits, for information-gated guidance and rate.
+- **Bifrost-1 + noise baseline:** Gaussian noise of std 0.33 / 0.66 / 1.31 on each revealed
+  token (held-out RMSE of the regressor: 1.31). Control `pilot_bifrost`.
+- **Latent statistics** (`levelb/latent_stats.py`): energy shares (global mean, between-class),
+  spectrum and effective dimension, and one linear probe of class information in true
+  latents, code-only reconstructions and the residual.

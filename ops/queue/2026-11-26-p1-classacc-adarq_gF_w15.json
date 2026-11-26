@@ -1,0 +1,12 @@
+{
+ "id": "2026-11-26-p1-classacc-adarq_gF_w15",
+ "what": "VALIDATION pilot_adarq_gF_w15: requested-class top-1/top-5 (ResNet-50)",
+ "script": "scripts/levelb/class_accuracy.sbatch",
+ "env": {
+  "SAMPLES": "${LEVELB_ROOT}/samples/pilot_adarq_gF_w15_seed100/samples_2000.npz"
+ },
+ "after": [
+  "2026-11-26-p1-score-adarq_gF_w15"
+ ],
+ "collect": true
+}

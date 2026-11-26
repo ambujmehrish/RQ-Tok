@@ -43,20 +43,12 @@ def _mask_by_order(mask_len, order, bsz, seq_len, device):
     ).bool()
 
 
-@torch.no_grad()
-def mar_decode(
-    model, conv, prompts: list[str], cfg_weight: float = 1.0, np_seed: int | None = None
-) -> tuple[torch.Tensor, list[int]]:
-    """Upstream's MAR loop. Returns tokens [B, N, d] and the number of tokens revealed per
-    step (upstream's guidance slicing is only valid when it is 1 at every step)."""
-    add_upstream_to_path()
-    from bifrost.models.mar.utils import sample_orders
-
+def _prompt_inputs(model, conv, neg: list[str], prompts: list[str], dev):
+    """Embedded text and masks for the guidance pair: the negative half first, then the
+    conditional half (upstream's layout)."""
     n_tok = bb.NUM_TOKENS
-    bsz = len(prompts)
-    dev = next(model.parameters()).device
     input_ids, _, attn, img_pos, pos_ids = conv.t2i_prompt(
-        [""] * bsz + list(prompts),
+        list(neg) + list(prompts),
         img_h=bb.RESOLUTION,
         img_w=bb.RESOLUTION,
         num_visual_gen_tokens=n_tok,
@@ -64,6 +56,39 @@ def mar_decode(
     if pos_ids.shape[1] == 3:
         pos_ids = rearrange(pos_ids, "bsz k c -> k bsz c")
     text = model.vision_language_model.model.embed_tokens(input_ids[:, :-n_tok].to(dev))
+    return text, attn.to(dev), pos_ids.to(dev), img_pos.to(dev)
+
+
+def random_other_classes(names: list[str], labels, rng: np.random.Generator) -> list[str]:
+    """Independent condition guidance (arXiv 2407.02687): one random class per image, never
+    the image's own. Called once per decoding step."""
+    off = rng.integers(1, len(names), size=len(labels))
+    return [names[(int(c) + int(o)) % len(names)] for c, o in zip(labels, off, strict=True)]
+
+
+@torch.no_grad()
+def mar_decode(
+    model,
+    conv,
+    prompts: list[str],
+    cfg_weight: float = 1.0,
+    np_seed: int | None = None,
+    neg_fn=None,
+    token_noise: float = 0.0,
+    generator=None,
+) -> tuple[torch.Tensor, list[int]]:
+    """Upstream's MAR loop. Returns tokens [B, N, d] and the number of tokens revealed per
+    step (upstream's guidance slicing is only valid when it is 1 at every step).
+    ``neg_fn`` (None = upstream's empty prompt, computed once): returns the negative half's
+    prompts, called every step. ``token_noise``: std of Gaussian noise added to each revealed
+    token (0 = upstream; the "regression + noise" baseline)."""
+    add_upstream_to_path()
+    from bifrost.models.mar.utils import sample_orders
+
+    n_tok = bb.NUM_TOKENS
+    bsz = len(prompts)
+    dev = next(model.parameters()).device
+    text, attn, pos_ids, img_pos = _prompt_inputs(model, conv, [""] * bsz, prompts, dev)
 
     if np_seed is not None:
         np.random.seed(np_seed)
@@ -76,15 +101,17 @@ def mar_decode(
         tokens = torch.cat([tokens, tokens], dim=0)
         mask = torch.cat([mask, mask], dim=0)
         tokens = tokens + model.learnable_pos_emb
+        if neg_fn is not None:
+            text, attn, pos_ids, img_pos = _prompt_inputs(model, conv, neg_fn(), prompts, dev)
         emb = torch.cat((text, tokens), dim=1)
         out = model.vision_language_model(
             inputs_embeds=emb,
             use_cache=None,
-            attention_mask=attn.to(dev),
+            attention_mask=attn,
             past_key_values=None,
             return_dict=True,
-            position_ids=pos_ids.to(dev),
-            image_position_mask=img_pos.to(dev),
+            position_ids=pos_ids,
+            image_position_mask=img_pos,
             t_emb=None,
         )
         pred = model.vision_head(out["hidden_states"][:, -n_tok:])
@@ -104,6 +131,10 @@ def mar_decode(
         to_pred2 = torch.cat([to_pred, to_pred], dim=0)
         sel = pred[to_pred2.nonzero(as_tuple=True)]
         sampled = sel[:bsz] + cfg_weight * (sel[bsz:] - sel[:bsz])
+        if token_noise > 0:
+            sampled = sampled + token_noise * torch.randn(
+                sampled.shape, device=dev, generator=generator
+            ).to(sampled.dtype)
         cur[to_pred.nonzero(as_tuple=True)] = sampled.to(cur.dtype)
         tokens = cur
     return tokens, revealed
@@ -123,27 +154,23 @@ def mar_decode_adarq(
     top_p: float | None = None,
     greedy: bool = False,
     residual_scale: float = 1.0,
+    neg_fn=None,
+    info: list | None = None,
 ):
     """The same MAR loop as ``mar_decode`` (unconditional + conditional halves, random
     order, one token per step, cosine schedule); the revealed patch is produced by the
     AdaRQ heads instead of the linear head: codes depth by depth from guided logits, then
     the residual by Euler integration of the guided flow velocity. Returns tokens, the
-    reveal count per step, and each patch's sampled depth."""
+    reveal count per step, and each patch's sampled depth. ``neg_fn`` as in ``mar_decode``.
+    ``info``: a list that receives one dict per step with the code distributions'
+    information sums per level (see ``AdaRQHeads.sample``)."""
     add_upstream_to_path()
     from bifrost.models.mar.utils import sample_orders
 
     n_tok = bb.NUM_TOKENS
     bsz = len(prompts)
     dev = next(model.parameters()).device
-    input_ids, _, attn, img_pos, pos_ids = conv.t2i_prompt(
-        [""] * bsz + list(prompts),
-        img_h=bb.RESOLUTION,
-        img_w=bb.RESOLUTION,
-        num_visual_gen_tokens=n_tok,
-    )
-    if pos_ids.shape[1] == 3:
-        pos_ids = rearrange(pos_ids, "bsz k c -> k bsz c")
-    text = model.vision_language_model.model.embed_tokens(input_ids[:, :-n_tok].to(dev))
+    text, attn, pos_ids, img_pos = _prompt_inputs(model, conv, [""] * bsz, prompts, dev)
     if np_seed is not None:
         np.random.seed(np_seed)
     mask = torch.ones(bsz, n_tok, device=dev)
@@ -155,15 +182,17 @@ def mar_decode_adarq(
         cur = tokens.clone()
         tokens = torch.cat([tokens, tokens], dim=0) + model.learnable_pos_emb
         mask = torch.cat([mask, mask], dim=0)
+        if neg_fn is not None:
+            text, attn, pos_ids, img_pos = _prompt_inputs(model, conv, neg_fn(), prompts, dev)
         emb = torch.cat((text, tokens), dim=1)
         out = model.vision_language_model(
             inputs_embeds=emb,
             use_cache=None,
-            attention_mask=attn.to(dev),
+            attention_mask=attn,
             past_key_values=None,
             return_dict=True,
-            position_ids=pos_ids.to(dev),
-            image_position_mask=img_pos.to(dev),
+            position_ids=pos_ids,
+            image_position_mask=img_pos,
             t_emb=None,
         )
         hid = out["hidden_states"][:, -n_tok:]
@@ -181,6 +210,7 @@ def mar_decode_adarq(
         revealed.append(int(to_pred[0].sum()))
         mask = mask_next.float()
         where = to_pred.nonzero(as_tuple=True)
+        stats = {} if info is not None else None
         lat, dep = heads.sample(
             hid[bsz:][where],
             hid[:bsz][where],
@@ -191,7 +221,10 @@ def mar_decode_adarq(
             residual_scale=residual_scale,
             flow_steps=flow_steps,
             generators=generator,
+            stats=stats,
         )
+        if info is not None:
+            info.append(stats)
         cur[where] = lat.to(cur.dtype)
         depths[where] = dep
         tokens = cur
@@ -333,6 +366,21 @@ def main() -> None:
     ap.add_argument("--nshards", type=int, default=1)
     ap.add_argument("--batch", type=int, default=16)
     ap.add_argument("--cfg-weight", type=float, default=1.0)
+    ap.add_argument(
+        "--neg-prompt",
+        choices=["empty", "random-class"],
+        default="empty",
+        help="negative half of the guidance pair: upstream's empty prompt, or an "
+        "independent random class redrawn every step (arXiv 2407.02687; "
+        "guidance for a model trained without prompt dropout)",
+    )
+    ap.add_argument(
+        "--token-noise",
+        type=float,
+        default=0.0,
+        help="bifrost: std of Gaussian noise added to each revealed token "
+        "(the regression + noise baseline; 0 = upstream)",
+    )
     ap.add_argument("--steps", type=int, default=28)
     ap.add_argument("--cn-scale", type=float, default=0.7)
     ap.add_argument("--guidance", type=float, default=3.5)
@@ -401,6 +449,11 @@ def main() -> None:
     imgs = np.zeros((hi - lo, args.res, args.res, 3), dtype=np.uint8)
     depth_sum, depth_n = 0, 0
     depth_hist = np.zeros(5, dtype=np.int64)  # index = sampled depth (1..4)
+    # information of the code distributions, summed over patches: [decoding step, level]
+    n_lvl = heads.D if heads is not None else 0
+    info_sum = {
+        key: np.zeros((bb.NUM_TOKENS, n_lvl)) for key in ("kl", "ent_cond", "ent_used", "n")
+    }
     for s in range(lo, hi, args.batch):
         e = min(s + args.batch, hi)
         lab = classes[s:e]
@@ -422,9 +475,20 @@ def main() -> None:
             imgs[s - lo : e - lo] = (np.clip(res, 0, 1) * 255).round().astype(np.uint8)
             print(f"  {e - lo}/{hi - lo} images", flush=True)
             continue
+        neg_fn = None
+        if args.neg_prompt == "random-class":
+            neg_rng = np.random.default_rng(4 * bseed + 5)  # its own stream
+            neg_fn = lambda lab=lab, r=neg_rng: random_other_classes(names, lab, r)  # noqa: E731
         if heads is None:
             tokens, revealed = mar_decode(
-                model, conv, names_b, cfg_weight=args.cfg_weight, np_seed=bseed
+                model,
+                conv,
+                names_b,
+                cfg_weight=args.cfg_weight,
+                np_seed=bseed,
+                neg_fn=neg_fn,
+                token_noise=args.token_noise,
+                generator=torch.Generator(device=dev).manual_seed(4 * bseed + 3),
             )
         else:
             # separate streams (codes, halting, residuals); MAR orders use NumPy (np_seed)
@@ -433,6 +497,7 @@ def main() -> None:
                 name: torch.Generator(device=dev).manual_seed(4 * bseed + off)
                 for name, off in (("code", 1), ("halt", 2), ("res", 3))
             }
+            info_steps: list = []
             tokens, revealed, depth = mar_decode_adarq(
                 model,
                 heads,
@@ -446,7 +511,12 @@ def main() -> None:
                 top_p=args.top_p,
                 greedy=args.greedy_codes,
                 residual_scale=args.residual_scale,
+                neg_fn=neg_fn,
+                info=info_steps,
             )
+            for k_step, st in enumerate(info_steps):
+                for key in info_sum:
+                    info_sum[key][k_step] += st[key].cpu().numpy()
             depth_sum += int(depth.sum())
             depth_n += depth.numel()
             depth_hist += np.bincount(depth.flatten().cpu().numpy(), minlength=5)[:5]
@@ -477,6 +547,18 @@ def main() -> None:
                 "range": [lo, hi],
                 "mean_depth": (depth_sum / depth_n) if depth_n else None,
                 "depth_hist": depth_hist[1:].tolist() if depth_n else None,
+                "code_info_nats": None
+                if not depth_n
+                else {
+                    "doc": "per [decoding step][level], mean over live patches: kl = KL(cond "
+                    "|| negative branch), ent_cond = entropy of the conditional code "
+                    "distribution, ent_used = entropy of the guided one; n = patches",
+                    **{
+                        key: (info_sum[key] / np.maximum(info_sum["n"], 1)).round(4).tolist()
+                        for key in ("kl", "ent_cond", "ent_used")
+                    },
+                    "n": info_sum["n"].astype(int).tolist(),
+                },
                 "revealed_per_step": "1 (asserted every batch)",
             },
             indent=2,

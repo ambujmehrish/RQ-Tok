@@ -1,0 +1,14 @@
+{
+ "id": "2026-11-26-p1-sample-bifrost_n066",
+ "what": "VALIDATION pilot (2,000 class-balanced, seed 100): Bifrost-1 + Gaussian noise std 0.66 on each revealed token (baseline; held-out RMSE is 1.31)",
+ "script": "scripts/levelb/sample.sbatch",
+ "env": {
+  "SEED": "100",
+  "N": "2000",
+  "BALANCED": "1",
+  "TAG": "pilot_bifrost_n066",
+  "ARM": "bifrost",
+  "TOKEN_NOISE": "0.66"
+ },
+ "collect": true
+}

@@ -70,6 +70,11 @@ if [ "$ARM" != "flux" ]; then EXTRA+=(--branch "$BRANCH" --controlnet "$CN"); fi
 [ "${GREEDY:-0}" = 1 ] && EXTRA+=(--greedy-codes)
 [ -n "${RESIDUAL_SCALE:-}" ] && EXTRA+=(--residual-scale "$RESIDUAL_SCALE")
 [ "${BALANCED:-0}" = 1 ] && EXTRA+=(--class-balanced)
+# guidance weight and its negative branch (NEG_PROMPT=random-class: guidance for a model
+# trained without prompt dropout); TOKEN_NOISE: the Bifrost-1 + noise baseline
+[ -n "${CFG_WEIGHT:-}" ] && EXTRA+=(--cfg-weight "$CFG_WEIGHT")
+[ -n "${NEG_PROMPT:-}" ] && EXTRA+=(--neg-prompt "$NEG_PROMPT")
+[ -n "${TOKEN_NOISE:-}" ] && EXTRA+=(--token-noise "$TOKEN_NOISE")
 python -m levelb.sample --arm "$ARM" "${EXTRA[@]+"${EXTRA[@]}"}" \
     --data "$LEVELB_ROOT/imagenet256" --seed "$SEED" --n "${N:-10000}" \
     --shard "$SHARD" --nshards "$NSHARDS" --out "$OUT" \

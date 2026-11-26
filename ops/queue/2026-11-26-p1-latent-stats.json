@@ -1,0 +1,7 @@
+{
+ "id": "2026-11-26-p1-latent-stats",
+ "what": "Latent statistics: energy shares, spectrum, linear-probe class information of true vs code-only latents (no generation)",
+ "script": "scripts/levelb/latent_stats.sbatch",
+ "env": {},
+ "collect": true
+}
