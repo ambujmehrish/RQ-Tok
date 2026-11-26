@@ -407,16 +407,6 @@
   "squeue": [
    {
     "elapsed": "0:00",
-    "jobid": "1508565",
-    "name": "adm-score",
-    "nodes": "1",
-    "reason_or_nodelist": "(Resources)",
-    "start": "2026-11-27T13:55:20",
-    "state": "PENDING",
-    "time_limit": "12:00:00"
-   },
-   {
-    "elapsed": "0:00",
     "jobid": "1508566",
     "name": "adm-score",
     "nodes": "1",
@@ -432,6 +422,46 @@
     "nodes": "1",
     "reason_or_nodelist": "(Priority)",
     "start": "2026-11-27T13:59:02",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508565",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Resources)",
+    "start": "2026-11-27T13:55:20",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508568",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508570",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508569",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "N/A",
     "state": "PENDING",
     "time_limit": "12:00:00"
    },
@@ -461,36 +491,6 @@
     "name": "adm-score",
     "nodes": "1",
     "reason_or_nodelist": "(Dependency)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "12:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508570",
-    "name": "adm-score",
-    "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "12:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508569",
-    "name": "adm-score",
-    "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "12:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508568",
-    "name": "adm-score",
-    "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
     "start": "N/A",
     "state": "PENDING",
     "time_limit": "12:00:00"
@@ -586,7 +586,7 @@
     "time_limit": "2:00:00"
    },
    {
-    "elapsed": "4:21",
+    "elapsed": "34:42",
     "jobid": "1508564",
     "name": "levelb-sample",
     "nodes": "1",
@@ -596,7 +596,7 @@
     "time_limit": "1-00:00:00"
    },
    {
-    "elapsed": "4:53",
+    "elapsed": "35:14",
     "jobid": "1508563",
     "name": "levelb-sample",
     "nodes": "1",
@@ -606,7 +606,7 @@
     "time_limit": "1-00:00:00"
    },
    {
-    "elapsed": "8:35",
+    "elapsed": "38:56",
     "jobid": "1508562",
     "name": "levelb-sample",
     "nodes": "1",
@@ -3261,5 +3261,5 @@
    "waiting_for_nodes": null
   }
  },
- "updated": "2026-11-26T14:03:55"
+ "updated": "2026-11-26T14:34:16"
 }
