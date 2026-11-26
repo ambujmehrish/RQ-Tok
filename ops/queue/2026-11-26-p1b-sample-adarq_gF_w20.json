@@ -1,0 +1,18 @@
+{
+ "id": "2026-11-26-p1b-sample-adarq_gF_w20",
+ "what": "VALIDATION pilot (2,000 class-balanced, seed 100): AdaRQ-Flow existing checkpoint, random-class guidance weight 2.0, greedy codes, residual noise 0.6",
+ "script": "scripts/levelb/sample.sbatch",
+ "env": {
+  "SEED": "100",
+  "N": "2000",
+  "BALANCED": "1",
+  "TAG": "pilot_adarq_gF_w20",
+  "ARM": "adarq",
+  "GREEDY": "1",
+  "RESIDUAL_SCALE": "0.6",
+  "NEG_PROMPT": "random-class",
+  "CFG_WEIGHT": "2.0"
+ },
+ "collect": true,
+ "needs_gres": "gpu:h200"
+}

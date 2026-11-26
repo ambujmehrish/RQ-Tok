@@ -92,7 +92,7 @@ Submit:
 Watch-only (jobs submitted by hand): `{"id", "what", "after_jobs": ["1507923"], "collect": true}`.
 
 Rules (the runner refuses anything else, naming the field):
-- **Keys:** `id what script env sbatch after after_mode after_jobs post collect`.
+- **Keys:** `id what script env sbatch after after_mode after_jobs post collect needs_gres`.
 - **`script`:** `^scripts/(levelb|bench)/[a-z0-9_]+\.sbatch$` and must exist.
 - **`env`:** names `^[A-Z][A-Z0-9_]{0,40}$` (PATH, HOME, PYTHON*, SLURM_*, LD_* ... denied);
   values `^[A-Za-z0-9_./:+=, %@{}$-]{0,400}$`; `$` only as `${NAME}`/`$NAME` with NAME in
@@ -102,6 +102,11 @@ Rules (the runner refuses anything else, naming the field):
 - **`after`:** request ids -> `--dependency=<after_mode>:<job ids>`.
 - **`post.module`:** `^levelb\.[a-z0-9_]+$`, run as `python3 -m` when every job is terminal.
 - **`collect`:** push results when the request finishes.
+- **`needs_gres`:** e.g. `"gpu:h200"`. The runner holds the request back (nothing reaches
+  `sbatch`) until `sinfo` shows a node offering that GRES in service (idle, mixed, allocated,
+  completing or planned, and responding); drained, down or maintenance nodes do not count.
+  Checked every tick, so the request goes out within one interval of the node returning.
+  `results/ops/status.json` shows `waiting_for_nodes` per request and `cluster.gpu_nodes`.
 
 Cancel: `ops/cancel/<id>.json` with `id`, `what`, `requests` (request ids; never raw job
 ids, so jobs from elsewhere are out of reach). Each cancel acts once.

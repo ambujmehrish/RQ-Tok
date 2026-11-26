@@ -1,0 +1,16 @@
+{
+ "id": "2026-11-26-p1b-sample-adarq_gS_w30",
+ "what": "VALIDATION pilot (2,000 class-balanced, seed 100): AdaRQ-Flow existing checkpoint, random-class guidance weight 3.0, sampled codes, default sampler",
+ "script": "scripts/levelb/sample.sbatch",
+ "env": {
+  "SEED": "100",
+  "N": "2000",
+  "BALANCED": "1",
+  "TAG": "pilot_adarq_gS_w30",
+  "ARM": "adarq",
+  "NEG_PROMPT": "random-class",
+  "CFG_WEIGHT": "3.0"
+ },
+ "collect": true,
+ "needs_gres": "gpu:h200"
+}

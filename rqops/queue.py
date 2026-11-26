@@ -71,6 +71,7 @@ ALLOWED_KEYS = {
     "after_jobs",
     "post",
     "collect",
+    "needs_gres",
 }
 AFTER_MODES = ("afterok", "afterany")  # afterany: training chains that resume after TIMEOUT
 ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,80}$")
@@ -100,6 +101,10 @@ SBATCH_RULES = {
     "array": re.compile(r"^[0-9,\-]{1,40}(%[0-9]{1,3})?$"),
 }
 JOB_ID_RE = re.compile(r"^\d{1,12}$")
+GRES_RE = re.compile(r"^gpu:[a-z0-9]{1,20}$")
+# sinfo node states in which a node takes jobs (now or once its jobs end); drained,
+# draining, down, maint, fail, reserved, unknown ... are out of service
+NODE_IN_SERVICE = {"idle", "mixed", "allocated", "completing", "planned"}
 POST_MODULE_RE = re.compile(r"^levelb\.[a-z0-9_]+$")
 
 
@@ -268,6 +273,12 @@ def validate(req, stem: str, repo: Path, known_ids: set | None = None) -> list[s
 
     if "collect" in req and not isinstance(req["collect"], bool):
         errs.append("collect: must be true or false")
+    if "needs_gres" in req:
+        ng = req["needs_gres"]
+        if not isinstance(ng, str) or not GRES_RE.match(ng):
+            errs.append(f"needs_gres: must match {GRES_RE.pattern}")
+        elif "script" not in req:
+            errs.append("needs_gres: only for a request with a script")
     return errs
 
 
@@ -417,6 +428,42 @@ def poll_states(run: Run, ids: list[str], env, cwd) -> tuple[dict | None, str | 
         st = parts[1].split()[0] if parts[1].split() else ""
         states.setdefault(base, []).append(st)
     return states, None
+
+
+def nodes_in_service(run: Run, env=None, cwd=None) -> tuple[list[dict] | None, str | None]:
+    """Every node with its state and GRES, and whether it takes jobs: (rows, error).
+    State flags sinfo appends (``*`` not responding, ``~ # ! % $ @ ^ -``) are dropped; a node
+    that does not respond is out of service whatever its base state."""
+    r = _call(run, ["sinfo", "-h", "-N", "-o", "%N|%T|%G"], env, cwd, timeout=120)
+    if r.returncode != 0:
+        return None, (r.stderr or r.stdout or "sinfo failed")[:300]
+    rows, seen = [], set()
+    for line in r.stdout.splitlines():
+        parts = [x.strip() for x in line.split("|")]
+        if len(parts) != 3 or not parts[0] or parts[0] in seen:
+            continue  # a node is listed once per partition it belongs to
+        seen.add(parts[0])
+        state = parts[1].lower()
+        base = state.rstrip("*~#!%$@^-")
+        rows.append(
+            {
+                "node": parts[0],
+                "state": state,
+                "gres": parts[2],
+                "in_service": base in NODE_IN_SERVICE and "*" not in state,
+            }
+        )
+    return rows, None
+
+
+def gres_in_service(rows: list[dict] | None, gres: str) -> list[str]:
+    """Nodes that offer ``gres`` (e.g. gpu:h200) and take jobs."""
+    out = []
+    for row in rows or []:
+        offered = {":".join(g.split(":")[:2]) for g in row["gres"].split(",")}
+        if row["in_service"] and gres in offered:
+            out.append(row["node"])
+    return out
 
 
 def cluster_snapshot(run: Run, env=None, cwd=None) -> dict:
@@ -590,6 +637,11 @@ def _tick_locked(repo: Path, state_path: Path, status_path: Path, run: Run, envi
     # passes; the bound keeps the tick finite whatever the state holds.
     attempts = 0
     progress = True
+    # needs_gres: hold a request back until a node with that GRES is in service (asked once
+    # per tick, and only if some unsubmitted request needs it)
+    node_rows, node_err = None, None
+    if any(r.get("needs_gres") and not reqs[i].get("jobid") for i, r in valid.items()):
+        node_rows, node_err = nodes_in_service(run, environ, str(repo))
     for _ in range(len(valid) + 1):
         if not progress:
             break
@@ -630,6 +682,15 @@ def _tick_locked(repo: Path, state_path: Path, status_path: Path, run: Run, envi
                     f"dependency did not complete: {failed} (afterok); not submitted"
                 )
                 continue
+            need = req.get("needs_gres")
+            if need and not gres_in_service(node_rows, need):
+                e["waiting_for_nodes"] = (
+                    f"{need}: sinfo failed ({node_err})"
+                    if node_err
+                    else f"{need}: no node in service"
+                )
+                continue
+            e.pop("waiting_for_nodes", None)
             if attempts >= MAX_NEW:
                 continue
             attempts += 1
@@ -709,6 +770,12 @@ def _tick_locked(repo: Path, state_path: Path, status_path: Path, run: Run, envi
             to_collect.append((rid, f"ops {rid}: {req['what']} ({', '.join(e.get('states', []))})"))
 
     snap = cluster_snapshot(run, environ, str(repo))
+    if node_rows is None and node_err is None:
+        node_rows, node_err = nodes_in_service(run, environ, str(repo))
+    # informational: the GPU nodes and whether they take jobs
+    snap["gpu_nodes"] = [r for r in node_rows or [] if "gpu" in r["gres"]]
+    if node_err:
+        snap["sinfo_error"] = node_err
     summary["cluster"] = snap["counts"]
     status = {
         "updated": _iso(now),
@@ -729,6 +796,7 @@ def _tick_locked(repo: Path, state_path: Path, status_path: Path, run: Run, envi
             "post_error": e.get("post_error"),
             "invalid": e.get("invalid"),
             "waiting_for": e.get("waiting_for"),
+            "waiting_for_nodes": e.get("waiting_for_nodes"),
             "post_output_tail": (e.get("post_output") or "")[-800:],
         }
     atomic_write_json(status_path, status)

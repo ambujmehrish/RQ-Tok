@@ -32,6 +32,8 @@ class FakeSlurm:
         self.squeue_fail = False
         self.sacct24_out = ""
         self.step_lines = True
+        self.sinfo_out = "vhpc13|idle|gpu:h200:1\nvhpc23|idle|gpu:rtx6000:2\nvhpc02|mixed|(null)\n"
+        self.sinfo_fail = False
 
     def __call__(self, cmd, env=None, cwd=None, timeout=None):
         self.calls.append({"cmd": list(cmd), "env": dict(env or {}), "cwd": cwd})
@@ -57,6 +59,10 @@ class FakeSlurm:
             if self.squeue_fail:
                 return q.Result(1, "", "slurm_load_jobs error: Socket timed out")
             return q.Result(0, self.squeue_out, "")
+        if cmd[0] == "sinfo":
+            if self.sinfo_fail:
+                return q.Result(1, "", "sinfo: error: Socket timed out")
+            return q.Result(0, self.sinfo_out, "")
         if cmd[0] == "scancel":
             if getattr(self, "scancel_fail", False):
                 return q.Result(1, "", "scancel: error: Kill job error")
@@ -172,6 +178,9 @@ GOOD = {"id": "r1", "what": "x", "script": "scripts/levelb/eval_baselines.sbatch
         ({"after_mode": "afterany"}, "after_mode"),
         ({"after": [], "after_mode": "afterany"}, "after_mode"),
         ({"after": ["r0"], "after_mode": "singleton"}, "after_mode"),
+        ({"needs_gres": "h200"}, "needs_gres"),
+        ({"needs_gres": "gpu:h200:1"}, "needs_gres"),
+        ({"needs_gres": ["gpu:h200"]}, "needs_gres"),
     ],
 )
 def test_validation_refuses(repo, patch, needle):
@@ -590,11 +599,64 @@ def test_submissions_and_first_failures_are_pushed_once(repo):
     fake = FakeSlurm()
     do_tick(repo, fake)
     assert fake.collects() == ["ops submitted 1"]
-    do_tick(repo, fake)                       # nothing new: no extra push
+    do_tick(repo, fake)  # nothing new: no extra push
     assert fake.collects() == ["ops submitted 1"]
     put(repo, "b", script="scripts/levelb/eval_baselines.sbatch")
     fake.sbatch_error = "sbatch: error: QOSMaxSubmitJobPerUserLimit"
-    do_tick(repo, fake)                       # first failure: pushed once
-    do_tick(repo, fake)                       # retried, not pushed again
+    do_tick(repo, fake)  # first failure: pushed once
+    do_tick(repo, fake)  # retried, not pushed again
     assert fake.collects() == ["ops submitted 1", "ops submitted 0; submit failed: b"]
 
+
+DRAINED = (
+    "vhpc13|drained*|gpu:h200:1\nvhpc14|drained|gpu:h200:1\nvhpc15|idle*|gpu:h200:1\n"
+    "vhpc23|idle|gpu:rtx6000:2\n"
+)
+
+
+def test_nodes_in_service_parsing():
+    fake = FakeSlurm()
+    fake.sinfo_out = (
+        DRAINED + "vhpc13|drained*|gpu:h200:1\nvhpc30|allocated|gpu:h200:1,gpu:rtx6000:1\n"
+    )
+    rows, err = q.nodes_in_service(fake)
+    assert err is None and [r["node"] for r in rows] == [
+        "vhpc13",
+        "vhpc14",
+        "vhpc15",
+        "vhpc23",
+        "vhpc30",
+    ]
+    assert q.gres_in_service(rows, "gpu:h200") == ["vhpc30"]  # idle* does not respond
+    assert q.gres_in_service(rows, "gpu:rtx6000") == ["vhpc23", "vhpc30"]
+    assert q.gres_in_service(None, "gpu:h200") == []
+
+
+def test_needs_gres_holds_until_a_node_is_in_service(repo):
+    """Nothing reaches sbatch while every H200 node is drained; the chain goes out in the
+    first tick after one returns."""
+    put(repo, "a", script="scripts/levelb/eval_baselines.sbatch", needs_gres="gpu:h200")
+    put(repo, "b", script="scripts/bench/tripwires.sbatch", after=["a"], needs_gres="gpu:h200")
+    put(repo, "c", script="scripts/bench/tripwires.sbatch")  # no gate: submitted at once
+    fake = FakeSlurm()
+    fake.sinfo_out = DRAINED
+    s = do_tick(repo, fake)
+    assert s["submitted"] == 1 and len(fake.sbatch()) == 1
+    st = status(repo)
+    assert st["requests"]["a"]["jobid"] is None
+    assert "no node in service" in st["requests"]["a"]["waiting_for_nodes"]
+    assert st["requests"]["b"]["waiting_for"] == ["a"]
+    assert [n["in_service"] for n in st["cluster"]["gpu_nodes"]] == [False, False, False, True]
+
+    fake.sinfo_fail = True  # sinfo down: still held, and said so
+    assert do_tick(repo, fake)["submitted"] == 0
+    assert "sinfo failed" in status(repo)["requests"]["a"]["waiting_for_nodes"]
+
+    fake.sinfo_fail = False
+    fake.sinfo_out = DRAINED.replace("vhpc14|drained", "vhpc14|idle")
+    s = do_tick(repo, fake)
+    assert s["submitted"] == 2
+    st = status(repo)
+    assert st["requests"]["a"]["jobid"] and st["requests"]["b"]["jobid"]
+    assert st["requests"]["a"]["waiting_for_nodes"] is None
+    assert do_tick(repo, fake)["submitted"] == 0  # never twice

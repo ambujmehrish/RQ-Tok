@@ -1,0 +1,15 @@
+{
+ "id": "2026-11-26-p1b-score-adarq_gF_w15",
+ "what": "VALIDATION pilot_adarq_gF_w15: FID/sFID/IS/P/R vs held-out reference (2,000)",
+ "script": "scripts/bench/adm_score.sbatch",
+ "env": {
+  "SAMPLES": "${LEVELB_ROOT}/samples/pilot_adarq_gF_w15_seed100",
+  "REF": "heldout",
+  "NSAMPLES": "2000"
+ },
+ "after": [
+  "2026-11-26-p1b-sample-adarq_gF_w15"
+ ],
+ "collect": true,
+ "needs_gres": "gpu:h200"
+}
