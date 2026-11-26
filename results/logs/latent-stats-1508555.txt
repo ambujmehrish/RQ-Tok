@@ -1,0 +1,7 @@
+probe latent    top-1 0.7465
+probe depth1    top-1 0.5216
+probe adaptive  top-1 0.6596
+probe depth4    top-1 0.6853
+probe residual  top-1 0.7323
+wrote results/levelb/latent_stats.json
+=== latent stats done: results/levelb/latent_stats.json ===
