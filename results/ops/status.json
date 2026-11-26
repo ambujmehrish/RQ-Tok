@@ -1998,14 +1998,14 @@
    "waiting_for": null
   },
   "2026-11-26-p1-classacc-adarq_gS_w30": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-26T11:26:40",
+   "finished": "2026-11-26T11:26:40",
    "invalid": null,
    "jobid": "1508551",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "CANCELLED"
    ],
    "submit_error": null,
    "submitted": "2026-11-26T11:16:19",
@@ -2138,14 +2138,14 @@
    "waiting_for": null
   },
   "2026-11-26-p1-sample-adarq_gS_w30": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-26T11:26:40",
+   "finished": "2026-11-26T11:26:40",
    "invalid": null,
    "jobid": "1508533",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "CANCELLED"
    ],
    "submit_error": null,
    "submitted": "2026-11-26T11:16:19",
@@ -2166,14 +2166,14 @@
    "waiting_for": null
   },
   "2026-11-26-p1-sample-bifrost_n066": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-26T11:26:40",
+   "finished": "2026-11-26T11:26:40",
    "invalid": null,
    "jobid": "1508535",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "CANCELLED"
    ],
    "submit_error": null,
    "submitted": "2026-11-26T11:16:19",
@@ -2194,14 +2194,14 @@
    "waiting_for": null
   },
   "2026-11-26-p1-score-adarq_gF_w15": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-26T11:26:40",
+   "finished": "2026-11-26T11:26:40",
    "invalid": null,
    "jobid": "1508537",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "CANCELLED"
    ],
    "submit_error": null,
    "submitted": "2026-11-26T11:16:19",
@@ -2250,42 +2250,42 @@
    "waiting_for": null
   },
   "2026-11-26-p1-score-adarq_gS_w20": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-26T11:26:40",
+   "finished": "2026-11-26T11:26:40",
    "invalid": null,
    "jobid": "1508541",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "CANCELLED"
    ],
    "submit_error": null,
    "submitted": "2026-11-26T11:16:19",
    "waiting_for": null
   },
   "2026-11-26-p1-score-adarq_gS_w30": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-26T11:26:40",
+   "finished": "2026-11-26T11:26:40",
    "invalid": null,
    "jobid": "1508542",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "CANCELLED"
    ],
    "submit_error": null,
    "submitted": "2026-11-26T11:16:19",
    "waiting_for": null
   },
   "2026-11-26-p1-score-bifrost_n033": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-26T11:26:40",
+   "finished": "2026-11-26T11:26:40",
    "invalid": null,
    "jobid": "1508543",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "CANCELLED"
    ],
    "submit_error": null,
    "submitted": "2026-11-26T11:16:19",
@@ -2306,19 +2306,19 @@
    "waiting_for": null
   },
   "2026-11-26-p1-score-bifrost_n131": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-26T11:26:40",
+   "finished": "2026-11-26T11:26:40",
    "invalid": null,
    "jobid": "1508545",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "CANCELLED"
    ],
    "submit_error": null,
    "submitted": "2026-11-26T11:16:19",
    "waiting_for": null
   }
  },
- "updated": "2026-11-26T11:21:30"
+ "updated": "2026-11-26T11:26:40"
 }
