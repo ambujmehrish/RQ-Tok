@@ -1,0 +1,1 @@
+slurmstepd-vhpc13: error: *** JOB 1508527 ON vhpc13 CANCELLED AT 2026-11-26T11:21:30 ***

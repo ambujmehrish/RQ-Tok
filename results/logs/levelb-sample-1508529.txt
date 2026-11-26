@@ -1,0 +1,5 @@
+/home/ambuj.mehrish/miniforge3/envs/bifrost1/lib/python3.11/site-packages/google/api_core/_python_version_support.py:273: FutureWarning: You are using a Python version (3.11.18) which Google will stop supporting in new releases of google.api_core once it reaches its end of life (2027-10-24). Please upgrade to the latest Python version, or at least Python 3.12, to continue receiving updates for google.api_core past that date.
+  warnings.warn(message, FutureWarning)
+2026-11-26 11:20:43 PID=3022 __init__.py:49 setup_logging() INFO → 'standard' logger initialized.
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:01<00:01,  1.68s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:02<00:00,  1.19s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:02<00:00,  1.27s/it]
+slurmstepd-vhpc15: error: *** JOB 1508529 ON vhpc15 CANCELLED AT 2026-11-26T11:21:30 ***
