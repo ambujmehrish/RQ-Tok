@@ -947,3 +947,45 @@ held-out reference, ResNet-50 class accuracy). Requests `2026-11-24-step0-*`.
 Reading: if code-only renders lose the class that true-latent renders keep, the tokenizer
 is the bottleneck and no sampler or guidance can recover it; if they keep it, the loss is in
 generation (weakness 1: no guidance). If α = 0 is best, the residual head adds only noise.
+
+### Step 0 results (2026-11-26; validation, 2,000 class-balanced images, seed 100; all 21 jobs completed)
+
+Oracle renders of real held-out images (no MLLM, no trained head) and generated pilots.
+Real pixels of the same 2,000 images: top-1 0.9145 (inflated: the classifier trained on them).
+FID of oracle rows is against a reference containing the same images: comparable between
+oracle rows only. Class-accuracy standard error ≈ 0.011.
+
+| bridge input | energy missing | top-1 | top-5 | IS | P | R | FID |
+|---|---|---|---|---|---|---|---|
+| real image, true latent | 0% | 0.762 | 0.950 | 178.9 | 0.915 | 0.816 | (21.73) |
+| real image, codes only, depth 4 | 36.6% | 0.658 | 0.891 | 131.7 | 0.834 | 0.772 | (25.26) |
+| real image, codes only, adaptive (mean 2.0) | 46.0% | 0.589 | 0.842 | 97.6 | 0.778 | 0.717 | (28.96) |
+| real image, codes only, depth 1 | 50.0% | 0.556 | 0.804 | 93.4 | 0.739 | 0.704 | (31.00) |
+| generated, AdaRQ-Flow F, α = 1 | — | 0.572 | 0.822 | 89.3 | 0.713 | 0.678 | 32.04 |
+| generated, F, α = 0.8 | — | 0.615 | 0.853 | 99.8 | 0.765 | 0.682 | 29.08 |
+| generated, F, α = 0.6 | — | 0.641 | 0.883 | 108.9 | 0.787 | 0.685 | 27.73 |
+| generated, F, α = 0.4 | — | 0.644 | 0.890 | 111.7 | 0.808 | 0.659 | 28.17 |
+| generated, F, α = 0.2 | — | 0.649 | 0.891 | 113.4 | 0.819 | 0.640 | 28.90 |
+| generated, F, α = 0 | — | 0.649 | 0.886 | 116.7 | 0.788 | 0.642 | 29.25 |
+| generated, Bifrost-1 | — | 0.888 | 0.990 | 280.7 | 0.942 | 0.676 | 29.83 |
+
+Stored-code agreement of the adaptive render: 0.99999. Mean depth of the generated pilots falls
+with α (2.23, 2.06, 1.89, 1.76, 1.67, 1.70).
+
+Conclusions (validation; they choose what to build, they do not rank methods):
+1. **The tokenizer loses class information, with its control in place.** Same images, same
+   renderer: true latent 0.762 → codes only at the operating depth 0.589 (−0.17; IS 179 → 98).
+   Four codes still lose 0.10. Weakness 2 is confirmed.
+2. **Bifrost-1's generated images are more class-typical than real images' own latents**
+   through the same renderer (0.888 vs 0.762; IS 281 vs 179). Its class fidelity is above the
+   real-latent level: the mean-regression effect. A faithful sampler of real latents would
+   top out near the true-latent row, not at Bifrost-1.
+3. **The gap to Bifrost-1 therefore has two parts of similar size:** tokenizer loss
+   (0.762 → 0.589) and typicality (0.762 → 0.888). Fixing the tokenizer alone cannot reach
+   Bifrost-1's IS; it also needs a typicality mechanism (guidance, or anchoring on the mean).
+4. **Residual noise:** class accuracy rises from α = 1 to 0.6 (0.572 → 0.641) and is flat
+   below (0.649 at 0); FID is best at 0.6 and recall falls below it. The residual head adds
+   diversity and little class information; it is not "only noise".
+5. The generator at α ≤ 0.6 (0.64–0.65) is above the code-only renders of real images at the
+   same depth (0.589): generated codes are somewhat more typical than real ones, so the
+   code-only row is not a hard cap on generation.
