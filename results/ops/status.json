@@ -479,6 +479,36 @@
    },
    {
     "elapsed": "0:00",
+    "jobid": "1508564",
+    "name": "levelb-sample",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "1-00:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508563",
+    "name": "levelb-sample",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "1-00:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508562",
+    "name": "levelb-sample",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "1-00:00:00"
+   },
+   {
+    "elapsed": "0:00",
     "jobid": "1508582",
     "name": "class-acc",
     "nodes": "1",
@@ -568,37 +598,7 @@
     "time_limit": "2:00:00"
    },
    {
-    "elapsed": "0:00",
-    "jobid": "1508564",
-    "name": "levelb-sample",
-    "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "1-00:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508563",
-    "name": "levelb-sample",
-    "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "1-00:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508562",
-    "name": "levelb-sample",
-    "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "1-00:00:00"
-   },
-   {
-    "elapsed": "4:08",
+    "elapsed": "54:36",
     "jobid": "1508558",
     "name": "levelb-sample",
     "nodes": "1",
@@ -608,7 +608,7 @@
     "time_limit": "1-00:00:00"
    },
    {
-    "elapsed": "10:12",
+    "elapsed": "1:00:40",
     "jobid": "1508556",
     "name": "levelb-sample",
     "nodes": "1",
@@ -618,7 +618,7 @@
     "time_limit": "1-00:00:00"
    },
    {
-    "elapsed": "10:12",
+    "elapsed": "1:00:40",
     "jobid": "1508557",
     "name": "levelb-sample",
     "nodes": "1",
@@ -3273,5 +3273,5 @@
    "waiting_for_nodes": null
   }
  },
- "updated": "2026-11-26T11:42:03"
+ "updated": "2026-11-26T12:32:31"
 }
