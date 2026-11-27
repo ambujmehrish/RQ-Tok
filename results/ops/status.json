@@ -49,7 +49,7 @@
  },
  "cluster": {
   "counts": {
-   "PENDING": 5,
+   "PENDING": 3,
    "RUNNING": 2
   },
   "ended_24h": [
@@ -238,6 +238,14 @@
     "state": "COMPLETED"
    },
    {
+    "elapsed": "00:23:41",
+    "end": "2026-11-27T16:54:21",
+    "exit": "0:0",
+    "jobid": "1508637",
+    "name": "adm-score",
+    "state": "COMPLETED"
+   },
+   {
     "elapsed": "00:00:18",
     "end": "2026-11-27T12:31:55",
     "exit": "0:0",
@@ -266,6 +274,14 @@
     "end": "2026-11-27T12:32:43",
     "exit": "0:0",
     "jobid": "1508642",
+    "name": "class-acc",
+    "state": "COMPLETED"
+   },
+   {
+    "elapsed": "00:00:38",
+    "end": "2026-11-27T16:54:59",
+    "exit": "0:0",
+    "jobid": "1508644",
     "name": "class-acc",
     "state": "COMPLETED"
    }
@@ -359,16 +375,6 @@
   "squeue": [
    {
     "elapsed": "0:00",
-    "jobid": "1508638",
-    "name": "adm-score",
-    "nodes": "1",
-    "reason_or_nodelist": "(Dependency)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "12:00:00"
-   },
-   {
-    "elapsed": "0:00",
     "jobid": "1508636",
     "name": "adm-score",
     "nodes": "1",
@@ -389,16 +395,6 @@
    },
    {
     "elapsed": "0:00",
-    "jobid": "1508644",
-    "name": "class-acc",
-    "nodes": "1",
-    "reason_or_nodelist": "(Dependency)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "2:00:00"
-   },
-   {
-    "elapsed": "0:00",
     "jobid": "1508643",
     "name": "class-acc",
     "nodes": "1",
@@ -408,17 +404,17 @@
     "time_limit": "2:00:00"
    },
    {
-    "elapsed": "4:21",
-    "jobid": "1508637",
+    "elapsed": "0:56",
+    "jobid": "1508638",
     "name": "adm-score",
     "nodes": "1",
     "reason_or_nodelist": "vhpc14",
-    "start": "2026-11-27T16:30:40",
+    "start": "2026-11-27T16:54:21",
     "state": "RUNNING",
     "time_limit": "12:00:00"
    },
    {
-    "elapsed": "5:16:01",
+    "elapsed": "5:36:17",
     "jobid": "1508633",
     "name": "levelb-sample",
     "nodes": "1",
@@ -3288,14 +3284,14 @@
    "waiting_for_nodes": null
   },
   "2026-11-27-test-classacc-bifrost_n066-seed0": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-27T16:55:17",
+   "finished": "2026-11-27T16:55:17",
    "invalid": null,
    "jobid": "1508644",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-27T10:00:35",
@@ -3363,14 +3359,14 @@
    "waiting_for_nodes": null
   },
   "2026-11-27-test-score-bifrost_n066-seed0-adm": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-27T16:55:17",
+   "finished": "2026-11-27T16:55:17",
    "invalid": null,
    "jobid": "1508637",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "RUNNING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-27T10:00:35",
@@ -3385,7 +3381,7 @@
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "RUNNING"
    ],
    "submit_error": null,
    "submitted": "2026-11-27T10:00:35",
@@ -3393,5 +3389,5 @@
    "waiting_for_nodes": null
   }
  },
- "updated": "2026-11-27T16:35:01"
+ "updated": "2026-11-27T16:55:17"
 }

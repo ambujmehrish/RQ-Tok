@@ -1,0 +1,1 @@
+top-1 0.8263  top-5 0.9668  (10000 images) -> /home/ambuj.mehrish/work/levelb/samples/bifrost_n066_seed0/samples_10000.cls.metrics.json
