@@ -438,7 +438,7 @@
     "gres": "gpu:h200:1",
     "in_service": true,
     "node": "vhpc13",
-    "state": "idle"
+    "state": "mixed"
    },
    {
     "gres": "gpu:h200:1",
@@ -3839,5 +3839,5 @@
    "waiting_for_nodes": null
   }
  },
- "updated": "2026-11-27T22:50:59"
+ "updated": "2026-11-27T23:51:30"
 }
