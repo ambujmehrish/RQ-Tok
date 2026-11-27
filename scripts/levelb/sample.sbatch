@@ -75,6 +75,15 @@ if [ "$ARM" != "flux" ]; then EXTRA+=(--branch "$BRANCH" --controlnet "$CN"); fi
 [ -n "${CFG_WEIGHT:-}" ] && EXTRA+=(--cfg-weight "$CFG_WEIGHT")
 [ -n "${NEG_PROMPT:-}" ] && EXTRA+=(--neg-prompt "$NEG_PROMPT")
 [ -n "${TOKEN_NOISE:-}" ] && EXTRA+=(--token-noise "$TOKEN_NOISE")
+# adarq: separate guidance weight for the residual flow, halting from unguided logits, and
+# the anchor mix with the Bifrost-1 branch (tokens = mu + ANCHOR_BETA * (sample - mu))
+[ -n "${FLOW_CFG_WEIGHT:-}" ] && EXTRA+=(--flow-cfg-weight "$FLOW_CFG_WEIGHT")
+[ "${NO_GUIDE_HALT:-0}" = 1 ] && EXTRA+=(--no-guide-halt)
+if [ -n "${ANCHOR_BETA:-}" ]; then
+  AB="$LEVELB_ROOT/branch_bifrost/final_trainable.pt"
+  [ -f "$AB" ] || die "$AB missing: the Bifrost-1 branch has not finished"
+  EXTRA+=(--anchor-branch "$AB" --anchor-beta "$ANCHOR_BETA")
+fi
 python -m levelb.sample --arm "$ARM" "${EXTRA[@]+"${EXTRA[@]}"}" \
     --data "$LEVELB_ROOT/imagenet256" --seed "$SEED" --n "${N:-10000}" \
     --shard "$SHARD" --nshards "$NSHARDS" --out "$OUT" \

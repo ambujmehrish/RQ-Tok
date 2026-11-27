@@ -1,0 +1,13 @@
+{
+ "id": "2026-11-27-p3-classacc-mix_b050",
+ "what": "VALIDATION pilot_mix_b050: requested-class top-1/top-5 (ResNet-50)",
+ "script": "scripts/levelb/class_accuracy.sbatch",
+ "env": {
+  "SAMPLES": "${LEVELB_ROOT}/samples/pilot_mix_b050_seed100/samples_2000.npz"
+ },
+ "after": [
+  "2026-11-27-p3-score-mix_b050"
+ ],
+ "needs_gres": "gpu:h200",
+ "collect": true
+}

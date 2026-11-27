@@ -1,0 +1,15 @@
+{
+ "id": "2026-11-27-p3-score-mix_b050",
+ "what": "VALIDATION pilot_mix_b050: FID/sFID/IS/P/R vs held-out reference (2,000)",
+ "script": "scripts/bench/adm_score.sbatch",
+ "env": {
+  "SAMPLES": "${LEVELB_ROOT}/samples/pilot_mix_b050_seed100",
+  "REF": "heldout",
+  "NSAMPLES": "2000"
+ },
+ "after": [
+  "2026-11-27-p3-sample-mix_b050"
+ ],
+ "needs_gres": "gpu:h200",
+ "collect": true
+}

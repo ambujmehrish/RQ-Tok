@@ -1,0 +1,20 @@
+{
+ "id": "2026-11-27-p3-sample-adarq_c4f2h_a06",
+ "what": "VALIDATION pilot: guidance 4 on codes, 2 on flow, halting unguided, residual noise 0.6",
+ "script": "scripts/levelb/sample.sbatch",
+ "env": {
+  "ARM": "adarq",
+  "SEED": "100",
+  "N": "2000",
+  "BALANCED": "1",
+  "GREEDY": "1",
+  "NEG_PROMPT": "random-class",
+  "CFG_WEIGHT": "4.0",
+  "FLOW_CFG_WEIGHT": "2.0",
+  "NO_GUIDE_HALT": "1",
+  "RESIDUAL_SCALE": "0.6",
+  "TAG": "pilot_adarq_c4f2h_a06"
+ },
+ "needs_gres": "gpu:h200",
+ "collect": true
+}

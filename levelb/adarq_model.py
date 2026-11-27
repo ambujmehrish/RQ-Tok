@@ -222,6 +222,7 @@ class AdaRQHeads(nn.Module):
         greedy: bool,
         u_halt: torch.Tensor,
         u_code: torch.Tensor,
+        halt_lg: torch.Tensor | None = None,
     ) -> torch.Tensor:
         """One level of code sampling from guided raw logits ``lg`` [M, K+1] -> symbols [M].
 
@@ -235,7 +236,9 @@ class AdaRQHeads(nn.Module):
         if lvl == 0:
             halt = torch.zeros(lg.shape[0], dtype=torch.bool, device=lg.device)
         else:
-            halt = u_halt < torch.softmax(lg, dim=-1)[:, k]
+            # ``halt_lg``: logits that decide halting when they differ from ``lg`` (e.g. the
+            # unguided conditional logits, so guidance cannot change the depth)
+            halt = u_halt < torch.softmax(lg if halt_lg is None else halt_lg, dim=-1)[:, k]
         code = lg[:, :k]
         if greedy or temp == 0:
             q = code.argmax(-1)
@@ -265,11 +268,15 @@ class AdaRQHeads(nn.Module):
         temperature: float | None = None,
         generator: torch.Generator | None = None,
         stats: dict | None = None,
+        flow_cfg_weight: float | None = None,
+        guide_halt: bool = True,
     ):
         """One latent per row of h: codes depth by depth (guided logits, gated halting, see
         ``sample_level``), then the residual by Euler integration of the guided velocity from
         ``residual_scale`` x N(0, I). ``generators``: {"code", "halt", "res"} torch generators
         (separate streams), or one generator for all. Returns (latent [M, d], depth [M]).
+        ``flow_cfg_weight``: guidance weight of the flow velocity (None = ``cfg_weight``).
+        ``guide_halt`` False: halting is decided from the unguided conditional logits.
         ``stats`` (needs ``h_u``): filled with per-level sums over live patches, in nats, over
         the K ordinary codes: ``kl`` = KL(conditional || negative branch), ``ent_cond`` and
         ``ent_used`` = entropy of the conditional and of the guided distribution, ``n``."""
@@ -287,11 +294,13 @@ class AdaRQHeads(nn.Module):
         alive = torch.ones(m, dtype=torch.bool, device=dev)
         zhat = torch.zeros(m, self.books.shape[-1], device=dev, dtype=self.books.dtype)
         for lvl in range(self.D):
+            halt_lg = None
             # guide the RAW logits (masking <halt> first would give -inf - (-inf) = NaN)
             lg = self.code_logits(h_c, zhat, lvl, forbid_halt=False)
             if h_u is not None:
                 lu = self.code_logits(h_u, zhat, lvl, forbid_halt=False)
                 lc, lg = lg, lu + cfg_weight * (lg - lu)
+                halt_lg = None if guide_halt else lc
                 if stats is not None:
                     pc, pu, pg = (F.log_softmax(x[:, : self.K], -1) for x in (lc, lu, lg))
                     live = alive.float()
@@ -306,11 +315,12 @@ class AdaRQHeads(nn.Module):
                         ).sum()
             u_halt = torch.rand(m, device=dev, generator=gh)  # drawn every level: aligned
             u_code = torch.rand(m, device=dev, generator=gc)
-            q = self.sample_level(lg, lvl, temps[lvl], top_p, greedy, u_halt, u_code)
+            q = self.sample_level(lg, lvl, temps[lvl], top_p, greedy, u_halt, u_code, halt_lg)
             q = torch.where(alive, q, torch.full_like(q, self.K))
             alive = alive & (q != self.K)  # <halt> ends the patch
             codes[:, lvl] = q
             zhat = zhat + self.books[lvl][q.clamp_max(self.K - 1)] * alive[:, None]
+        w_flow = cfg_weight if flow_cfg_weight is None else flow_cfg_weight
         cond_c = h_c + self.res_cond(zhat.to(h_c.dtype))
         cond_u = None if h_u is None else h_u + self.res_cond(zhat.to(h_u.dtype))
         x = residual_scale * torch.randn(m, zhat.shape[-1], device=dev, generator=gr)
@@ -319,7 +329,7 @@ class AdaRQHeads(nn.Module):
             v = self.flow(x.to(h_c.dtype), t, cond_c).float()
             if cond_u is not None:
                 vu = self.flow(x.to(h_c.dtype), t, cond_u).float()
-                v = vu + cfg_weight * (v - vu)
+                v = vu + w_flow * (v - vu)
             x = x + v / flow_steps
         latent = zhat.float() + self.res_rms * x
         return latent, (codes != self.K).sum(-1)

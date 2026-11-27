@@ -156,6 +156,9 @@ def mar_decode_adarq(
     residual_scale: float = 1.0,
     neg_fn=None,
     info: list | None = None,
+    flow_cfg_weight: float | None = None,
+    guide_halt: bool = True,
+    anchor=None,
 ):
     """The same MAR loop as ``mar_decode`` (unconditional + conditional halves, random
     order, one token per step, cosine schedule); the revealed patch is produced by the
@@ -163,7 +166,10 @@ def mar_decode_adarq(
     the residual by Euler integration of the guided flow velocity. Returns tokens, the
     reveal count per step, and each patch's sampled depth. ``neg_fn`` as in ``mar_decode``.
     ``info``: a list that receives one dict per step with the code distributions'
-    information sums per level (see ``AdaRQHeads.sample``)."""
+    information sums per level (see ``AdaRQHeads.sample``). ``anchor`` = (Bifrost-1 model,
+    beta): every revealed token becomes ``mu + beta * (sample - mu)``, with ``mu`` the
+    regression prediction of that model for the same context (beta 0 = Bifrost-1's decoding,
+    beta 1 = this arm's); a no-training probe of a mean-anchored bridge."""
     add_upstream_to_path()
     from bifrost.models.mar.utils import sample_orders
 
@@ -178,8 +184,12 @@ def mar_decode_adarq(
     orders = sample_orders(bsz, n_tok).to(dev)
     depths = torch.zeros(bsz, n_tok, dtype=torch.long, device=dev)
     revealed = []
+    if anchor is not None:
+        model_b, beta = anchor
+        text_b, attn_b, pos_b, img_pos_b = _prompt_inputs(model_b, conv, [], prompts, dev)
     for step in range(n_tok):
         cur = tokens.clone()
+        masked_now = mask.bool()
         tokens = torch.cat([tokens, tokens], dim=0) + model.learnable_pos_emb
         mask = torch.cat([mask, mask], dim=0)
         if neg_fn is not None:
@@ -222,9 +232,26 @@ def mar_decode_adarq(
             flow_steps=flow_steps,
             generators=generator,
             stats=stats,
+            flow_cfg_weight=flow_cfg_weight,
+            guide_halt=guide_halt,
         )
         if info is not None:
             info.append(stats)
+        if anchor is not None:
+            # the other model reads the same tokens, with its own mask token and positions
+            tok_b = torch.where(masked_now[..., None], model_b.mask_token.to(cur.dtype), cur)
+            out_b = model_b.vision_language_model(
+                inputs_embeds=torch.cat((text_b, tok_b + model_b.learnable_pos_emb), dim=1),
+                use_cache=None,
+                attention_mask=attn_b,
+                past_key_values=None,
+                return_dict=True,
+                position_ids=pos_b,
+                image_position_mask=img_pos_b,
+                t_emb=None,
+            )
+            mu = model_b.vision_head(out_b["hidden_states"][:, -n_tok:])[where].float()
+            lat = mu + beta * (lat.float() - mu)
         cur[where] = lat.to(cur.dtype)
         depths[where] = dep
         tokens = cur
@@ -367,6 +394,23 @@ def main() -> None:
     ap.add_argument("--batch", type=int, default=16)
     ap.add_argument("--cfg-weight", type=float, default=1.0)
     ap.add_argument(
+        "--flow-cfg-weight",
+        type=float,
+        default=None,
+        help="adarq: guidance weight of the residual flow (default: --cfg-weight)",
+    )
+    ap.add_argument(
+        "--no-guide-halt",
+        action="store_true",
+        help="adarq: decide halting from the unguided conditional logits",
+    )
+    ap.add_argument(
+        "--anchor-branch",
+        default=None,
+        help="adarq: Bifrost-1 final_trainable.pt; tokens become mu + beta * (sample - mu)",
+    )
+    ap.add_argument("--anchor-beta", type=float, default=1.0)
+    ap.add_argument(
         "--neg-prompt",
         choices=["empty", "random-class"],
         default="empty",
@@ -418,7 +462,9 @@ def main() -> None:
         print(f"{part} exists; nothing to do")
         return
 
-    heads = model = conv = None
+    heads = model = conv = anchor_model = None
+    if args.anchor_branch and args.arm != "adarq":
+        raise SystemExit("--anchor-branch is for --arm adarq")
     if args.arm != "flux" and not (args.branch and args.controlnet):
         raise SystemExit(f"--arm {args.arm} needs --branch and --controlnet")
     if args.arm == "flux":
@@ -437,6 +483,11 @@ def main() -> None:
             int(trained["flow_width"]),
             int(trained["flow_depth"]),
         )
+        if args.anchor_branch:
+            anchor_model = load_bifrost_branch(args.vlm, width, args.anchor_branch, dev)
+            anchor_model = (
+                anchor_model.to(torch.bfloat16) if dev.type == "cuda" else anchor_model.float()
+            )
     else:
         model = load_bifrost_branch(args.vlm, width, args.branch, dev)
     if model is not None:
@@ -513,6 +564,9 @@ def main() -> None:
                 residual_scale=args.residual_scale,
                 neg_fn=neg_fn,
                 info=info_steps,
+                flow_cfg_weight=args.flow_cfg_weight,
+                guide_halt=not args.no_guide_halt,
+                anchor=None if anchor_model is None else (anchor_model, args.anchor_beta),
             )
             for k_step, st in enumerate(info_steps):
                 for key in info_sum:

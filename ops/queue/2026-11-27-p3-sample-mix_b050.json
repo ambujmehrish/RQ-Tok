@@ -1,0 +1,19 @@
+{
+ "id": "2026-11-27-p3-sample-mix_b050",
+ "what": "VALIDATION pilot: anchor mix beta 0.5 (Bifrost-1 prediction + beta x deviation of the guided AdaRQ-Flow sample)",
+ "script": "scripts/levelb/sample.sbatch",
+ "env": {
+  "ARM": "adarq",
+  "SEED": "100",
+  "N": "2000",
+  "BALANCED": "1",
+  "GREEDY": "1",
+  "NEG_PROMPT": "random-class",
+  "CFG_WEIGHT": "2.0",
+  "RESIDUAL_SCALE": "0.6",
+  "ANCHOR_BETA": "0.5",
+  "TAG": "pilot_mix_b050"
+ },
+ "needs_gres": "gpu:h200",
+ "collect": true
+}

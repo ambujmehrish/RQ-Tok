@@ -1,0 +1,13 @@
+{
+ "id": "2026-11-27-p3-classacc-adarq_c3f2h_a06",
+ "what": "VALIDATION pilot_adarq_c3f2h_a06: requested-class top-1/top-5 (ResNet-50)",
+ "script": "scripts/levelb/class_accuracy.sbatch",
+ "env": {
+  "SAMPLES": "${LEVELB_ROOT}/samples/pilot_adarq_c3f2h_a06_seed100/samples_2000.npz"
+ },
+ "after": [
+  "2026-11-27-p3-score-adarq_c3f2h_a06"
+ ],
+ "needs_gres": "gpu:h200",
+ "collect": true
+}

@@ -337,3 +337,37 @@ def test_bifrost_random_class_guidance(tiny_vlm):  # noqa: F811
     guided = run(2.0)
     assert not torch.allclose(guided, plain, atol=1e-4)
     assert torch.equal(guided, run(2.0))
+
+
+def test_anchor_mix_endpoints(tiny_vlm, tmp_path):  # noqa: F811
+    """anchor=(Bifrost-1 model, beta): beta 0 is Bifrost-1's own decoding, beta 1 is this
+    arm's own decoding."""
+    from levelb import adarq_model as am
+    from levelb import adarq_tokenizer as at
+    from levelb.sample import mar_decode_adarq
+
+    torch.manual_seed(0)
+    model_a = bb.build_model(tiny_vlm, inner_dim=HIDDEN).float().eval()
+    torch.manual_seed(1)
+    model_b = bb.build_model(tiny_vlm, inner_dim=HIDDEN).float().eval()
+    with torch.no_grad():  # two different trained states: mask token, positions, head
+        for p in (model_b.mask_token, model_b.learnable_pos_emb, model_b.vision_head.weight):
+            p.add_(0.3 * torch.randn_like(p))
+    q = at.make_quantizer(HIDDEN, 16, 4, tau=0.5, adaptive=True)
+    books = torch.stack([q._book(k).embed.detach().clone() for k in range(4)])
+    heads = am.AdaRQHeads(HIDDEN, books, res_rms=0.1, flow_width=32, flow_depth=2).eval()
+    conv = bb.make_conversation()
+    prompts = ["tench", "goldfish"]
+
+    def run(anchor):
+        gens = {n: torch.Generator().manual_seed(i) for i, n in enumerate(("code", "halt", "res"))}
+        return mar_decode_adarq(
+            model_a, heads, conv, prompts, np_seed=0, flow_steps=2, generator=gens, anchor=anchor
+        )[0]
+
+    own = run(None)
+    assert torch.allclose(run((model_b, 1.0)), own, atol=1e-5)
+    bifrost = mar_decode(model_b, conv, prompts, np_seed=0)[0]
+    assert torch.allclose(run((model_b, 0.0)), bifrost, atol=1e-4)
+    mid = run((model_b, 0.5))
+    assert not torch.allclose(mid, own, atol=1e-3) and not torch.allclose(mid, bifrost, atol=1e-3)

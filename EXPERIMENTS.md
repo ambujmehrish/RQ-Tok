@@ -1110,3 +1110,21 @@ One seed each: no claim yet (seed s.d. of FID has been 0.1–0.3). Reading:
   FID, sFID and IS together yet.
 - Validation ranked these two the other way round on nothing reliable: validation FID was
   25.5 vs 25.6; the test separates them (9.92 vs 11.37).
+
+### Queued 2026-11-27 (third batch): closing the IS gap with no training (validation only)
+
+Decision by the user: seeds 1–2 of the test runs wait until the IS gap is closed. Requests
+`2026-11-27-p3-*` (8 pilots, each with scoring and class accuracy; 2,000 class-balanced
+images, seed 100; gated on an H200 node). On validation only IS and class accuracy are read
+across arms; FID is settled on test. Target: Bifrost-1's 0.888 top-1 / IS 280.7.
+
+- **Decoupled guidance on AdaRQ-Flow** (greedy codes; control `pilot_adarq_gF_w20`: top-1
+  0.774, IS 154). At weight 3 the single weight overshot and the depth rose (1.99 → 2.30):
+  guidance was also moving the halting decision and the flow velocity. New: halting decided
+  from the unguided conditional logits, and a separate flow weight. Runs: codes/flow 2/2,
+  3/2, 4/2 at residual noise 0.6, and 3/2 at noise 0.3.
+- **Anchor mix** (a no-training probe of a mean-anchored bridge): every revealed token is
+  `μ + β·(sample − μ)`, μ = the Bifrost-1 branch's regression prediction for the same
+  context, sample = guided AdaRQ-Flow's (weight 2, noise 0.6); β = 0.25, 0.5, 0.75. β = 0 is
+  Bifrost-1's decoding and β = 1 is `pilot_adarq_gF_w20` (checked in tests).
+- **Strengthened baseline:** Bifrost-1 + guidance 2 + token noise 0.33.

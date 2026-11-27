@@ -1,0 +1,17 @@
+{
+ "id": "2026-11-27-p3-sample-bifrost_g20_n033",
+ "what": "VALIDATION pilot: Bifrost-1 + random-class guidance 2 + token noise 0.33 (strengthened baseline)",
+ "script": "scripts/levelb/sample.sbatch",
+ "env": {
+  "ARM": "bifrost",
+  "SEED": "100",
+  "N": "2000",
+  "BALANCED": "1",
+  "NEG_PROMPT": "random-class",
+  "CFG_WEIGHT": "2.0",
+  "TOKEN_NOISE": "0.33",
+  "TAG": "pilot_bifrost_g20_n033"
+ },
+ "needs_gres": "gpu:h200",
+ "collect": true
+}
