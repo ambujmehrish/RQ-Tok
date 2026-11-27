@@ -49,7 +49,7 @@
  },
  "cluster": {
   "counts": {
-   "PENDING": 21,
+   "PENDING": 19,
    "RUNNING": 3
   },
   "ended_24h": [
@@ -254,6 +254,14 @@
     "state": "COMPLETED"
    },
    {
+    "elapsed": "01:44:23",
+    "end": "2026-11-27T19:07:58",
+    "exit": "0:0",
+    "jobid": "1508636",
+    "name": "adm-score",
+    "state": "COMPLETED"
+   },
+   {
     "elapsed": "00:23:41",
     "end": "2026-11-27T16:54:21",
     "exit": "0:0",
@@ -323,6 +331,14 @@
     "exit": "0:0",
     "jobid": "1508667",
     "name": "levelb-sample",
+    "state": "COMPLETED"
+   },
+   {
+    "elapsed": "00:14:13",
+    "end": "2026-11-27T19:12:07",
+    "exit": "0:0",
+    "jobid": "1508675",
+    "name": "adm-score",
     "state": "COMPLETED"
    }
   ],
@@ -415,6 +431,46 @@
   "squeue": [
    {
     "elapsed": "0:00",
+    "jobid": "1508673",
+    "name": "levelb-sample",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "2026-11-28T19:12:07",
+    "state": "PENDING",
+    "time_limit": "1-00:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508674",
+    "name": "levelb-sample",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "2026-11-28T19:12:07",
+    "state": "PENDING",
+    "time_limit": "1-00:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508672",
+    "name": "levelb-sample",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "2026-11-28T19:07:58",
+    "state": "PENDING",
+    "time_limit": "1-00:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508671",
+    "name": "levelb-sample",
+    "nodes": "1",
+    "reason_or_nodelist": "(Resources)",
+    "start": "2026-11-28T18:36:17",
+    "state": "PENDING",
+    "time_limit": "1-00:00:00"
+   },
+   {
+    "elapsed": "0:00",
     "jobid": "1508682",
     "name": "adm-score",
     "nodes": "1",
@@ -485,63 +541,13 @@
    },
    {
     "elapsed": "0:00",
-    "jobid": "1508671",
-    "name": "levelb-sample",
+    "jobid": "1508683",
+    "name": "class-acc",
     "nodes": "1",
     "reason_or_nodelist": "(Priority)",
-    "start": "2026-11-28T18:36:17",
+    "start": "2026-11-28T19:12:07",
     "state": "PENDING",
-    "time_limit": "1-00:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508670",
-    "name": "levelb-sample",
-    "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "2026-11-28T06:57:54",
-    "state": "PENDING",
-    "time_limit": "1-00:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508669",
-    "name": "levelb-sample",
-    "nodes": "1",
-    "reason_or_nodelist": "(Resources)",
-    "start": "2026-11-28T05:23:35",
-    "state": "PENDING",
-    "time_limit": "1-00:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508674",
-    "name": "levelb-sample",
-    "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "1-00:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508673",
-    "name": "levelb-sample",
-    "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "1-00:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508672",
-    "name": "levelb-sample",
-    "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "1-00:00:00"
+    "time_limit": "2:00:00"
    },
    {
     "elapsed": "0:00",
@@ -614,37 +620,27 @@
     "time_limit": "2:00:00"
    },
    {
-    "elapsed": "0:00",
-    "jobid": "1508683",
-    "name": "class-acc",
-    "nodes": "1",
-    "reason_or_nodelist": "(Dependency)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "2:00:00"
-   },
-   {
-    "elapsed": "4:15",
-    "jobid": "1508675",
-    "name": "adm-score",
+    "elapsed": "0:15",
+    "jobid": "1508670",
+    "name": "levelb-sample",
     "nodes": "1",
     "reason_or_nodelist": "vhpc15",
-    "start": "2026-11-27T18:57:54",
+    "start": "2026-11-27T19:12:07",
     "state": "RUNNING",
-    "time_limit": "12:00:00"
+    "time_limit": "1-00:00:00"
    },
    {
-    "elapsed": "1:38:34",
-    "jobid": "1508636",
-    "name": "adm-score",
+    "elapsed": "4:24",
+    "jobid": "1508669",
+    "name": "levelb-sample",
     "nodes": "1",
     "reason_or_nodelist": "vhpc13",
-    "start": "2026-11-27T17:23:35",
+    "start": "2026-11-27T19:07:58",
     "state": "RUNNING",
-    "time_limit": "12:00:00"
+    "time_limit": "1-00:00:00"
    },
    {
-    "elapsed": "25:52",
+    "elapsed": "36:05",
     "jobid": "1508668",
     "name": "levelb-sample",
     "nodes": "1",
@@ -3680,7 +3676,7 @@
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "RUNNING"
    ],
    "submit_error": null,
    "submitted": "2026-11-27T17:46:12",
@@ -3695,7 +3691,7 @@
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "RUNNING"
    ],
    "submit_error": null,
    "submitted": "2026-11-27T17:46:12",
@@ -3763,14 +3759,14 @@
    "waiting_for_nodes": null
   },
   "2026-11-27-p3-score-adarq_c2f2h_a06": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-27T19:12:22",
+   "finished": "2026-11-27T19:12:22",
    "invalid": null,
    "jobid": "1508675",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "RUNNING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-27T17:46:12",
@@ -3958,14 +3954,14 @@
    "waiting_for_nodes": null
   },
   "2026-11-27-test-score-adarq_gF_w20-seed0-val": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-27T19:12:22",
+   "finished": "2026-11-27T19:12:22",
    "invalid": null,
    "jobid": "1508636",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "RUNNING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-27T10:00:35",
@@ -4003,5 +3999,5 @@
    "waiting_for_nodes": null
   }
  },
- "updated": "2026-11-27T19:02:09"
+ "updated": "2026-11-27T19:12:22"
 }

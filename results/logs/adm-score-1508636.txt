@@ -17,3 +17,12 @@ Deprecated in NumPy 1.20; for more details and guidance: https://numpy.org/devdo
 /home/ambuj.mehrish/work/bench/adm/guided-diffusion/evaluations/evaluator.py:344: DeprecationWarning: `np.bool` is a deprecated alias for the builtin `bool`. To silence this warning, use `bool` by itself. Doing this will not modify any behavior and is safe. If you specifically wanted the numpy scalar type, use `np.bool_` here.
 Deprecated in NumPy 1.20; for more details and guidance: https://numpy.org/devdocs/release/1.20.0-notes.html#deprecations
   features_2_status = np.zeros([len(features_2), radii_1.shape[1]], dtype=np.bool)
+computing/reading sample batch statistics...
+Computing evaluations...
+Inception Score: 158.09881591796875
+FID: 9.985498349511829
+sFID: 24.690624137357872
+Precision: 0.7755
+Recall: 0.51334
+  IS 158.0988  FID 9.9855  sFID 24.6906  Precision 0.7755  Recall 0.5133
+=== metrics: /home/ambuj.mehrish/work/levelb/samples/adarq_gF_w20_seed0/samples_10000.val.metrics.json ===
