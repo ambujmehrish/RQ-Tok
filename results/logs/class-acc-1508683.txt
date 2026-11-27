@@ -1,0 +1,1 @@
+top-1 0.7555  top-5 0.9400  (2000 images) -> /home/ambuj.mehrish/work/levelb/samples/pilot_adarq_c2f2h_a06_seed100/samples_2000.cls.metrics.json
