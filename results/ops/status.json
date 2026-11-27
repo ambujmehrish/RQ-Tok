@@ -54,14 +54,6 @@
   },
   "ended_24h": [
    {
-    "elapsed": "00:06:03",
-    "end": "2026-11-26T11:37:54",
-    "exit": "0:0",
-    "jobid": "1508555",
-    "name": "latent-stats",
-    "state": "COMPLETED"
-   },
-   {
     "elapsed": "01:13:46",
     "end": "2026-11-26T12:45:37",
     "exit": "0:0",
@@ -379,7 +371,7 @@
     "gres": "gpu:rtx6000:2",
     "in_service": true,
     "node": "vhpc23",
-    "state": "idle"
+    "state": "mixed"
    },
    {
     "gres": "gpu:a40:3",
@@ -465,6 +457,16 @@
    },
    {
     "elapsed": "0:00",
+    "jobid": "1508639",
+    "name": "class-acc",
+    "nodes": "1",
+    "reason_or_nodelist": "(Resources)",
+    "start": "2026-11-28T11:19:26",
+    "state": "PENDING",
+    "time_limit": "2:00:00"
+   },
+   {
+    "elapsed": "0:00",
     "jobid": "1508640",
     "name": "class-acc",
     "nodes": "1",
@@ -480,16 +482,6 @@
     "nodes": "1",
     "reason_or_nodelist": "(Priority)",
     "start": "2026-11-28T11:19:26",
-    "state": "PENDING",
-    "time_limit": "2:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508639",
-    "name": "class-acc",
-    "nodes": "1",
-    "reason_or_nodelist": "(Resources)",
-    "start": "2026-11-28T11:15:17",
     "state": "PENDING",
     "time_limit": "2:00:00"
    },
@@ -524,7 +516,7 @@
     "time_limit": "2:00:00"
    },
    {
-    "elapsed": "2:13",
+    "elapsed": "42:37",
     "jobid": "1508634",
     "name": "levelb-sample",
     "nodes": "1",
@@ -534,7 +526,7 @@
     "time_limit": "1-00:00:00"
    },
    {
-    "elapsed": "2:39",
+    "elapsed": "43:03",
     "jobid": "1508633",
     "name": "levelb-sample",
     "nodes": "1",
@@ -544,7 +536,7 @@
     "time_limit": "1-00:00:00"
    },
    {
-    "elapsed": "6:22",
+    "elapsed": "46:46",
     "jobid": "1508628",
     "name": "levelb-sample",
     "nodes": "1",
@@ -3519,5 +3511,5 @@
    "waiting_for_nodes": null
   }
  },
- "updated": "2026-11-27T11:21:39"
+ "updated": "2026-11-27T12:02:03"
 }
