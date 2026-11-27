@@ -1,0 +1,13 @@
+{
+  "IS": 242.96131896972656,
+  "FID": 26.422569308535003,
+  "sFID": 106.72401700344926,
+  "Precision": 0.913,
+  "Recall": 0.7027,
+  "node": {
+    "host": "vhpc14",
+    "cpu": "Intel(R) Xeon(R) 6760P",
+    "threads": 8,
+    "openblas_core": "SkylakeX"
+  }
+}
