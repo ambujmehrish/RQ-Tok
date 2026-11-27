@@ -123,3 +123,25 @@ vision_denoising_type:  mar
   1648/2000 images
   1664/2000 images
   1680/2000 images
+  1696/2000 images
+  1712/2000 images
+  1728/2000 images
+  1744/2000 images
+  1760/2000 images
+  1776/2000 images
+  1792/2000 images
+  1808/2000 images
+  1824/2000 images
+  1840/2000 images
+  1856/2000 images
+  1872/2000 images
+  1888/2000 images
+  1904/2000 images
+  1920/2000 images
+  1936/2000 images
+  1952/2000 images
+  1968/2000 images
+  1984/2000 images
+  2000/2000 images
+wrote /home/ambuj.mehrish/work/levelb/samples/pilot_adarq_c2f2h_a06_seed100/shard00of01.npz
+=== shard 0/1 of adarq seed 100 done: /home/ambuj.mehrish/work/levelb/samples/pilot_adarq_c2f2h_a06_seed100 ===

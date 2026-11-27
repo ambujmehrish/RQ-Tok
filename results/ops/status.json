@@ -49,7 +49,7 @@
  },
  "cluster": {
   "counts": {
-   "PENDING": 22,
+   "PENDING": 21,
    "RUNNING": 3
   },
   "ended_24h": [
@@ -316,6 +316,14 @@
     "jobid": "1508644",
     "name": "class-acc",
     "state": "COMPLETED"
+   },
+   {
+    "elapsed": "01:11:42",
+    "end": "2026-11-27T18:57:54",
+    "exit": "0:0",
+    "jobid": "1508667",
+    "name": "levelb-sample",
+    "state": "COMPLETED"
    }
   ],
   "gpu_nodes": [
@@ -477,16 +485,6 @@
    },
    {
     "elapsed": "0:00",
-    "jobid": "1508675",
-    "name": "adm-score",
-    "nodes": "1",
-    "reason_or_nodelist": "(Dependency)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "12:00:00"
-   },
-   {
-    "elapsed": "0:00",
     "jobid": "1508671",
     "name": "levelb-sample",
     "nodes": "1",
@@ -501,7 +499,7 @@
     "name": "levelb-sample",
     "nodes": "1",
     "reason_or_nodelist": "(Priority)",
-    "start": "2026-11-28T17:46:12",
+    "start": "2026-11-28T06:57:54",
     "state": "PENDING",
     "time_limit": "1-00:00:00"
    },
@@ -626,7 +624,17 @@
     "time_limit": "2:00:00"
    },
    {
-    "elapsed": "1:23:20",
+    "elapsed": "4:15",
+    "jobid": "1508675",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "vhpc15",
+    "start": "2026-11-27T18:57:54",
+    "state": "RUNNING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "1:38:34",
     "jobid": "1508636",
     "name": "adm-score",
     "nodes": "1",
@@ -636,22 +644,12 @@
     "time_limit": "12:00:00"
    },
    {
-    "elapsed": "10:38",
+    "elapsed": "25:52",
     "jobid": "1508668",
     "name": "levelb-sample",
     "nodes": "1",
     "reason_or_nodelist": "vhpc14",
     "start": "2026-11-27T18:36:17",
-    "state": "RUNNING",
-    "time_limit": "1-00:00:00"
-   },
-   {
-    "elapsed": "1:00:43",
-    "jobid": "1508667",
-    "name": "levelb-sample",
-    "nodes": "1",
-    "reason_or_nodelist": "vhpc15",
-    "start": "2026-11-27T17:46:12",
     "state": "RUNNING",
     "time_limit": "1-00:00:00"
    }
@@ -3645,14 +3643,14 @@
    "waiting_for_nodes": null
   },
   "2026-11-27-p3-sample-adarq_c2f2h_a06": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-27T19:02:09",
+   "finished": "2026-11-27T19:02:09",
    "invalid": null,
    "jobid": "1508667",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "RUNNING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-27T17:46:12",
@@ -3772,7 +3770,7 @@
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "RUNNING"
    ],
    "submit_error": null,
    "submitted": "2026-11-27T17:46:12",
@@ -4005,5 +4003,5 @@
    "waiting_for_nodes": null
   }
  },
- "updated": "2026-11-27T18:46:54"
+ "updated": "2026-11-27T19:02:09"
 }
