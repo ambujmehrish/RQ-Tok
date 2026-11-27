@@ -16,3 +16,13 @@ vision_denoising_type:  mar
 Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  6.81it/s][A
 Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  6.93it/s][ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  6.91it/s]
 Loading pipeline components...:  86%|████████▌ | 6/7 [00:00<00:00,  5.81it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:01<00:00,  5.90it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:01<00:00,  6.29it/s]
+  16/2000 images
+  32/2000 images
+  48/2000 images
+  64/2000 images
+  80/2000 images
+  96/2000 images
+  112/2000 images
+  128/2000 images
+  144/2000 images
+  160/2000 images
