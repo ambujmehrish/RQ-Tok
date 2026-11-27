@@ -1013,3 +1013,46 @@ Requests `2026-11-26-p1-*`.
 - **Latent statistics** (`levelb/latent_stats.py`): energy shares (global mean, between-class),
   spectrum and effective dimension, and one linear probe of class information in true
   latents, code-only reconstructions and the residual.
+
+### Phase 1 results (2026-11-27; validation, 2,000 class-balanced images, seed 100; 28/28 jobs completed)
+
+Requests `2026-11-26-p1b-*` (submitted by the runner's `needs_gres` gate when vhpc13–15
+returned from maintenance). Class-accuracy standard error ≈ 0.011. Validation FID and
+recall have disagreed with test before (pilot FID ranked sampler F behind Bifrost-1; test
+reversed it), so only IS and class accuracy are read across arms here.
+
+| run | top-1 | top-5 | IS | P | R | FID | sFID |
+|---|---|---|---|---|---|---|---|
+| AdaRQ-Flow F, noise 0.6, no guidance (control) | 0.641 | 0.883 | 108.9 | 0.787 | 0.685 | 27.73 | 108.72 |
+| + random-class guidance 1.5 | 0.727 | 0.928 | 143.9 | 0.837 | 0.691 | 25.88 | 108.72 |
+| + guidance 2 | **0.774** | 0.942 | **154.2** | 0.836 | 0.702 | **25.47** | 109.38 |
+| + guidance 3 | 0.724 | 0.929 | 142.8 | 0.784 | 0.717 | 26.65 | 111.47 |
+| AdaRQ-Flow default sampler, no guidance (control) | 0.425 | 0.683 | 53.2 | 0.602 | 0.625 | 46.71 | 121.87 |
+| + guidance 1.5 / 2 / 3 | 0.593 / 0.643 / 0.665 | 0.821 / 0.867 / 0.875 | 86.3 / 103.3 / 105.2 | 0.704 / 0.738 / 0.738 | 0.688 / 0.695 / 0.700 | 34.45 / 30.90 / 30.98 | 118.82 / 117.67 / 118.80 |
+| Bifrost-1 (control) | 0.888 | 0.990 | 280.7 | 0.942 | 0.676 | 29.83 | 110.71 |
+| Bifrost-1 + token noise 0.33 | 0.882 | 0.987 | 254.7 | 0.931 | 0.693 | 27.55 | 108.20 |
+| Bifrost-1 + token noise 0.66 | 0.826 | 0.967 | 200.1 | 0.891 | 0.706 | 25.58 | 107.51 |
+| Bifrost-1 + token noise 1.31 | 0.667 | 0.884 | 120.9 | 0.773 | 0.687 | 28.23 | 112.03 |
+
+Latent statistics (`results/levelb/latent_stats.json`; 50,000 train + 10,000 held-out images):
+global mean 18.5% of the energy; between-class variance 8.6% of the variance; participation
+ratio 70, with 49 / 374 / 1,191 components for 50 / 90 / 99% of the variance. Linear probe
+(class from the mean-pooled latent), top-1: true latent 0.746; codes depth 1 / adaptive /
+depth 4: 0.522 / 0.660 / 0.685; **the residual the adaptive codes leave: 0.732.**
+
+Code-distribution information logged in the guidance runs (weight 2, sampler F): KL between
+the conditional and the random-class branch is ~1.0 nat per level in the first 4 decoding
+steps and ~0.23–0.33 afterwards, without decaying to zero (first 8 / 16 / 32 steps hold
+24% / 35% / 56% of the total). Conditional code entropy ≈ 2.6–2.9 nats (about 15 effective
+codes of 1,024).
+
+Conclusions:
+1. **Guidance works on the existing checkpoint with no training** (top-1 0.641 → 0.774, IS
+   109 → 154 at weight 2, above the true-latent render's 0.762); weight 3 overshoots. The
+   gate in `docs/adarq_v2_options.md` (top-1 ≥ 0.75, recall ≥ 0.5) is met.
+2. **Bifrost-1 + noise is a strong baseline.** At noise 0.66 it keeps top-1 0.826 / IS 200,
+   above guided AdaRQ-Flow (0.774 / 154), with the same validation FID (25.6 vs 25.5). Naive
+   noise around the regression mean buys FID cheaply; any new method must beat this curve.
+3. **The codes leave the class behind:** the residual probes at 0.732, the codes at 0.660.
+4. **Class information does not vanish late in decoding**, so switching guidance off after
+   the first steps is not supported by these logs (to be tested directly, not assumed).
