@@ -314,3 +314,26 @@ def test_bifrost_token_noise_is_applied_and_seeded(tiny_vlm):  # noqa: F811
     assert not torch.allclose(plain, noisy)
     assert torch.equal(noisy, run(0.5))  # seeded
     assert not torch.equal(noisy, run(0.5, seed=1))
+
+
+def test_bifrost_random_class_guidance(tiny_vlm):  # noqa: F811
+    """mar_decode with a negative-prompt function: weight 1 is unguided whatever the
+    negatives are; weight 2 changes the tokens and is reproducible."""
+    from levelb.sample import random_other_classes
+
+    model = bb.build_model(tiny_vlm, inner_dim=HIDDEN).float().eval()
+    conv = bb.make_conversation()
+    names = [f"class {i}" for i in range(20)]
+    labels = np.array([3, 7])
+    prompts = [names[c] for c in labels]
+
+    def run(weight, seed=0, guided=True):
+        rng = np.random.default_rng(seed)
+        neg = (lambda: random_other_classes(names, labels, rng)) if guided else None
+        return mar_decode(model, conv, prompts, cfg_weight=weight, np_seed=0, neg_fn=neg)[0]
+
+    plain = run(1.0, guided=False)
+    assert torch.allclose(run(1.0), plain, atol=1e-4)  # weight 1: the negative branch cancels
+    guided = run(2.0)
+    assert not torch.allclose(guided, plain, atol=1e-4)
+    assert torch.equal(guided, run(2.0))

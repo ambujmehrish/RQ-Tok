@@ -1,0 +1,13 @@
+{
+ "id": "2026-11-27-p2-classacc-bifrost_g20_n066",
+ "what": "VALIDATION pilot_bifrost_g20_n066: requested-class top-1/top-5 (ResNet-50)",
+ "script": "scripts/levelb/class_accuracy.sbatch",
+ "env": {
+  "SAMPLES": "${LEVELB_ROOT}/samples/pilot_bifrost_g20_n066_seed100/samples_2000.npz"
+ },
+ "after": [
+  "2026-11-27-p2-score-bifrost_g20_n066"
+ ],
+ "needs_gres": "gpu:h200",
+ "collect": true
+}

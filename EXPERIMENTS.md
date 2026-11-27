@@ -1056,3 +1056,20 @@ Conclusions:
 3. **The codes leave the class behind:** the residual probes at 0.732, the codes at 0.660.
 4. **Class information does not vanish late in decoding**, so switching guidance off after
    the first steps is not supported by these logs (to be tested directly, not assumed).
+
+### Queued 2026-11-27 (user's OK): guidance on Bifrost-1 (validation), two test-protocol runs (seed 0)
+
+Requests `2026-11-27-p2-*` and `2026-11-27-test-*`, all gated on an H200 node being in service.
+
+- **Validation (2,000 class-balanced, seed 100):** Bifrost-1 with random-class guidance at
+  weights 1.5 and 2, each with token noise 0 and 0.66. Guidance on a regression output is an
+  extrapolation `μ_neg + w·(μ_c − μ_neg)`; untested anywhere. Question: does it lift IS above
+  plain Bifrost-1 (280.7), and does noise then recover FID? Controls: `pilot_bifrost`,
+  `pilot_bifrost_n066`.
+- **Test protocol, seed 0 (10,000 random-class images; ADM reference primary, ImageNet val
+  secondary; class accuracy):** two settings fixed on validation before any test scoring:
+  (a) Bifrost-1 + token noise 0.66 (best validation FID of the noise sweep);
+  (b) AdaRQ-Flow, greedy codes, residual noise 0.6, random-class guidance 2 (best validation
+  top-1, IS and FID of the guidance sweep). Seeds 1–2 follow only if seed 0 warrants it; a
+  claim needs all three. Compared with Bifrost-1 16.98 / 28.30 / 266.5 and AdaRQ-Flow F
+  15.50 / 24.35 / 90.7 (FID / sFID / IS, 3 seeds).

@@ -1,0 +1,16 @@
+{
+ "id": "2026-11-27-p2-sample-bifrost_g20_n0",
+ "what": "VALIDATION pilot (2,000 class-balanced, seed 100): Bifrost-1 + random-class guidance weight 2.0, token noise 0",
+ "script": "scripts/levelb/sample.sbatch",
+ "env": {
+  "ARM": "bifrost",
+  "SEED": "100",
+  "N": "2000",
+  "BALANCED": "1",
+  "NEG_PROMPT": "random-class",
+  "CFG_WEIGHT": "2.0",
+  "TAG": "pilot_bifrost_g20_n0"
+ },
+ "needs_gres": "gpu:h200",
+ "collect": true
+}

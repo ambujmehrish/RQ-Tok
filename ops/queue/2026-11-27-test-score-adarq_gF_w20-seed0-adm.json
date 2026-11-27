@@ -1,0 +1,14 @@
+{
+ "id": "2026-11-27-test-score-adarq_gF_w20-seed0-adm",
+ "what": "TEST: score adarq_gF_w20 seed 0 vs ADM reference (primary)",
+ "script": "scripts/bench/adm_score.sbatch",
+ "env": {
+  "SAMPLES": "${LEVELB_ROOT}/samples/adarq_gF_w20_seed0",
+  "REF": "adm"
+ },
+ "after": [
+  "2026-11-27-test-sample-adarq_gF_w20-seed0"
+ ],
+ "needs_gres": "gpu:h200",
+ "collect": true
+}

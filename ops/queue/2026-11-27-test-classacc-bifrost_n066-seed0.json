@@ -1,0 +1,13 @@
+{
+ "id": "2026-11-27-test-classacc-bifrost_n066-seed0",
+ "what": "TEST: requested-class top-1/top-5 of bifrost_n066 seed 0 (ResNet-50)",
+ "script": "scripts/levelb/class_accuracy.sbatch",
+ "env": {
+  "SAMPLES": "${LEVELB_ROOT}/samples/bifrost_n066_seed0/samples_10000.npz"
+ },
+ "after": [
+  "2026-11-27-test-score-bifrost_n066-seed0-adm"
+ ],
+ "needs_gres": "gpu:h200",
+ "collect": true
+}
