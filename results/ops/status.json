@@ -49,7 +49,7 @@
  },
  "cluster": {
   "counts": {
-   "PENDING": 3,
+   "PENDING": 2,
    "RUNNING": 2
   },
   "ended_24h": [
@@ -230,6 +230,14 @@
     "state": "COMPLETED"
    },
    {
+    "elapsed": "05:40:54",
+    "end": "2026-11-27T16:59:54",
+    "exit": "0:0",
+    "jobid": "1508633",
+    "name": "levelb-sample",
+    "state": "COMPLETED"
+   },
+   {
     "elapsed": "05:11:14",
     "end": "2026-11-27T16:30:40",
     "exit": "0:0",
@@ -385,16 +393,6 @@
    },
    {
     "elapsed": "0:00",
-    "jobid": "1508635",
-    "name": "adm-score",
-    "nodes": "1",
-    "reason_or_nodelist": "(Dependency)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "12:00:00"
-   },
-   {
-    "elapsed": "0:00",
     "jobid": "1508643",
     "name": "class-acc",
     "nodes": "1",
@@ -404,7 +402,17 @@
     "time_limit": "2:00:00"
    },
    {
-    "elapsed": "0:56",
+    "elapsed": "0:34",
+    "jobid": "1508635",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "vhpc13",
+    "start": "2026-11-27T16:59:54",
+    "state": "RUNNING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "6:07",
     "jobid": "1508638",
     "name": "adm-score",
     "nodes": "1",
@@ -412,16 +420,6 @@
     "start": "2026-11-27T16:54:21",
     "state": "RUNNING",
     "time_limit": "12:00:00"
-   },
-   {
-    "elapsed": "5:36:17",
-    "jobid": "1508633",
-    "name": "levelb-sample",
-    "nodes": "1",
-    "reason_or_nodelist": "vhpc13",
-    "start": "2026-11-27T11:19:00",
-    "state": "RUNNING",
-    "time_limit": "1-00:00:00"
    }
   ]
  },
@@ -3299,14 +3297,14 @@
    "waiting_for_nodes": null
   },
   "2026-11-27-test-sample-adarq_gF_w20-seed0": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-27T17:00:27",
+   "finished": "2026-11-27T17:00:27",
    "invalid": null,
    "jobid": "1508633",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "RUNNING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-27T10:00:35",
@@ -3336,7 +3334,7 @@
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "RUNNING"
    ],
    "submit_error": null,
    "submitted": "2026-11-27T10:00:35",
@@ -3389,5 +3387,5 @@
    "waiting_for_nodes": null
   }
  },
- "updated": "2026-11-27T16:55:17"
+ "updated": "2026-11-27T17:00:27"
 }
