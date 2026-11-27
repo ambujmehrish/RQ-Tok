@@ -57,3 +57,12 @@ vision_denoising_type:  mar
   528/2000 images
   544/2000 images
   560/2000 images
+  576/2000 images
+  592/2000 images
+  608/2000 images
+  624/2000 images
+  640/2000 images
+  656/2000 images
+  672/2000 images
+  688/2000 images
+  704/2000 images
