@@ -49,7 +49,8 @@
  },
  "cluster": {
   "counts": {
-   "PENDING": 20
+   "PENDING": 17,
+   "RUNNING": 3
   },
   "ended_24h": [
    {
@@ -398,13 +399,13 @@
     "gres": "gpu:h200:1",
     "in_service": true,
     "node": "vhpc14",
-    "state": "idle"
+    "state": "mixed"
    },
    {
     "gres": "gpu:h200:1",
     "in_service": true,
     "node": "vhpc15",
-    "state": "idle"
+    "state": "mixed"
    },
    {
     "gres": "gpu:rtx6000:2",
@@ -526,6 +527,36 @@
    },
    {
     "elapsed": "0:00",
+    "jobid": "1508628",
+    "name": "levelb-sample",
+    "nodes": "1",
+    "reason_or_nodelist": "(Resources)",
+    "start": "2026-11-28T10:00:49",
+    "state": "PENDING",
+    "time_limit": "1-00:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508633",
+    "name": "levelb-sample",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "2026-11-28T10:00:36",
+    "state": "PENDING",
+    "time_limit": "1-00:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508634",
+    "name": "levelb-sample",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "2026-11-28T10:00:36",
+    "state": "PENDING",
+    "time_limit": "1-00:00:00"
+   },
+   {
+    "elapsed": "0:00",
     "jobid": "1508644",
     "name": "class-acc",
     "nodes": "1",
@@ -585,63 +616,33 @@
     "time_limit": "2:00:00"
    },
    {
-    "elapsed": "0:00",
-    "jobid": "1508634",
-    "name": "levelb-sample",
-    "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "1-00:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508633",
-    "name": "levelb-sample",
-    "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "1-00:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508628",
-    "name": "levelb-sample",
-    "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "1-00:00:00"
-   },
-   {
-    "elapsed": "0:00",
+    "elapsed": "1:00:18",
     "jobid": "1508627",
     "name": "levelb-sample",
     "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "N/A",
-    "state": "PENDING",
+    "reason_or_nodelist": "vhpc13",
+    "start": "2026-11-27T10:00:49",
+    "state": "RUNNING",
     "time_limit": "1-00:00:00"
    },
    {
-    "elapsed": "0:00",
+    "elapsed": "1:00:31",
     "jobid": "1508626",
     "name": "levelb-sample",
     "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "N/A",
-    "state": "PENDING",
+    "reason_or_nodelist": "vhpc15",
+    "start": "2026-11-27T10:00:36",
+    "state": "RUNNING",
     "time_limit": "1-00:00:00"
    },
    {
-    "elapsed": "0:00",
+    "elapsed": "1:00:32",
     "jobid": "1508625",
     "name": "levelb-sample",
     "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "N/A",
-    "state": "PENDING",
+    "reason_or_nodelist": "vhpc14",
+    "start": "2026-11-27T10:00:35",
+    "state": "RUNNING",
     "time_limit": "1-00:00:00"
    }
   ]
@@ -3316,7 +3317,9 @@
    "jobid": "1508639",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "PENDING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-27T10:00:35",
    "waiting_for": null,
@@ -3329,7 +3332,9 @@
    "jobid": "1508640",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "PENDING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-27T10:00:35",
    "waiting_for": null,
@@ -3342,7 +3347,9 @@
    "jobid": "1508641",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "PENDING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-27T10:00:35",
    "waiting_for": null,
@@ -3355,7 +3362,9 @@
    "jobid": "1508642",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "PENDING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-27T10:00:35",
    "waiting_for": null,
@@ -3368,7 +3377,9 @@
    "jobid": "1508625",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "RUNNING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-27T10:00:35",
    "waiting_for": null,
@@ -3381,7 +3392,9 @@
    "jobid": "1508626",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "RUNNING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-27T10:00:35",
    "waiting_for": null,
@@ -3394,7 +3407,9 @@
    "jobid": "1508627",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "RUNNING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-27T10:00:35",
    "waiting_for": null,
@@ -3407,7 +3422,9 @@
    "jobid": "1508628",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "PENDING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-27T10:00:35",
    "waiting_for": null,
@@ -3420,7 +3437,9 @@
    "jobid": "1508629",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "PENDING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-27T10:00:35",
    "waiting_for": null,
@@ -3433,7 +3452,9 @@
    "jobid": "1508630",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "PENDING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-27T10:00:35",
    "waiting_for": null,
@@ -3446,7 +3467,9 @@
    "jobid": "1508631",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "PENDING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-27T10:00:35",
    "waiting_for": null,
@@ -3459,7 +3482,9 @@
    "jobid": "1508632",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "PENDING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-27T10:00:35",
    "waiting_for": null,
@@ -3472,7 +3497,9 @@
    "jobid": "1508643",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "PENDING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-27T10:00:35",
    "waiting_for": null,
@@ -3485,7 +3512,9 @@
    "jobid": "1508644",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "PENDING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-27T10:00:35",
    "waiting_for": null,
@@ -3498,7 +3527,9 @@
    "jobid": "1508633",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "PENDING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-27T10:00:35",
    "waiting_for": null,
@@ -3511,7 +3542,9 @@
    "jobid": "1508634",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "PENDING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-27T10:00:35",
    "waiting_for": null,
@@ -3524,7 +3557,9 @@
    "jobid": "1508635",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "PENDING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-27T10:00:35",
    "waiting_for": null,
@@ -3537,7 +3572,9 @@
    "jobid": "1508636",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "PENDING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-27T10:00:35",
    "waiting_for": null,
@@ -3550,7 +3587,9 @@
    "jobid": "1508637",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "PENDING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-27T10:00:35",
    "waiting_for": null,
@@ -3563,12 +3602,14 @@
    "jobid": "1508638",
    "post_error": null,
    "post_output_tail": "",
-   "states": [],
+   "states": [
+    "PENDING"
+   ],
    "submit_error": null,
    "submitted": "2026-11-27T10:00:35",
    "waiting_for": null,
    "waiting_for_nodes": null
   }
  },
- "updated": "2026-11-27T10:00:35"
+ "updated": "2026-11-27T11:01:07"
 }
