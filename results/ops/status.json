@@ -54,38 +54,6 @@
   },
   "ended_24h": [
    {
-    "elapsed": "00:11:41",
-    "end": "2026-11-26T15:11:24",
-    "exit": "0:0",
-    "jobid": "1508565",
-    "name": "adm-score",
-    "state": "COMPLETED"
-   },
-   {
-    "elapsed": "00:13:14",
-    "end": "2026-11-26T15:15:33",
-    "exit": "0:0",
-    "jobid": "1508566",
-    "name": "adm-score",
-    "state": "COMPLETED"
-   },
-   {
-    "elapsed": "00:14:49",
-    "end": "2026-11-26T15:17:24",
-    "exit": "0:0",
-    "jobid": "1508567",
-    "name": "adm-score",
-    "state": "COMPLETED"
-   },
-   {
-    "elapsed": "00:10:13",
-    "end": "2026-11-26T15:21:37",
-    "exit": "0:0",
-    "jobid": "1508568",
-    "name": "adm-score",
-    "state": "COMPLETED"
-   },
-   {
     "elapsed": "00:13:31",
     "end": "2026-11-26T21:53:49",
     "exit": "0:0",
@@ -442,7 +410,7 @@
     "time_limit": "2:00:00"
    },
    {
-    "elapsed": "3:44:40",
+    "elapsed": "4:45:13",
     "jobid": "1508634",
     "name": "levelb-sample",
     "nodes": "1",
@@ -452,7 +420,7 @@
     "time_limit": "1-00:00:00"
    },
    {
-    "elapsed": "3:45:06",
+    "elapsed": "4:45:39",
     "jobid": "1508633",
     "name": "levelb-sample",
     "nodes": "1",
@@ -3427,5 +3395,5 @@
    "waiting_for_nodes": null
   }
  },
- "updated": "2026-11-27T15:04:06"
+ "updated": "2026-11-27T16:04:39"
 }
