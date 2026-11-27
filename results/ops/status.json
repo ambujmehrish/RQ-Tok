@@ -419,7 +419,7 @@
     "gres": "gpu:rtx6000:2",
     "in_service": true,
     "node": "vhpc23",
-    "state": "idle"
+    "state": "mixed"
    },
    {
     "gres": "gpu:a40:3",
@@ -495,6 +495,16 @@
    },
    {
     "elapsed": "0:00",
+    "jobid": "1508678",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
     "jobid": "1508682",
     "name": "adm-score",
     "nodes": "1",
@@ -529,16 +539,6 @@
     "name": "adm-score",
     "nodes": "1",
     "reason_or_nodelist": "(Dependency)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "12:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508678",
-    "name": "adm-score",
-    "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
     "start": "N/A",
     "state": "PENDING",
     "time_limit": "12:00:00"
@@ -614,7 +614,7 @@
     "time_limit": "2:00:00"
    },
    {
-    "elapsed": "4:46",
+    "elapsed": "25:03",
     "jobid": "1508673",
     "name": "levelb-sample",
     "nodes": "1",
@@ -624,7 +624,7 @@
     "time_limit": "1-00:00:00"
    },
    {
-    "elapsed": "10:59",
+    "elapsed": "31:16",
     "jobid": "1508672",
     "name": "levelb-sample",
     "nodes": "1",
@@ -634,7 +634,7 @@
     "time_limit": "1-00:00:00"
    },
    {
-    "elapsed": "42:12",
+    "elapsed": "1:02:29",
     "jobid": "1508671",
     "name": "levelb-sample",
     "nodes": "1",
@@ -3993,5 +3993,5 @@
    "waiting_for_nodes": null
   }
  },
- "updated": "2026-11-27T20:28:22"
+ "updated": "2026-11-27T20:48:39"
 }
