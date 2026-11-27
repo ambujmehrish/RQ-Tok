@@ -402,7 +402,7 @@
     "time_limit": "2:00:00"
    },
    {
-    "elapsed": "0:34",
+    "elapsed": "5:44",
     "jobid": "1508635",
     "name": "adm-score",
     "nodes": "1",
@@ -412,7 +412,7 @@
     "time_limit": "12:00:00"
    },
    {
-    "elapsed": "6:07",
+    "elapsed": "11:17",
     "jobid": "1508638",
     "name": "adm-score",
     "nodes": "1",
@@ -3387,5 +3387,5 @@
    "waiting_for_nodes": null
   }
  },
- "updated": "2026-11-27T17:00:27"
+ "updated": "2026-11-27T17:05:38"
 }
