@@ -408,7 +408,7 @@
     "gres": "gpu:rtx6000:2",
     "in_service": true,
     "node": "vhpc23",
-    "state": "mixed"
+    "state": "idle"
    },
    {
     "gres": "gpu:a40:3",
@@ -3087,5 +3087,5 @@
    "waiting_for_nodes": null
   }
  },
- "updated": "2026-11-27T01:41:09"
+ "updated": "2026-11-27T02:41:40"
 }
