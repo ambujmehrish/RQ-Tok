@@ -54,30 +54,6 @@
   },
   "ended_24h": [
    {
-    "elapsed": "01:13:46",
-    "end": "2026-11-26T12:45:37",
-    "exit": "0:0",
-    "jobid": "1508556",
-    "name": "levelb-sample",
-    "state": "COMPLETED"
-   },
-   {
-    "elapsed": "01:15:26",
-    "end": "2026-11-26T12:47:17",
-    "exit": "0:0",
-    "jobid": "1508557",
-    "name": "levelb-sample",
-    "state": "COMPLETED"
-   },
-   {
-    "elapsed": "01:12:41",
-    "end": "2026-11-26T12:50:36",
-    "exit": "0:0",
-    "jobid": "1508558",
-    "name": "levelb-sample",
-    "state": "COMPLETED"
-   },
-   {
     "elapsed": "01:09:43",
     "end": "2026-11-26T13:55:20",
     "exit": "0:0",
@@ -419,7 +395,7 @@
     "gres": "gpu:rtx6000:2",
     "in_service": true,
     "node": "vhpc23",
-    "state": "mixed"
+    "state": "idle"
    },
    {
     "gres": "gpu:a40:3",
@@ -514,7 +490,7 @@
     "time_limit": "2:00:00"
    },
    {
-    "elapsed": "1:18:17",
+    "elapsed": "1:43:35",
     "jobid": "1508634",
     "name": "levelb-sample",
     "nodes": "1",
@@ -524,7 +500,7 @@
     "time_limit": "1-00:00:00"
    },
    {
-    "elapsed": "1:18:43",
+    "elapsed": "1:44:01",
     "jobid": "1508633",
     "name": "levelb-sample",
     "nodes": "1",
@@ -3499,5 +3475,5 @@
    "waiting_for_nodes": null
   }
  },
- "updated": "2026-11-27T12:37:42"
+ "updated": "2026-11-27T13:03:01"
 }
