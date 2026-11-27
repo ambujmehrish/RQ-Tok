@@ -138,3 +138,11 @@ vision_denoising_type:  mar
   1824/2000 images
   1840/2000 images
   1856/2000 images
+  1872/2000 images
+  1888/2000 images
+  1904/2000 images
+  1920/2000 images
+  1936/2000 images
+  1952/2000 images
+  1968/2000 images
+  1984/2000 images
