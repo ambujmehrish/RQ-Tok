@@ -49,26 +49,10 @@
  },
  "cluster": {
   "counts": {
-   "PENDING": 7,
-   "RUNNING": 3
+   "PENDING": 1,
+   "RUNNING": 1
   },
   "ended_24h": [
-   {
-    "elapsed": "00:13:25",
-    "end": "2026-11-26T22:20:08",
-    "exit": "0:0",
-    "jobid": "1508573",
-    "name": "adm-score",
-    "state": "COMPLETED"
-   },
-   {
-    "elapsed": "00:00:21",
-    "end": "2026-11-26T22:20:29",
-    "exit": "0:0",
-    "jobid": "1508582",
-    "name": "class-acc",
-    "state": "COMPLETED"
-   },
    {
     "elapsed": "01:04:02",
     "end": "2026-11-27T11:04:37",
@@ -334,10 +318,74 @@
     "state": "COMPLETED"
    },
    {
+    "elapsed": "00:15:21",
+    "end": "2026-11-27T22:21:24",
+    "exit": "0:0",
+    "jobid": "1508680",
+    "name": "adm-score",
+    "state": "COMPLETED"
+   },
+   {
+    "elapsed": "00:10:35",
+    "end": "2026-11-27T22:21:04",
+    "exit": "0:0",
+    "jobid": "1508681",
+    "name": "adm-score",
+    "state": "COMPLETED"
+   },
+   {
     "elapsed": "00:00:18",
     "end": "2026-11-27T22:00:25",
     "exit": "0:0",
     "jobid": "1508683",
+    "name": "class-acc",
+    "state": "COMPLETED"
+   },
+   {
+    "elapsed": "00:00:16",
+    "end": "2026-11-27T22:21:20",
+    "exit": "0:0",
+    "jobid": "1508684",
+    "name": "class-acc",
+    "state": "COMPLETED"
+   },
+   {
+    "elapsed": "00:00:13",
+    "end": "2026-11-27T22:21:33",
+    "exit": "0:0",
+    "jobid": "1508685",
+    "name": "class-acc",
+    "state": "COMPLETED"
+   },
+   {
+    "elapsed": "00:00:17",
+    "end": "2026-11-27T22:21:41",
+    "exit": "0:0",
+    "jobid": "1508686",
+    "name": "class-acc",
+    "state": "COMPLETED"
+   },
+   {
+    "elapsed": "00:00:13",
+    "end": "2026-11-27T22:21:46",
+    "exit": "0:0",
+    "jobid": "1508687",
+    "name": "class-acc",
+    "state": "COMPLETED"
+   },
+   {
+    "elapsed": "00:00:14",
+    "end": "2026-11-27T22:21:55",
+    "exit": "0:0",
+    "jobid": "1508688",
+    "name": "class-acc",
+    "state": "COMPLETED"
+   },
+   {
+    "elapsed": "00:00:11",
+    "end": "2026-11-27T22:21:57",
+    "exit": "0:0",
+    "jobid": "1508689",
     "name": "class-acc",
     "state": "COMPLETED"
    }
@@ -377,13 +425,13 @@
     "gres": "gpu:h200:1",
     "in_service": true,
     "node": "vhpc13",
-    "state": "mixed"
+    "state": "idle"
    },
    {
     "gres": "gpu:h200:1",
     "in_service": true,
     "node": "vhpc14",
-    "state": "mixed"
+    "state": "idle"
    },
    {
     "gres": "gpu:h200:1",
@@ -431,46 +479,6 @@
   "squeue": [
    {
     "elapsed": "0:00",
-    "jobid": "1508684",
-    "name": "class-acc",
-    "nodes": "1",
-    "reason_or_nodelist": "(Resources)",
-    "start": "2026-11-28T19:43:21",
-    "state": "PENDING",
-    "time_limit": "2:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508685",
-    "name": "class-acc",
-    "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "2026-11-28T19:43:21",
-    "state": "PENDING",
-    "time_limit": "2:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508687",
-    "name": "class-acc",
-    "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "2026-11-28T21:43:00",
-    "state": "PENDING",
-    "time_limit": "2:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508686",
-    "name": "class-acc",
-    "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "2026-11-28T19:43:21",
-    "state": "PENDING",
-    "time_limit": "2:00:00"
-   },
-   {
-    "elapsed": "0:00",
     "jobid": "1508690",
     "name": "class-acc",
     "nodes": "1",
@@ -480,47 +488,7 @@
     "time_limit": "2:00:00"
    },
    {
-    "elapsed": "0:00",
-    "jobid": "1508689",
-    "name": "class-acc",
-    "nodes": "1",
-    "reason_or_nodelist": "(Dependency)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "2:00:00"
-   },
-   {
-    "elapsed": "0:00",
-    "jobid": "1508688",
-    "name": "class-acc",
-    "nodes": "1",
-    "reason_or_nodelist": "(Dependency)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "2:00:00"
-   },
-   {
-    "elapsed": "4:52",
-    "jobid": "1508681",
-    "name": "adm-score",
-    "nodes": "1",
-    "reason_or_nodelist": "vhpc14",
-    "start": "2026-11-27T22:10:29",
-    "state": "RUNNING",
-    "time_limit": "12:00:00"
-   },
-   {
-    "elapsed": "9:18",
-    "jobid": "1508680",
-    "name": "adm-score",
-    "nodes": "1",
-    "reason_or_nodelist": "vhpc13",
-    "start": "2026-11-27T22:06:03",
-    "state": "RUNNING",
-    "time_limit": "12:00:00"
-   },
-   {
-    "elapsed": "0:36",
+    "elapsed": "10:48",
     "jobid": "1508682",
     "name": "adm-score",
     "nodes": "1",
@@ -3414,14 +3382,14 @@
    "waiting_for_nodes": null
   },
   "2026-11-27-p3-classacc-adarq_c3f2h_a03": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-27T22:25:33",
+   "finished": "2026-11-27T22:25:33",
    "invalid": null,
    "jobid": "1508684",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-27T17:46:12",
@@ -3429,14 +3397,14 @@
    "waiting_for_nodes": null
   },
   "2026-11-27-p3-classacc-adarq_c3f2h_a06": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-27T22:25:33",
+   "finished": "2026-11-27T22:25:33",
    "invalid": null,
    "jobid": "1508685",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-27T17:46:12",
@@ -3444,14 +3412,14 @@
    "waiting_for_nodes": null
   },
   "2026-11-27-p3-classacc-adarq_c4f2h_a06": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-27T22:25:33",
+   "finished": "2026-11-27T22:25:33",
    "invalid": null,
    "jobid": "1508686",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-27T17:46:12",
@@ -3459,14 +3427,14 @@
    "waiting_for_nodes": null
   },
   "2026-11-27-p3-classacc-bifrost_g20_n033": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-27T22:25:33",
+   "finished": "2026-11-27T22:25:33",
    "invalid": null,
    "jobid": "1508687",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-27T17:46:12",
@@ -3474,14 +3442,14 @@
    "waiting_for_nodes": null
   },
   "2026-11-27-p3-classacc-mix_b025": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-27T22:25:33",
+   "finished": "2026-11-27T22:25:33",
    "invalid": null,
    "jobid": "1508688",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-27T17:46:12",
@@ -3489,14 +3457,14 @@
    "waiting_for_nodes": null
   },
   "2026-11-27-p3-classacc-mix_b050": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-27T22:25:33",
+   "finished": "2026-11-27T22:25:33",
    "invalid": null,
    "jobid": "1508689",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-27T17:46:12",
@@ -3714,14 +3682,14 @@
    "waiting_for_nodes": null
   },
   "2026-11-27-p3-score-mix_b025": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-27T22:25:33",
+   "finished": "2026-11-27T22:25:33",
    "invalid": null,
    "jobid": "1508680",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "RUNNING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-27T17:46:12",
@@ -3729,14 +3697,14 @@
    "waiting_for_nodes": null
   },
   "2026-11-27-p3-score-mix_b050": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-27T22:25:33",
+   "finished": "2026-11-27T22:25:33",
    "invalid": null,
    "jobid": "1508681",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "RUNNING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-27T17:46:12",
@@ -3879,5 +3847,5 @@
    "waiting_for_nodes": null
   }
  },
- "updated": "2026-11-27T22:15:21"
+ "updated": "2026-11-27T22:25:33"
 }
