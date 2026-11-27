@@ -1073,3 +1073,40 @@ Requests `2026-11-27-p2-*` and `2026-11-27-test-*`, all gated on an H200 node be
   top-1, IS and FID of the guidance sweep). Seeds 1–2 follow only if seed 0 warrants it; a
   claim needs all three. Compared with Bifrost-1 16.98 / 28.30 / 266.5 and AdaRQ-Flow F
   15.50 / 24.35 / 90.7 (FID / sFID / IS, 3 seeds).
+
+### Results 2026-11-27: guidance on Bifrost-1 (validation) and the first guided test runs (seed 0)
+
+**Validation** (2,000 class-balanced, seed 100; `2026-11-27-p2-*`, 12/12 completed):
+
+| run | top-1 | top-5 | IS | P | R | FID | sFID |
+|---|---|---|---|---|---|---|---|
+| Bifrost-1 (control) | 0.888 | 0.990 | 280.7 | 0.942 | 0.676 | 29.83 | 110.71 |
+| + guidance 1.5 | 0.901 | 0.989 | 281.0 | 0.951 | 0.691 | 29.68 | 109.63 |
+| + guidance 2 | 0.892 | 0.991 | 282.1 | 0.936 | 0.704 | 28.63 | 109.29 |
+| + noise 0.66 (control) | 0.826 | 0.967 | 200.1 | 0.891 | 0.706 | 25.58 | 107.51 |
+| + noise 0.66 + guidance 1.5 | 0.855 | 0.981 | 242.5 | 0.919 | 0.707 | 26.25 | 106.41 |
+| + noise 0.66 + guidance 2 | 0.864 | 0.981 | 243.0 | 0.913 | 0.703 | 26.42 | 106.72 |
+
+Guidance does not move plain Bifrost-1 (IS 281–282: the regression output is at this
+renderer's ceiling); it restores most of what noise costs (IS 200 → 243).
+
+**Test protocol, seed 0** (10,000 random-class images, ADM reference; settings fixed on
+validation beforehand; ImageNet-val scores of the two new rows still running):
+
+| arm | FID | sFID | IS | P | R | top-1 | top-5 |
+|---|---|---|---|---|---|---|---|
+| Bifrost-1 | 16.99 | 28.27 | 270.2 | 0.939 | 0.242 | 0.895 | 0.989 |
+| Bifrost-1 + token noise 0.66 | 11.37 | 20.41 | 206.9 | 0.885 | 0.438 | 0.826 | 0.967 |
+| AdaRQ-Flow F (unguided) | 15.40 | 24.26 | 92.8 | 0.726 | 0.607 | 0.579 | 0.831 |
+| AdaRQ-Flow, greedy codes, residual noise 0.6, random-class guidance 2 | **9.92** | 21.19 | 158.1 | 0.833 | 0.526 | 0.763 | 0.946 |
+
+One seed each: no claim yet (seed s.d. of FID has been 0.1–0.3). Reading:
+- Guided AdaRQ-Flow, with no retraining, has the lowest FID of any arm: 42% below Bifrost-1.
+  Guidance took it from 15.40 to 9.92 and IS from 93 to 158.
+- Plain noise on Bifrost-1's output takes its FID from 16.99 to 11.37 and doubles recall, at
+  IS 207. It beats unguided AdaRQ-Flow on everything but recall, and guided AdaRQ-Flow on
+  IS, class accuracy and (slightly) sFID; guided AdaRQ-Flow beats it on FID and recall.
+- Both new rows are below Bifrost-1 on IS (158 and 207 vs 270). No arm beats Bifrost-1 on
+  FID, sFID and IS together yet.
+- Validation ranked these two the other way round on nothing reliable: validation FID was
+  25.5 vs 25.6; the test separates them (9.92 vs 11.37).
