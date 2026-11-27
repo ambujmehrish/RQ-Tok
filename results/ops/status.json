@@ -49,18 +49,10 @@
  },
  "cluster": {
   "counts": {
-   "PENDING": 13,
+   "PENDING": 12,
    "RUNNING": 3
   },
   "ended_24h": [
-   {
-    "elapsed": "00:13:31",
-    "end": "2026-11-26T21:53:49",
-    "exit": "0:0",
-    "jobid": "1508569",
-    "name": "adm-score",
-    "state": "COMPLETED"
-   },
    {
     "elapsed": "00:11:11",
     "end": "2026-11-26T21:57:06",
@@ -388,6 +380,14 @@
     "jobid": "1508675",
     "name": "adm-score",
     "state": "COMPLETED"
+   },
+   {
+    "elapsed": "00:13:50",
+    "end": "2026-11-27T21:51:29",
+    "exit": "0:0",
+    "jobid": "1508676",
+    "name": "adm-score",
+    "state": "COMPLETED"
    }
   ],
   "gpu_nodes": [
@@ -479,27 +479,27 @@
   "squeue": [
    {
     "elapsed": "0:00",
-    "jobid": "1508678",
-    "name": "adm-score",
-    "nodes": "1",
-    "reason_or_nodelist": "(Resources)",
-    "start": "2026-11-28T19:43:21",
-    "state": "PENDING",
-    "time_limit": "12:00:00"
-   },
-   {
-    "elapsed": "0:00",
     "jobid": "1508683",
     "name": "class-acc",
     "nodes": "1",
-    "reason_or_nodelist": "(Priority)",
-    "start": "2026-11-28T19:43:21",
+    "reason_or_nodelist": "(Resources)",
+    "start": "2026-11-28T09:45:49",
     "state": "PENDING",
     "time_limit": "2:00:00"
    },
    {
     "elapsed": "0:00",
     "jobid": "1508679",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "2026-11-28T09:51:29",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508681",
     "name": "adm-score",
     "nodes": "1",
     "reason_or_nodelist": "(Priority)",
@@ -513,7 +513,7 @@
     "name": "adm-score",
     "nodes": "1",
     "reason_or_nodelist": "(Priority)",
-    "start": "2026-11-28T21:43:00",
+    "start": "2026-11-28T11:45:00",
     "state": "PENDING",
     "time_limit": "12:00:00"
    },
@@ -529,13 +529,13 @@
    },
    {
     "elapsed": "0:00",
-    "jobid": "1508681",
-    "name": "adm-score",
+    "jobid": "1508684",
+    "name": "class-acc",
     "nodes": "1",
     "reason_or_nodelist": "(Priority)",
-    "start": "N/A",
+    "start": "2026-11-28T21:51:00",
     "state": "PENDING",
-    "time_limit": "12:00:00"
+    "time_limit": "2:00:00"
    },
    {
     "elapsed": "0:00",
@@ -598,27 +598,7 @@
     "time_limit": "2:00:00"
    },
    {
-    "elapsed": "0:00",
-    "jobid": "1508684",
-    "name": "class-acc",
-    "nodes": "1",
-    "reason_or_nodelist": "(Dependency)",
-    "start": "N/A",
-    "state": "PENDING",
-    "time_limit": "2:00:00"
-   },
-   {
-    "elapsed": "11:53",
-    "jobid": "1508676",
-    "name": "adm-score",
-    "nodes": "1",
-    "reason_or_nodelist": "vhpc13",
-    "start": "2026-11-27T21:37:39",
-    "state": "RUNNING",
-    "time_limit": "12:00:00"
-   },
-   {
-    "elapsed": "59:14",
+    "elapsed": "1:04:32",
     "jobid": "1508674",
     "name": "levelb-sample",
     "nodes": "1",
@@ -628,7 +608,17 @@
     "time_limit": "1-00:00:00"
    },
    {
-    "elapsed": "3:43",
+    "elapsed": "3:21",
+    "jobid": "1508678",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "vhpc13",
+    "start": "2026-11-27T21:51:29",
+    "state": "RUNNING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "9:01",
     "jobid": "1508677",
     "name": "adm-score",
     "nodes": "1",
@@ -3762,14 +3752,14 @@
    "waiting_for_nodes": null
   },
   "2026-11-27-p3-score-adarq_c3f2h_a03": {
-   "collected": null,
-   "finished": null,
+   "collected": "2026-11-27T21:54:50",
+   "finished": "2026-11-27T21:54:50",
    "invalid": null,
    "jobid": "1508676",
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "RUNNING"
+    "COMPLETED"
    ],
    "submit_error": null,
    "submitted": "2026-11-27T17:46:12",
@@ -3799,7 +3789,7 @@
    "post_error": null,
    "post_output_tail": "",
    "states": [
-    "PENDING"
+    "RUNNING"
    ],
    "submit_error": null,
    "submitted": "2026-11-27T17:46:12",
@@ -3987,5 +3977,5 @@
    "waiting_for_nodes": null
   }
  },
- "updated": "2026-11-27T21:49:32"
+ "updated": "2026-11-27T21:54:50"
 }
