@@ -1,0 +1,14 @@
+{
+ "id": "2026-11-28-test-score-mix_b050-seed0-adm",
+ "what": "TEST: score mix_b050 seed 0 vs ADM reference (primary)",
+ "script": "scripts/bench/adm_score.sbatch",
+ "env": {
+  "SAMPLES": "${LEVELB_ROOT}/samples/mix_b050_seed0",
+  "REF": "adm"
+ },
+ "after": [
+  "2026-11-28-test-sample-mix_b050-seed0"
+ ],
+ "needs_gres": "gpu:h200",
+ "collect": true
+}

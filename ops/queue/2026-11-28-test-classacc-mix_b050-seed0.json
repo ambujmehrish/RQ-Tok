@@ -1,0 +1,13 @@
+{
+ "id": "2026-11-28-test-classacc-mix_b050-seed0",
+ "what": "TEST: requested-class top-1/top-5 of mix_b050 seed 0 (ResNet-50)",
+ "script": "scripts/levelb/class_accuracy.sbatch",
+ "env": {
+  "SAMPLES": "${LEVELB_ROOT}/samples/mix_b050_seed0/samples_10000.npz"
+ },
+ "after": [
+  "2026-11-28-test-score-mix_b050-seed0-adm"
+ ],
+ "needs_gres": "gpu:h200",
+ "collect": true
+}

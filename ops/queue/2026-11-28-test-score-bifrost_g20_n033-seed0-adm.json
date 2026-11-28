@@ -1,0 +1,14 @@
+{
+ "id": "2026-11-28-test-score-bifrost_g20_n033-seed0-adm",
+ "what": "TEST: score bifrost_g20_n033 seed 0 vs ADM reference (primary)",
+ "script": "scripts/bench/adm_score.sbatch",
+ "env": {
+  "SAMPLES": "${LEVELB_ROOT}/samples/bifrost_g20_n033_seed0",
+  "REF": "adm"
+ },
+ "after": [
+  "2026-11-28-test-sample-bifrost_g20_n033-seed0"
+ ],
+ "needs_gres": "gpu:h200",
+ "collect": true
+}

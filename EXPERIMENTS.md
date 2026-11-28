@@ -1166,3 +1166,13 @@ Conclusions:
 4. **Nothing exceeds Bifrost-1's IS** beyond noise level (best: guided Bifrost-1, 282 vs 281).
    Under the fixed renderer settings the regression output sits at the IS ceiling, so the
    realistic target is IS on par with Bifrost-1 together with clearly better FID and sFID.
+
+### Queued 2026-11-28 (user: one seed, to confirm the numbers): three test-protocol runs at seed 0
+
+Requests `2026-11-28-test-*`, gated on an H200 node. 10,000 random-class images, seed 0; ADM
+reference (primary), ImageNet val (secondary), class accuracy. Settings fixed on validation
+before any test scoring: anchor mix β = 0.25 (validation top-1 0.889, IS 273), anchor mix
+β = 0.5 (0.856, 239), and the matched simple baseline Bifrost-1 + guidance 2 + noise 0.33
+(0.889, 258). One seed each by the user's decision: they confirm where the settings land and
+support no claim. Compared with seed 0 of Bifrost-1 (16.99 / 28.27 / 270.2), Bifrost-1 +
+noise 0.66 (11.37 / 20.41 / 206.9) and guided AdaRQ-Flow (9.92 / 21.19 / 158.1).
