@@ -488,7 +488,7 @@
     "time_limit": "2:00:00"
    },
    {
-    "elapsed": "3:19:40",
+    "elapsed": "4:20:14",
     "jobid": "1508723",
     "name": "levelb-sample",
     "nodes": "1",
@@ -498,7 +498,7 @@
     "time_limit": "1-00:00:00"
    },
    {
-    "elapsed": "4:02:14",
+    "elapsed": "5:02:48",
     "jobid": "1508721",
     "name": "levelb-sample",
     "nodes": "1",
@@ -508,7 +508,7 @@
     "time_limit": "1-00:00:00"
    },
    {
-    "elapsed": "4:02:14",
+    "elapsed": "5:02:48",
     "jobid": "1508722",
     "name": "levelb-sample",
     "nodes": "1",
@@ -4059,5 +4059,5 @@
    "waiting_for_nodes": null
   }
  },
- "updated": "2026-11-28T12:58:31"
+ "updated": "2026-11-28T13:59:05"
 }
