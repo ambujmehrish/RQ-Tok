@@ -48,7 +48,9 @@
   }
  },
  "cluster": {
-  "counts": {},
+  "counts": {
+   "PENDING": 12
+  },
   "ended_24h": [
    {
     "elapsed": "01:04:02",
@@ -414,7 +416,7 @@
     "gres": "gpu:a40:1",
     "in_service": false,
     "node": "vhpc3",
-    "state": "draining"
+    "state": "drained"
    },
    {
     "gres": "gpu:a40:1",
@@ -489,7 +491,128 @@
     "state": "drained"
    }
   ],
-  "squeue": []
+  "squeue": [
+   {
+    "elapsed": "0:00",
+    "jobid": "1508729",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508728",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508727",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508726",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508725",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508724",
+    "name": "adm-score",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "12:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508732",
+    "name": "class-acc",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "2:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508731",
+    "name": "class-acc",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "2:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508730",
+    "name": "class-acc",
+    "nodes": "1",
+    "reason_or_nodelist": "(Dependency)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "2:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508723",
+    "name": "levelb-sample",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "1-00:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508722",
+    "name": "levelb-sample",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "1-00:00:00"
+   },
+   {
+    "elapsed": "0:00",
+    "jobid": "1508721",
+    "name": "levelb-sample",
+    "nodes": "1",
+    "reason_or_nodelist": "(Priority)",
+    "start": "N/A",
+    "state": "PENDING",
+    "time_limit": "1-00:00:00"
+   }
+  ]
  },
  "queue": [
   "2026-11-18-watch-flux1024",
@@ -700,7 +823,19 @@
   "2026-11-27-test-score-adarq_gF_w20-seed0-adm",
   "2026-11-27-test-score-adarq_gF_w20-seed0-val",
   "2026-11-27-test-score-bifrost_n066-seed0-adm",
-  "2026-11-27-test-score-bifrost_n066-seed0-val"
+  "2026-11-27-test-score-bifrost_n066-seed0-val",
+  "2026-11-28-test-classacc-bifrost_g20_n033-seed0",
+  "2026-11-28-test-classacc-mix_b025-seed0",
+  "2026-11-28-test-classacc-mix_b050-seed0",
+  "2026-11-28-test-sample-bifrost_g20_n033-seed0",
+  "2026-11-28-test-sample-mix_b025-seed0",
+  "2026-11-28-test-sample-mix_b050-seed0",
+  "2026-11-28-test-score-bifrost_g20_n033-seed0-adm",
+  "2026-11-28-test-score-bifrost_g20_n033-seed0-val",
+  "2026-11-28-test-score-mix_b025-seed0-adm",
+  "2026-11-28-test-score-mix_b025-seed0-val",
+  "2026-11-28-test-score-mix_b050-seed0-adm",
+  "2026-11-28-test-score-mix_b050-seed0-val"
  ],
  "requests": {
   "2026-11-18-watch-flux1024": {
@@ -3837,7 +3972,185 @@
    "submitted": "2026-11-27T10:00:35",
    "waiting_for": null,
    "waiting_for_nodes": null
+  },
+  "2026-11-28-test-classacc-bifrost_g20_n033-seed0": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508730",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [
+    "PENDING"
+   ],
+   "submit_error": null,
+   "submitted": "2026-11-28T08:56:18",
+   "waiting_for": null,
+   "waiting_for_nodes": null
+  },
+  "2026-11-28-test-classacc-mix_b025-seed0": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508731",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [
+    "PENDING"
+   ],
+   "submit_error": null,
+   "submitted": "2026-11-28T08:56:18",
+   "waiting_for": null,
+   "waiting_for_nodes": null
+  },
+  "2026-11-28-test-classacc-mix_b050-seed0": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508732",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [],
+   "submit_error": null,
+   "submitted": "2026-11-28T08:56:18",
+   "waiting_for": null,
+   "waiting_for_nodes": null
+  },
+  "2026-11-28-test-sample-bifrost_g20_n033-seed0": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508721",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [
+    "PENDING"
+   ],
+   "submit_error": null,
+   "submitted": "2026-11-28T08:56:18",
+   "waiting_for": null,
+   "waiting_for_nodes": null
+  },
+  "2026-11-28-test-sample-mix_b025-seed0": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508722",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [
+    "PENDING"
+   ],
+   "submit_error": null,
+   "submitted": "2026-11-28T08:56:18",
+   "waiting_for": null,
+   "waiting_for_nodes": null
+  },
+  "2026-11-28-test-sample-mix_b050-seed0": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508723",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [
+    "PENDING"
+   ],
+   "submit_error": null,
+   "submitted": "2026-11-28T08:56:18",
+   "waiting_for": null,
+   "waiting_for_nodes": null
+  },
+  "2026-11-28-test-score-bifrost_g20_n033-seed0-adm": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508724",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [
+    "PENDING"
+   ],
+   "submit_error": null,
+   "submitted": "2026-11-28T08:56:18",
+   "waiting_for": null,
+   "waiting_for_nodes": null
+  },
+  "2026-11-28-test-score-bifrost_g20_n033-seed0-val": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508725",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [
+    "PENDING"
+   ],
+   "submit_error": null,
+   "submitted": "2026-11-28T08:56:18",
+   "waiting_for": null,
+   "waiting_for_nodes": null
+  },
+  "2026-11-28-test-score-mix_b025-seed0-adm": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508726",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [
+    "PENDING"
+   ],
+   "submit_error": null,
+   "submitted": "2026-11-28T08:56:18",
+   "waiting_for": null,
+   "waiting_for_nodes": null
+  },
+  "2026-11-28-test-score-mix_b025-seed0-val": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508727",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [
+    "PENDING"
+   ],
+   "submit_error": null,
+   "submitted": "2026-11-28T08:56:18",
+   "waiting_for": null,
+   "waiting_for_nodes": null
+  },
+  "2026-11-28-test-score-mix_b050-seed0-adm": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508728",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [
+    "PENDING"
+   ],
+   "submit_error": null,
+   "submitted": "2026-11-28T08:56:18",
+   "waiting_for": null,
+   "waiting_for_nodes": null
+  },
+  "2026-11-28-test-score-mix_b050-seed0-val": {
+   "collected": null,
+   "finished": null,
+   "invalid": null,
+   "jobid": "1508729",
+   "post_error": null,
+   "post_output_tail": "",
+   "states": [
+    "PENDING"
+   ],
+   "submit_error": null,
+   "submitted": "2026-11-28T08:56:18",
+   "waiting_for": null,
+   "waiting_for_nodes": null
   }
  },
- "updated": "2026-11-28T07:55:45"
+ "updated": "2026-11-28T08:56:18"
 }
