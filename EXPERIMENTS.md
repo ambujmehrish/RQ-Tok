@@ -1128,3 +1128,41 @@ across arms; FID is settled on test. Target: Bifrost-1's 0.888 top-1 / IS 280.7.
   context, sample = guided AdaRQ-Flow's (weight 2, noise 0.6); β = 0.25, 0.5, 0.75. β = 0 is
   Bifrost-1's decoding and β = 1 is `pilot_adarq_gF_w20` (checked in tests).
 - **Strengthened baseline:** Bifrost-1 + guidance 2 + token noise 0.33.
+
+### Results 2026-11-28: closing the IS gap with no training (validation; 24/24 jobs completed)
+
+2,000 class-balanced images, seed 100. Class-accuracy standard error ≈ 0.011. Read IS and
+class accuracy across arms; validation FID is indicative only.
+
+| run | top-1 | top-5 | IS | P | R | FID | sFID |
+|---|---|---|---|---|---|---|---|
+| Bifrost-1 (= anchor mix β 0) | 0.888 | 0.990 | 280.7 | 0.942 | 0.676 | 29.83 | 110.71 |
+| anchor mix β 0.25 | 0.889 | 0.993 | 273.0 | 0.946 | 0.683 | 28.60 | 107.28 |
+| anchor mix β 0.5 | 0.856 | 0.985 | 238.9 | 0.919 | 0.686 | 26.40 | 105.52 |
+| anchor mix β 0.75 | 0.804 | 0.966 | 190.6 | 0.868 | 0.696 | 25.11 | 106.28 |
+| guided AdaRQ-Flow (= β 1; codes/flow 2/2, halting guided) | 0.774 | 0.942 | 154.2 | 0.836 | 0.702 | 25.47 | 109.38 |
+| AdaRQ-Flow codes/flow 2/2, halting unguided | 0.755 | 0.940 | 156.6 | 0.838 | 0.696 | 25.65 | 108.72 |
+| AdaRQ-Flow codes/flow 3/2, halting unguided | 0.697 | 0.912 | 135.2 | 0.789 | 0.705 | 27.37 | 112.60 |
+| AdaRQ-Flow codes/flow 4/2, halting unguided | 0.671 | 0.874 | 108.1 | 0.714 | 0.686 | 31.53 | 115.37 |
+| AdaRQ-Flow codes/flow 3/2, residual noise 0.3 | 0.712 | 0.921 | 129.5 | 0.781 | 0.697 | 27.59 | 109.25 |
+| Bifrost-1 + noise 0.33 | 0.882 | 0.987 | 254.7 | 0.931 | 0.693 | 27.55 | 108.20 |
+| Bifrost-1 + guidance 2 + noise 0.33 | 0.889 | 0.984 | 257.7 | 0.932 | 0.701 | 27.68 | 106.72 |
+| Bifrost-1 + noise 0.66 | 0.826 | 0.967 | 200.1 | 0.891 | 0.706 | 25.58 | 107.51 |
+| Bifrost-1 + guidance 2 + noise 0.66 | 0.864 | 0.981 | 243.0 | 0.913 | 0.703 | 26.42 | 106.72 |
+
+ImageNet-val (secondary) scores of the seed-0 test runs: Bifrost-1 + noise 0.66 FID 12.32 /
+sFID 23.58; guided AdaRQ-Flow FID 9.99 / sFID 24.69 (Bifrost-1 19.25 / 31.51; F 13.61 / 27.60).
+
+Conclusions:
+1. **Guidance alone cannot close the gap.** Code guidance above 2 hurts whatever is done
+   with halting and the flow weight (top-1 0.755 → 0.697 → 0.671). AdaRQ-Flow's ceiling with
+   this tokenizer and no training is about top-1 0.77 / IS 155.
+2. **The anchor mix closes it.** At β = 0.25 class accuracy equals Bifrost-1's (0.889 vs
+   0.888) and IS is 97% of it (273 vs 281); β moves smoothly from Bifrost-1 to guided
+   AdaRQ-Flow.
+3. **At equal class accuracy the mix keeps more IS than noise does:** β 0.25 has IS 273 against
+   255–258 for Bifrost-1 + noise 0.33 (± guidance), all at top-1 0.88–0.89. At lower fidelity
+   the two families are level (β 0.5: 0.856 / 239; guidance + noise 0.66: 0.864 / 243).
+4. **Nothing exceeds Bifrost-1's IS** beyond noise level (best: guided Bifrost-1, 282 vs 281).
+   Under the fixed renderer settings the regression output sits at the IS ceiling, so the
+   realistic target is IS on par with Bifrost-1 together with clearly better FID and sFID.
